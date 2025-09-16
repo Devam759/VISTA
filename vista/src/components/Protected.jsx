@@ -9,7 +9,7 @@ export default function Protected({ children, allow = ["Student", "Warden", "Chi
   const router = useRouter();
 
   useEffect(() => {
-    if (!role) router.replace("/login");
+    // No redirect; app auto-logs in as Student via AuthProvider
   }, [role, router]);
 
   if (!role) return null;

@@ -10,6 +10,7 @@ function StatusBadge({ status }) {
 
 export default function AttendanceView() {
   const { role, user } = useAuth();
+  const isStudent = role === "Student";
   const [statusFilter, setStatusFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState("");
 
@@ -65,12 +66,10 @@ export default function AttendanceView() {
             <tr className="text-left border-b border-black/[.06]">
               <th className="py-2 pr-4">Date</th>
               <th className="py-2 pr-4">Time</th>
-              <th className="py-2 pr-4">Roll No</th>
-              <th className="py-2 pr-4">Name</th>
+              {!isStudent && <th className="py-2 pr-4">Roll No</th>}
+              {!isStudent && <th className="py-2 pr-4">Name</th>}
               <th className="py-2 pr-4">Status</th>
               <th className="py-2 pr-4">Confidence</th>
-              <th className="py-2 pr-4">Wifi</th>
-              <th className="py-2 pr-4">Geo</th>
             </tr>
           </thead>
           <tbody>
@@ -78,12 +77,10 @@ export default function AttendanceView() {
               <tr key={r.id} className="border-b border-black/[.06]">
                 <td className="py-2 pr-4">{r.date}</td>
                 <td className="py-2 pr-4">{r.time}</td>
-                <td className="py-2 pr-4 font-mono">{r.rollNo}</td>
-                <td className="py-2 pr-4">{r.name}</td>
+                {!isStudent && <td className="py-2 pr-4 font-mono">{r.rollNo}</td>}
+                {!isStudent && <td className="py-2 pr-4">{r.name}</td>}
                 <td className="py-2 pr-4"><StatusBadge status={r.status} /></td>
                 <td className="py-2 pr-4">{r.confidence ? r.confidence.toFixed(2) + "%" : "-"}</td>
-                <td className="py-2 pr-4">{r.wifi ? "✅" : "❌"}</td>
-                <td className="py-2 pr-4">{r.geo ? "✅" : "❌"}</td>
               </tr>
             ))}
           </tbody>

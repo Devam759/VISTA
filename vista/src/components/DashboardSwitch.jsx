@@ -8,6 +8,7 @@ export default function DashboardSwitch() {
   if (role === "Student") return (
     <div className="grid gap-6 sm:grid-cols-2">
       <Card title="My Attendance" href="/attendance"><p className="text-sm">View your daily status and history.</p></Card>
+      <Card title="Mark Attendance" href="/mark"><p className="text-sm">Open camera and capture now.</p></Card>
     </div>
   );
   if (role === "Warden") return (
