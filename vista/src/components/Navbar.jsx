@@ -3,6 +3,7 @@
 import { useAuth } from "./AuthProvider";
 import ThemeToggle from "./ThemeToggle";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
 	const { role, logout } = useAuth();
@@ -32,28 +33,28 @@ export default function Navbar() {
 							</svg>
 						</button>
 						
-						<a href="/" className="flex items-center group">
+						<Link href="/" className="flex items-center group">
 							<img src="/logo.webp" alt="VISTA" className="h-12 w-30 rounded-xl shadow-sm group-hover:shadow-md transition-all duration-200" />
-						</a>
+						</Link>
 					</div>
 					
 					{/* Desktop navigation */}
 					<nav className="hidden md:flex gap-5 text-sm items-center">
 						{role ? (
 							<>
-								<a href="/" className="hover:underline underline-offset-4">Dashboard</a>
+								<Link href="/" className="hover:underline underline-offset-4">Dashboard</Link>
 								{role !== "Student" && (
 									<>
-										<a href="/students" className="hover:underline underline-offset-4">Students</a>
-										<a href="/hostels" className="hover:underline underline-offset-4">Hostels</a>
+										<Link href="/students" className="hover:underline underline-offset-4">Students</Link>
+										<Link href="/hostels" className="hover:underline underline-offset-4">Hostels</Link>
 									</>
 								)}
-								<a href="/attendance" className="hover:underline underline-offset-4">Attendance</a>
+								<Link href="/attendance" className="hover:underline underline-offset-4">Attendance</Link>
 								<span className="text-xs px-2 py-0.5 rounded-full pill">{role}</span>
 								<button onClick={logout} className="btn">Logout</button>
 							</>
 						) : (
-							<a href="/login" className="btn btn-primary">Login</a>
+							<Link href="/login" className="btn btn-primary">Login</Link>
 						)}
 						<ThemeToggle />
 					</nav>
@@ -78,9 +79,9 @@ export default function Navbar() {
 				}`}>
 					{/* Mobile navbar header */}
 					<div className="flex items-center justify-between p-4 border-b border-[color:var(--border)]">
-						<a href="/" className="flex items-center group" onClick={() => setIsMobileMenuOpen(false)}>
+						<Link href="/" className="flex items-center group" onClick={() => setIsMobileMenuOpen(false)}>
 							<img src="/logo.webp" alt="VISTA" className="h-10 w-10 rounded-xl shadow-sm" />
-						</a>
+						</Link>
 						<button
 							onClick={() => setIsMobileMenuOpen(false)}
 							className="p-2 rounded-lg hover:bg-[color:var(--muted)]/50 transition-colors"
@@ -97,26 +98,26 @@ export default function Navbar() {
 						{role ? (
 							<>
 								<div className="space-y-4">
-									<a href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+									<Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 										<span className="flex-1">Dashboard</span>
-									</a>
+									</Link>
 									{role !== "Student" && (
 										<>
-											<a href="/students" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+											<Link href="/students" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 												<span className="flex-1">Students</span>
-											</a>
-											<a href="/hostels" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+											</Link>
+											<Link href="/hostels" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 												<span className="flex-1">Hostels</span>
-											</a>
+											</Link>
 										</>
 									)}
-									<a href="/attendance" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+									<Link href="/attendance" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 										<span className="flex-1">Attendance</span>
-									</a>
+									</Link>
 									{role === "Student" && (
-										<a href="/mark" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+										<Link href="/mark" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 											<span className="flex-1">Mark Attendance</span>
-										</a>
+										</Link>
 									)}
 								</div>
 								
@@ -133,9 +134,9 @@ export default function Navbar() {
 							</>
 						) : (
 							<div className="space-y-4">
-								<a href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+								<Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 									<span className="flex-1">Login</span>
-								</a>
+								</Link>
 								<div className="px-4">
 									<ThemeToggle />
 								</div>

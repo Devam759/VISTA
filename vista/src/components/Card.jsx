@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 export default function Card({ title, subtitle, children, href }) {
   const Wrapper = ({ children }) => href ? (
-    <a href={href} className="block rounded-2xl surface shadow-sm p-6 card-hover group">
+    <Link href={href} className="block rounded-2xl surface shadow-sm p-6 card-hover group">
       {children}
-    </a>
+    </Link>
   ) : (
     <div className="rounded-2xl surface shadow-sm p-6">
       {children}
