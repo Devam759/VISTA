@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd vista && npm run build",
+  "outputDirectory": "vista/.next",
+  "installCommand": "cd vista && npm install",
+  "devCommand": "cd vista && npm run dev",
+  "framework": "nextjs"
+}

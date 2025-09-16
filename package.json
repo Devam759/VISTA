@@ -1,0 +1,14 @@
+{
+  "name": "vista-project",
+  "version": "1.0.0",
+  "description": "VISTA Night Attendance System",
+  "scripts": {
+    "build": "cd vista && npm run build",
+    "dev": "cd vista && npm run dev",
+    "start": "cd vista && npm run start",
+    "install-deps": "cd vista && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

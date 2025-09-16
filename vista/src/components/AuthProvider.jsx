@@ -14,29 +14,39 @@ export default function AuthProvider({ children }) {
   const [role, setRole] = useState(null);
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const savedToken = typeof window !== "undefined" ? window.localStorage.getItem("vista_token") : null;
-    const savedRole = typeof window !== "undefined" ? window.localStorage.getItem("vista_role") : null;
-    const savedUser = typeof window !== "undefined" ? window.localStorage.getItem("vista_user") : null;
-    if (savedToken && !token) setToken(savedToken);
-    if (savedRole && !role) setRole(savedRole);
-    if (savedUser && !user) try { setUser(JSON.parse(savedUser)); } catch {}
-    // Auto-login as Student if no session exists
-    if (!savedToken && !savedRole && !savedUser && !role && !token && !user) {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+    
+    const savedToken = window.localStorage.getItem("vista_token");
+    const savedRole = window.localStorage.getItem("vista_role");
+    const savedUser = window.localStorage.getItem("vista_user");
+    
+    if (savedToken && savedRole && savedUser) {
+      setToken(savedToken);
+      setRole(savedRole);
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        setUser(null);
+      }
+    } else {
+      // Auto-login as Student if no session exists
       const mockUser = { id: 1, email: "devamgupta@jklu.edu.in", role: "Student" };
       setToken("mock-token");
       setRole("Student");
       setUser(mockUser);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("vista_token", "mock-token");
-        window.localStorage.setItem("vista_role", "Student");
-        window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
-      }
+      window.localStorage.setItem("vista_token", "mock-token");
+      window.localStorage.setItem("vista_role", "Student");
+      window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
     }
-  }, [role, token, user]);
+    
+    setIsInitialized(true);
+  }, []);
 
   useEffect(() => {
     async function hydrate() {
