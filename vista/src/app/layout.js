@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "../components/AuthProvider";
 import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "VISTA - Night Attendance",
   description: "VISTA college night attendance system",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -24,7 +28,10 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <Navbar />
-          <main className="max-w-6xl mx-auto px-6 py-8">{children}</main>
+          <div className="container-app py-6 flex gap-6">
+            <Sidebar />
+            <main className="flex-1 min-w-0">{children}</main>
+          </div>
         </AuthProvider>
       </body>
     </html>

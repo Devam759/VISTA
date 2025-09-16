@@ -17,7 +17,13 @@ export default function CameraCapture({ onCapture }) {
     setError("");
     setIsStarting(true);
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      // Use portrait orientation for mobile, landscape for desktop
+      const isMobile = window.innerWidth < 768;
+      const videoConstraints = isMobile 
+        ? { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }
+        : { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } };
+      
+      const s = await navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false });
       setStream(s);
       if (videoRef.current) {
         const video = videoRef.current;
@@ -42,6 +48,13 @@ export default function CameraCapture({ onCapture }) {
       setIsStarting(false);
     }
   }, []);
+
+  // Auto-start camera when component mounts
+  useEffect(() => {
+    if (!stream && !isStarting) {
+      start();
+    }
+  }, [start, stream, isStarting]);
 
   const stop = useCallback(() => {
     if (isStarting) return; // avoid interrupting play() startup
@@ -132,30 +145,38 @@ export default function CameraCapture({ onCapture }) {
       {error ? <div className="text-sm text-rose-600">{error}</div> : null}
       {!photo ? (
         <div className="rounded-xl overflow-hidden bg-black/5">
-          <video ref={videoRef} className="w-full aspect-video bg-black" playsInline muted />
+          <video 
+            ref={videoRef} 
+            className="w-full bg-black mirror md:aspect-video aspect-[3/4]" 
+            playsInline 
+            muted 
+          />
         </div>
       ) : (
         <div className="rounded-xl overflow-hidden bg-black/5">
-          <img src={photo} alt="Captured" className="w-full aspect-video object-contain bg-black" />
+          <img 
+            src={photo} 
+            alt="Captured" 
+            className="w-full bg-black object-contain md:aspect-video aspect-[3/4]" 
+          />
         </div>
       )}
       <canvas ref={canvasRef} className="hidden" />
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-3 items-center">
         {!photo ? (
           <>
             {!stream ? (
-              <button onClick={start} disabled={isStarting} className="px-3 py-2 rounded-md bg-black text-white disabled:opacity-60">{isStarting ? "Starting camera..." : "Start camera"}</button>
+              <button onClick={start} disabled={isStarting} className="btn btn-primary disabled:opacity-60">
+                {isStarting ? "Starting camera..." : "Start camera"}
+              </button>
             ) : (
-              <>
-                <button onClick={stop} disabled={isStarting} className="px-3 py-2 rounded-md border border-black/[.12] bg-white disabled:opacity-60">Stop</button>
-                <span className="text-xs text-foreground/70">Auto-capture is active when face fills frame</span>
-              </>
+              <span className="text-sm text-foreground/70 font-medium">📷 Auto-capture active - position your face in frame</span>
             )}
           </>
         ) : (
           <>
-            <button onClick={resetPhoto} className="px-3 py-2 rounded-md border border-black/[.12] bg-white">Retake</button>
-            <a download="capture.jpg" href={photo} className="px-3 py-2 rounded-md bg-black text-white">Download</a>
+            <button onClick={resetPhoto} className="btn">Retake Photo</button>
+            <a download="capture.jpg" href={photo} className="btn btn-primary">Download Photo</a>
           </>
         )}
       </div>

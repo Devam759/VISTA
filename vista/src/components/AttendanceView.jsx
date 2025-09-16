@@ -4,8 +4,19 @@ import { useMemo, useState } from "react";
 import { useAuth } from "./AuthProvider";
 
 function StatusBadge({ status }) {
-  const color = status === "Present" ? "bg-emerald-500/15 text-emerald-600" : status === "Late" ? "bg-amber-500/15 text-amber-600" : "bg-rose-500/15 text-rose-600";
-  return <span className={`px-2 py-0.5 rounded-full text-xs ${color}`}>{status}</span>;
+  const color = status === "Present" 
+    ? "bg-emerald-500/15 text-emerald-600 border-emerald-200" 
+    : status === "Late" 
+    ? "bg-amber-500/15 text-amber-600 border-amber-200" 
+    : "bg-rose-500/15 text-rose-600 border-rose-200";
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${color}`}>
+      <div className={`w-2 h-2 rounded-full mr-2 ${
+        status === "Present" ? "bg-emerald-500" : status === "Late" ? "bg-amber-500" : "bg-rose-500"
+      }`}></div>
+      {status}
+    </span>
+  );
 }
 
 export default function AttendanceView() {
@@ -43,16 +54,25 @@ export default function AttendanceView() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
+    <div className="space-y-8">
+      <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-xl font-semibold">Attendance</h1>
-          <p className="text-sm text-foreground/70">Daily logs with verification flags</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Attendance Records</h1>
+          <p className="text-sm text-foreground/60">Daily logs with verification and confidence scores</p>
         </div>
-        <div className="flex gap-2 text-sm">
-          <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="px-2 py-1 rounded-md border border-black/[.12] bg-white shadow-xs" />
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-2 py-1 rounded-md border border-black/[.12] bg-white shadow-xs">
-            <option>All</option>
+        <div className="flex gap-3">
+          <input 
+            type="date" 
+            value={dateFilter} 
+            onChange={(e) => setDateFilter(e.target.value)} 
+            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors" 
+          />
+          <select 
+            value={statusFilter} 
+            onChange={(e) => setStatusFilter(e.target.value)} 
+            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors"
+          >
+            <option>All Status</option>
             <option>Present</option>
             <option>Late</option>
             <option>Absent</option>
@@ -60,27 +80,48 @@ export default function AttendanceView() {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
-        <table className="w-full text-sm border-collapse">
+      <div className="overflow-hidden rounded-2xl surface shadow-sm border border-[color:var(--border)]">
+        <table className="w-full">
           <thead>
-            <tr className="text-left border-b border-black/[.06]">
-              <th className="py-2 pr-4">Date</th>
-              <th className="py-2 pr-4">Time</th>
-              {!isStudent && <th className="py-2 pr-4">Roll No</th>}
-              {!isStudent && <th className="py-2 pr-4">Name</th>}
-              <th className="py-2 pr-4">Status</th>
-              <th className="py-2 pr-4">Confidence</th>
+            <tr className="border-b border-[color:var(--border)] bg-[color:var(--muted)]/50">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Date</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Time</th>
+              {!isStudent && <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Roll No</th>}
+              {!isStudent && <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Name</th>}
+              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Confidence</th>
             </tr>
           </thead>
-          <tbody>
-            {filtered.map((r) => (
-              <tr key={r.id} className="border-b border-black/[.06]">
-                <td className="py-2 pr-4">{r.date}</td>
-                <td className="py-2 pr-4">{r.time}</td>
-                {!isStudent && <td className="py-2 pr-4 font-mono">{r.rollNo}</td>}
-                {!isStudent && <td className="py-2 pr-4">{r.name}</td>}
-                <td className="py-2 pr-4"><StatusBadge status={r.status} /></td>
-                <td className="py-2 pr-4">{r.confidence ? r.confidence.toFixed(2) + "%" : "-"}</td>
+          <tbody className="divide-y divide-[color:var(--border)]">
+            {filtered.map((r, index) => (
+              <tr key={r.id} className={`hover:bg-[color:var(--muted)]/30 transition-colors ${index % 2 === 0 ? 'bg-[color:var(--card)]' : 'bg-[color:var(--muted)]/20'}`}>
+                <td className="px-6 py-4 text-sm font-medium text-foreground">{r.date}</td>
+                <td className="px-6 py-4 text-sm text-foreground/80 font-mono">{r.time}</td>
+                {!isStudent && <td className="px-6 py-4 text-sm font-mono text-foreground/80">{r.rollNo}</td>}
+                {!isStudent && <td className="px-6 py-4 text-sm font-medium text-foreground">{r.name}</td>}
+                <td className="px-6 py-4">
+                  <StatusBadge status={r.status} />
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {r.confidence ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-[color:var(--muted)] rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            r.confidence >= 95 ? 'bg-emerald-500' : 
+                            r.confidence >= 90 ? 'bg-amber-500' : 'bg-rose-500'
+                          }`}
+                          style={{ width: `${r.confidence}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs font-medium text-foreground/70 min-w-[3rem]">
+                        {r.confidence.toFixed(1)}%
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-foreground/40">-</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
