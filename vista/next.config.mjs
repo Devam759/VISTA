@@ -1,12 +1,18 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 /** @type {import('next').NextConfig} */
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const nextConfig = {
-  outputFileTracingRoot: __dirname,
+  // Remove outputFileTracingRoot as it can cause issues on Vercel
+  experimental: {
+    // Enable modern features
+    serverComponentsExternalPackages: [],
+  },
+  // Ensure proper static generation
+  trailingSlash: false,
+  // Handle API routes properly
+  async rewrites() {
+    return [
+      // Add any API rewrites if needed
+    ];
+  },
 };
 
 export default nextConfig;
