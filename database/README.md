@@ -5,6 +5,7 @@ This directory contains the complete SQL database schema for the VISTA College N
 ## Database Overview
 
 The VISTA database is designed to manage:
+
 - **User Authentication**: Students and Wardens
 - **Hostel Management**: 4 hostels (BH1, BH2, GH1, GH2)
 - **Room Allocation**: Individual room assignments
@@ -37,12 +38,14 @@ The VISTA database is designed to manage:
 ## Installation
 
 ### Prerequisites
+
 - MySQL 8.0+ or MariaDB 10.3+
 - Database user with CREATE privileges
 
 ### Setup Steps
 
 1. **Create Database**:
+
    ```bash
    mysql -u root -p < vista_database.sql
    ```
