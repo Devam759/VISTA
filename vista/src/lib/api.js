@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 async function request(path, options = {}) {
   try {
@@ -39,6 +39,11 @@ export async function loginWithEmailPassword(email, password) {
 
 export async function getMe(token) {
   return request("/auth/me", { method: "GET", token });
+}
+
+export async function getStudents(token, hostel = "All Hostels") {
+  const url = hostel === "All Hostels" ? "/students" : `/students?hostel=${hostel}`;
+  return request(url, { method: "GET", token });
 }
 
 

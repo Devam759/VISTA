@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Protected from "../../components/Protected";
+import { useAuth } from "../../components/AuthProvider";
+import { getStudents } from "../../lib/api";
 
 function Badge({ children }) {
   return (
@@ -13,24 +15,42 @@ function Badge({ children }) {
 
 export default function StudentsPage() {
   const [selectedHostel, setSelectedHostel] = useState("All Hostels");
-  
-  const data = [
-    { studentId: 1, rollNo: "23BCS001", name: "Aarav Patel", roomNo: "B-205", hostel: "BH1" },
-    { studentId: 2, rollNo: "23BCS002", name: "Isha Sharma", roomNo: "G-310", hostel: "GH1" },
-    { studentId: 3, rollNo: "23BCS003", name: "Rohan Mehta", roomNo: "B-110", hostel: "BH2" },
-    { studentId: 4, rollNo: "23BCS004", name: "Priya Singh", roomNo: "B-206", hostel: "BH1" },
-    { studentId: 5, rollNo: "23BCS005", name: "Arjun Kumar", roomNo: "B-111", hostel: "BH2" },
-    { studentId: 6, rollNo: "23BCS006", name: "Sneha Reddy", roomNo: "B-207", hostel: "BH1" },
-    { studentId: 7, rollNo: "23BCS007", name: "Vikram Joshi", roomNo: "B-112", hostel: "BH2" },
-    { studentId: 8, rollNo: "23BCS008", name: "Ananya Gupta", roomNo: "G-311", hostel: "GH1" },
-    { studentId: 9, rollNo: "23BCS009", name: "Kavya Nair", roomNo: "G-401", hostel: "GH2" },
-    { studentId: 10, rollNo: "23BCS010", name: "Meera Joshi", roomNo: "G-402", hostel: "GH2" },
-    { studentId: 11, rollNo: "23BCS011", name: "Riya Agarwal", roomNo: "G-403", hostel: "GH2" },
-  ];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { token } = useAuth();
 
-  const filteredData = selectedHostel === "All Hostels" 
-    ? data 
-    : data.filter(student => student.hostel === selectedHostel);
+  useEffect(() => {
+    fetchStudents();
+  }, [selectedHostel, token]);
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getStudents(token, selectedHostel);
+      setData(response.students || []);
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      setError("Failed to load student data");
+      // Fallback to mock data if API fails
+      setData([
+        { studentId: 1, rollNo: "23BCS001", name: "Aarav Patel", roomNo: "B-205", hostel: "BH1" },
+        { studentId: 2, rollNo: "23BCS002", name: "Isha Sharma", roomNo: "G-310", hostel: "GH1" },
+        { studentId: 3, rollNo: "23BCS003", name: "Rohan Mehta", roomNo: "B-110", hostel: "BH2" },
+        { studentId: 4, rollNo: "23BCS004", name: "Priya Singh", roomNo: "B-206", hostel: "BH1" },
+        { studentId: 5, rollNo: "23BCS005", name: "Arjun Kumar", roomNo: "B-111", hostel: "BH2" },
+        { studentId: 6, rollNo: "23BCS006", name: "Sneha Reddy", roomNo: "B-207", hostel: "BH1" },
+        { studentId: 7, rollNo: "23BCS007", name: "Vikram Joshi", roomNo: "B-112", hostel: "BH2" },
+        { studentId: 8, rollNo: "23BCS008", name: "Ananya Gupta", roomNo: "G-311", hostel: "GH1" },
+        { studentId: 9, rollNo: "23BCS009", name: "Kavya Nair", roomNo: "G-401", hostel: "GH2" },
+        { studentId: 10, rollNo: "23BCS010", name: "Meera Joshi", roomNo: "G-402", hostel: "GH2" },
+        { studentId: 11, rollNo: "23BCS011", name: "Riya Agarwal", roomNo: "G-403", hostel: "GH2" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Protected allow={["Warden"]}>
@@ -94,6 +114,27 @@ export default function StudentsPage() {
         </button>
       </div>
       
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading students...</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error loading data</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+                <p className="mt-1">Showing fallback data instead.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      
       <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
@@ -106,7 +147,7 @@ export default function StudentsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredData.map((s, index) => (
+            {data.map((s, index) => (
               <tr key={s.studentId} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{s.studentId}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{s.rollNo}</td>

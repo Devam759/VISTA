@@ -35,13 +35,13 @@ export default function AuthProvider({ children }) {
         setUser(null);
       }
     } else {
-      // Auto-login as Student if no session exists
-      const mockUser = { id: 1, email: "devamgupta@jklu.edu.in", role: "Student" };
+      // Auto-login as Warden if no session exists
+      const mockUser = { id: 1, email: "warden@jklu.edu.in", role: "Warden" };
       setToken("mock-token");
-      setRole("Student");
+      setRole("Warden");
       setUser(mockUser);
       window.localStorage.setItem("vista_token", "mock-token");
-      window.localStorage.setItem("vista_role", "Student");
+      window.localStorage.setItem("vista_role", "Warden");
       window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
     }
     
@@ -84,14 +84,14 @@ export default function AuthProvider({ children }) {
       window.localStorage.removeItem("vista_user");
       window.localStorage.removeItem("vista_role");
     }
-    // Immediately auto-login as Student again to keep the app usable without login
-    const mockUser = { id: 1, email: "devamgupta@jklu.edu.in", role: "Student" };
+    // Immediately auto-login as Warden again to keep the app usable without login
+    const mockUser = { id: 1, email: "warden@jklu.edu.in", role: "Warden" };
     setToken("mock-token");
-    setRole("Student");
+    setRole("Warden");
     setUser(mockUser);
     if (typeof window !== "undefined") {
       window.localStorage.setItem("vista_token", "mock-token");
-      window.localStorage.setItem("vista_role", "Student");
+      window.localStorage.setItem("vista_role", "Warden");
       window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
     }
     router.push("/");

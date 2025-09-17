@@ -4,12 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 
-export default function Protected({ children, allow = ["Student", "Warden"] }) {
+export default function Protected({ children, allow = ["Student", "Warden", "ChiefWarden"] }) {
   const { role } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // No redirect; app auto-logs in as Student via AuthProvider
+    // No redirect; app auto-logs in as Warden via AuthProvider
   }, [role, router]);
 
   // Show loading state while auth is initializing
