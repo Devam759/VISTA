@@ -19,17 +19,17 @@ export default function FacePage() {
   }
 
   return (
-    <Protected allow={["Warden", "ChiefWarden"]}>
+    <Protected allow={["Student"]}>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold">Face Enrollment</h1>
-        <p className="text-sm text-foreground/70">Upload a face image to enroll</p>
+        <p className="text-sm text-foreground/70">Upload your face image for attendance system</p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="rounded-lg border border-black/[.08] dark:border-white/[.145] p-4">
-          <div className="text-sm mb-2">Select student</div>
-          <input className="w-full px-2 py-1 rounded border border-black/[.12] bg-transparent" placeholder="Roll No or Name" />
+          <div className="text-sm mb-2">Your Information</div>
+          <div className="text-sm text-foreground/70">This enrollment is for your attendance verification</div>
         </div>
 
         <div className="rounded-lg border border-black/[.08] dark:border-white/[.145] p-4">
@@ -42,7 +42,7 @@ export default function FacePage() {
       </div>
 
       <div>
-        <button disabled={!file} className="px-3 py-1.5 rounded bg-black text-white disabled:opacity-50 dark:bg-white dark:text-black">Enroll</button>
+        <button disabled={!file} className="px-3 py-1.5 rounded bg-black text-white disabled:opacity-50 dark:bg-white dark:text-black">Enroll My Face</button>
       </div>
     </div>
     </Protected>

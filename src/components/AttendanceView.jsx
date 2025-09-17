@@ -22,8 +22,9 @@ function StatusBadge({ status }) {
 export default function AttendanceView() {
   const { role, user } = useAuth();
   const isStudent = role === "Student";
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All Status");
   const [dateFilter, setDateFilter] = useState("");
+  const [hostelFilter, setHostelFilter] = useState("All Hostels");
 
   const data = useMemo(() => {
     if (role === "Student") {
@@ -32,24 +33,30 @@ export default function AttendanceView() {
       const studentName = email === "devamgupta@jklu.edu.in" ? "Devam Gupta" : "You";
       const rollNo = email === "devamgupta@jklu.edu.in" ? "23BCS999" : "ROLL-XXX";
       return [
-        { id: 1, date: "2025-09-12", time: "22:03", rollNo, name: studentName, status: "Present", wifi: true, geo: true, confidence: 97.3 },
-        { id: 2, date: "2025-09-13", time: "22:11", rollNo, name: studentName, status: "Present", wifi: true, geo: true, confidence: 96.4 },
-        { id: 3, date: "2025-09-14", time: "22:22", rollNo, name: studentName, status: "Late", wifi: true, geo: false, confidence: 93.1 },
-        { id: 4, date: "2025-09-15", time: "22:05", rollNo, name: studentName, status: "Present", wifi: true, geo: true, confidence: 98.4 },
-        { id: 5, date: "2025-09-16", time: "22:00", rollNo, name: studentName, status: "Present", wifi: true, geo: true, confidence: 99.1 },
+        { id: 1, date: "2025-09-12", time: "22:03", rollNo, name: studentName, status: "Present", hostel: "BH1", roomNo: "B-205" },
+        { id: 2, date: "2025-09-13", time: "22:11", rollNo, name: studentName, status: "Present", hostel: "BH1", roomNo: "B-205" },
+        { id: 3, date: "2025-09-14", time: "22:22", rollNo, name: studentName, status: "Late", hostel: "BH1", roomNo: "B-205" },
+        { id: 4, date: "2025-09-15", time: "22:05", rollNo, name: studentName, status: "Present", hostel: "BH1", roomNo: "B-205" },
+        { id: 5, date: "2025-09-16", time: "22:00", rollNo, name: studentName, status: "Present", hostel: "BH1", roomNo: "B-205" },
       ];
     }
     // Staff sample data
     return [
-      { id: 1, date: "2025-09-15", time: "22:05", rollNo: "23BCS001", name: "Aarav Patel", status: "Present", wifi: true, geo: true, confidence: 98.4 },
-      { id: 2, date: "2025-09-15", time: "22:17", rollNo: "23BCS002", name: "Isha Sharma", status: "Late", wifi: true, geo: false, confidence: 92.1 },
-      { id: 3, date: "2025-09-15", time: "22:45", rollNo: "23BCS003", name: "Rohan Mehta", status: "Absent", wifi: false, geo: false, confidence: 0 },
+      { id: 1, date: "2025-09-15", time: "22:05", rollNo: "23BCS001", name: "Aarav Patel", status: "Present", hostel: "BH1", roomNo: "B-205" },
+      { id: 2, date: "2025-09-15", time: "22:17", rollNo: "23BCS002", name: "Isha Sharma", status: "Late", hostel: "GH1", roomNo: "G-310" },
+      { id: 3, date: "2025-09-15", time: "22:45", rollNo: "23BCS003", name: "Rohan Mehta", status: "Absent", hostel: "BH2", roomNo: "B-110" },
+      { id: 4, date: "2025-09-15", time: "22:08", rollNo: "23BCS004", name: "Priya Singh", status: "Present", hostel: "BH1", roomNo: "B-206" },
+      { id: 5, date: "2025-09-15", time: "22:12", rollNo: "23BCS005", name: "Arjun Kumar", status: "Present", hostel: "BH2", roomNo: "B-111" },
+      { id: 6, date: "2025-09-15", time: "22:15", rollNo: "23BCS009", name: "Kavya Nair", status: "Present", hostel: "GH2", roomNo: "G-401" },
+      { id: 7, date: "2025-09-15", time: "22:20", rollNo: "23BCS010", name: "Meera Joshi", status: "Late", hostel: "GH2", roomNo: "G-402" },
+      { id: 8, date: "2025-09-15", time: "22:25", rollNo: "23BCS011", name: "Riya Agarwal", status: "Present", hostel: "GH2", roomNo: "G-403" },
     ];
   }, [role, user]);
 
   const filtered = data.filter((r) => {
-    if (statusFilter !== "All" && r.status !== statusFilter) return false;
+    if (statusFilter !== "All Status" && r.status !== statusFilter) return false;
     if (dateFilter && r.date !== dateFilter) return false;
+    if (hostelFilter !== "All Hostels" && r.hostel !== hostelFilter) return false;
     return true;
   });
 
@@ -80,6 +87,60 @@ export default function AttendanceView() {
         </div>
       </div>
 
+      {/* Hostel Filter Buttons */}
+      <div className="flex gap-2 flex-wrap">
+        <button
+          onClick={() => setHostelFilter("All Hostels")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+            hostelFilter === "All Hostels"
+              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          }`}
+        >
+          All Hostels
+        </button>
+        <button
+          onClick={() => setHostelFilter("BH1")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+            hostelFilter === "BH1"
+              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          }`}
+        >
+          BH1
+        </button>
+        <button
+          onClick={() => setHostelFilter("BH2")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+            hostelFilter === "BH2"
+              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          }`}
+        >
+          BH2
+        </button>
+        <button
+          onClick={() => setHostelFilter("GH1")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+            hostelFilter === "GH1"
+              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          }`}
+        >
+          GH1
+        </button>
+        <button
+          onClick={() => setHostelFilter("GH2")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+            hostelFilter === "GH2"
+              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          }`}
+        >
+          GH2
+        </button>
+      </div>
+
       <div className="overflow-hidden rounded-2xl surface shadow-sm border border-[color:var(--border)]">
         <table className="w-full">
           <thead>
@@ -89,7 +150,8 @@ export default function AttendanceView() {
               {!isStudent && <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Roll No</th>}
               {!isStudent && <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Name</th>}
               <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Confidence</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Hostel</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider">Room No</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[color:var(--border)]">
@@ -102,26 +164,12 @@ export default function AttendanceView() {
                 <td className="px-6 py-4">
                   <StatusBadge status={r.status} />
                 </td>
-                <td className="px-6 py-4 text-sm">
-                  {r.confidence ? (
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-[color:var(--muted)] rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            r.confidence >= 95 ? 'bg-emerald-500' : 
-                            r.confidence >= 90 ? 'bg-amber-500' : 'bg-rose-500'
-                          }`}
-                          style={{ width: `${r.confidence}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-xs font-medium text-foreground/70 min-w-[3rem]">
-                        {r.confidence.toFixed(1)}%
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-foreground/40">-</span>
-                  )}
+                <td className="px-6 py-4 text-sm text-foreground/80">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {r.hostel}
+                  </span>
                 </td>
+                <td className="px-6 py-4 text-sm font-medium text-foreground">{r.roomNo}</td>
               </tr>
             ))}
           </tbody>

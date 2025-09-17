@@ -8,7 +8,7 @@ import AttendanceView from "../../components/AttendanceView";
 
 export default function AttendancePage() {
   return (
-    <Protected allow={["Student", "Warden", "ChiefWarden"]}>
+    <Protected allow={["Student", "Warden"]}>
       <AttendanceView />
     </Protected>
   );

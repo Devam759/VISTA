@@ -30,9 +30,9 @@ export default function RootLayout({ children }) {
         <ErrorBoundary>
           <AuthProvider>
             <Navbar />
-            <div className="container-app py-6 flex gap-6">
+            <div className="container-app py-6 flex gap-6 min-h-screen">
               <Sidebar />
-              <main className="flex-1 min-w-0">{children}</main>
+              <main className="flex-1 min-w-0 overflow-x-auto">{children}</main>
             </div>
           </AuthProvider>
         </ErrorBoundary>

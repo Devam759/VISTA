@@ -26,13 +26,20 @@ async function request(path, options = {}) {
     console.warn(`API request failed: ${error.message}`);
     // Return mock data for development/demo purposes
     if (path === "/auth/me") {
-      return { user: { id: 1, email: "devamgupta@jklu.edu.in", role: "Student" } };
+      return { user: { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" } };
     }
     throw error;
   }
 }
 
 export async function loginWithEmailPassword(email, password) {
+  // Mock login for development/demo purposes
+  if (email === "bhuwanesh@jklu.edu.in" && password === "123") {
+    return { 
+      token: "mock-token", 
+      user: { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" } 
+    };
+  }
   // Expect backend to return: { token, user: { id, email, role } }
   return request("/auth/login", { body: { email, password } });
 }

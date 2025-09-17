@@ -5,10 +5,11 @@ export default function HostelsPage() {
     { hostelId: 1, name: "BH1", type: "Boys", warden: "Mr. Verma" },
     { hostelId: 2, name: "BH2", type: "Boys", warden: "Mr. Rao" },
     { hostelId: 3, name: "GH1", type: "Girls", warden: "Ms. Kapoor" },
+    { hostelId: 4, name: "GH2", type: "Girls", warden: "Ms. Sharma" },
   ];
 
   return (
-    <Protected allow={["ChiefWarden", "Warden"]}>
+    <Protected allow={["Warden"]}>
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold">Hostels</h1>
