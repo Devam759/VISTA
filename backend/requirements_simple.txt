@@ -1,4 +1,4 @@
-# VISTA Backend Requirements
+# VISTA Backend Requirements - Simplified Version
 # Python 3.8+ required
 
 # Web Framework
@@ -6,9 +6,8 @@ Flask==2.3.3
 Flask-CORS==4.0.0
 Flask-JWT-Extended==4.5.3
 
-# Database
+# Database (MySQL only for now)
 PyMySQL==1.1.0
-psycopg2-binary==2.9.7
 SQLAlchemy==2.0.23
 Flask-SQLAlchemy==3.0.5
 

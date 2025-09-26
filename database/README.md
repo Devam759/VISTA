@@ -1,176 +1,201 @@
-# VISTA Database Schema
+# VISTA College Night Attendance System - Database
 
-This directory contains the complete SQL database schema for the VISTA College Night Attendance System.
+This directory contains the complete database schema and sample data for the VISTA College Night Attendance System.
 
-## Database Overview
+## Files Overview
 
-The VISTA database is designed to manage:
+### 1. `vista_schema.sql`
+- **Main database schema file**
+- Contains all table definitions, relationships, indexes, views, stored procedures, and triggers
+- Includes initial sample data for hostels, rooms, users, and students
+- Sets up the complete database structure
 
-- **User Authentication**: Students and Wardens
-- **Hostel Management**: 4 hostels (BH1, BH2, GH1, GH2)
-- **Room Allocation**: Individual room assignments
-- **Face Enrollment**: Student face recognition data
-- **Attendance Tracking**: Daily attendance records with multiple verification methods
-- **Audit Logging**: Complete change tracking
+### 2. `sample_data.sql`
+- **Additional sample data file**
+- Contains extended sample data for testing and development
+- Includes historical attendance records, notifications, system logs
+- Provides comprehensive test data for all features
+
+## Database Features
+
+### Core Tables
+- **users** - Authentication and role management
+- **students** - Student-specific information
+- **hostels** - Hostel information (BH1, BH2, GH1, GH2)
+- **rooms** - Room assignments and occupancy
+- **attendance_records** - Daily attendance tracking
+- **face_enrollments** - Biometric face data
+
+### Advanced Features
+- **Face Recognition** - Biometric attendance verification
+- **GPS Verification** - Location-based attendance validation
+- **WiFi Verification** - Network-based attendance confirmation
+- **Role-based Access** - Student, Warden, ChiefWarden roles
+- **Audit Logging** - Complete system activity tracking
+- **Notifications** - System notification management
+
+### Key Features
+- ✅ Face recognition with confidence scoring
+- ✅ GPS location verification
+- ✅ WiFi network verification
+- ✅ Multi-role authentication system
+- ✅ Real-time attendance tracking
+- ✅ Comprehensive audit logging
+- ✅ Automated room occupancy tracking
+- ✅ Advanced reporting views
+- ✅ Stored procedures for common operations
+- ✅ Triggers for data consistency
+
+## Installation Instructions
+
+### 1. Create Database
+```sql
+-- Run the main schema file
+mysql -u root -p < vista_schema.sql
+```
+
+### 2. Add Sample Data (Optional)
+```sql
+-- Run additional sample data
+mysql -u root -p vista_attendance < sample_data.sql
+```
+
+### 3. Verify Installation
+```sql
+-- Check database structure
+USE vista_attendance;
+SHOW TABLES;
+
+-- Check sample data
+SELECT COUNT(*) as Total_Users FROM users;
+SELECT COUNT(*) as Total_Students FROM students;
+SELECT COUNT(*) as Total_Attendance_Records FROM attendance_records;
+```
 
 ## Database Structure
 
-### Core Tables
+### Hostels
+- **BH1** - Boys Hostel 1 (200 capacity)
+- **BH2** - Boys Hostel 2 (200 capacity)  
+- **GH1** - Girls Hostel 1 (160 capacity)
+- **GH2** - Girls Hostel 2 (160 capacity)
 
-1. **users** - User authentication and basic information
-2. **hostels** - Hostel information (BH1, BH2, GH1, GH2)
-3. **rooms** - Individual rooms within hostels
-4. **students** - Student-specific data linked to users
-5. **face_enrollments** - Face recognition data for students
-6. **attendance_records** - Daily attendance tracking
-7. **attendance_settings** - System configuration
-8. **audit_logs** - Change tracking and security
+### User Roles
+- **Student** - Can mark attendance, view own records
+- **Warden** - Can view hostel attendance, manage students
+- **ChiefWarden** - Full system access, all hostels
 
-### Key Features
+### Attendance Verification Methods
+- **Face_Recognition** - Biometric verification
+- **Manual** - Staff-marked attendance
+- **Wifi** - Network-based verification
+- **GPS** - Location-based verification
+- **QR_Code** - QR code scanning
 
-- **Multi-verification Attendance**: Face recognition, WiFi, GPS
-- **Real-time Room Occupancy**: Automatic tracking
-- **Comprehensive Audit Trail**: All changes logged
-- **Performance Optimized**: Indexes on frequently queried columns
-- **Data Views**: Pre-built queries for common operations
-- **Stored Procedures**: Reusable database operations
+## Key Views
 
-## Installation
+### 1. `student_details`
+Complete student information with hostel and room details
 
-### Prerequisites
+### 2. `attendance_summary`
+Student attendance statistics and percentages
 
-- MySQL 8.0+ or MariaDB 10.3+
-- Database user with CREATE privileges
-
-### Setup Steps
-
-1. **Create Database**:
-
-   ```bash
-   mysql -u root -p < vista_database.sql
-   ```
-
-2. **Verify Installation**:
-   ```sql
-   USE vista_attendance;
-   SHOW TABLES;
-   SELECT COUNT(*) FROM students;
-   ```
-
-3. **Update Configuration** (Optional):
-   ```sql
-   -- Update attendance settings
-   UPDATE attendance_settings 
-   SET setting_value = '22:30:00' 
-   WHERE setting_name = 'attendance_deadline';
-   ```
-
-## Sample Data
-
-The database includes:
-
-- **4 Hostels**: BH1, BH2, GH1, GH2
-- **60 Rooms**: 15 rooms per hostel
-- **11 Students**: Sample student records
-- **11 Users**: 1 Warden + 10 Students
-- **11 Attendance Records**: Recent attendance data
-- **Default Settings**: System configuration
-
-## Database Views
-
-### student_details
-Complete student information including hostel and room details.
-
-### attendance_summary
-Student attendance statistics with percentages.
-
-### hostel_statistics
-Hostel occupancy and capacity information.
+### 3. `hostel_statistics`
+Hostel occupancy and attendance statistics
 
 ## Stored Procedures
 
-### GetStudentAttendance(student_roll, start_date, end_date)
-Retrieves attendance records for a specific student within a date range.
+### 1. `GetStudentAttendance(roll_number, start_date, end_date)`
+Get attendance records for a specific student
 
-### GetHostelAttendance(hostel_name, attendance_date)
-Gets attendance status for all students in a hostel on a specific date.
+### 2. `GetHostelAttendance(hostel_name, date)`
+Get attendance records for a specific hostel on a date
 
-### UpdateRoomOccupancy()
-Recalculates room occupancy based on current student assignments.
+### 3. `UpdateRoomOccupancy()`
+Update room occupancy counts
+
+### 4. `MarkAttendance(...)`
+Mark attendance with full verification data
+
+## Sample Data
+
+The database includes comprehensive sample data:
+- 4 hostels with 60+ rooms
+- 24+ student users
+- 50+ attendance records
+- Face enrollment data
+- System notifications
+- Audit logs
 
 ## Security Features
 
-- **Password Hashing**: Secure password storage
-- **Role-based Access**: Student and Warden roles
-- **Audit Logging**: Complete change tracking
-- **Data Validation**: Foreign key constraints
-- **Index Optimization**: Performance tuning
+- Password hashing for user authentication
+- Role-based access control
+- IP address logging
+- User agent tracking
+- Complete audit trail
+- Data integrity constraints
 
-## API Integration
+## Performance Optimizations
 
-The database is designed to work with the VISTA frontend application:
-
-- **Authentication**: User login and role verification
-- **Student Management**: CRUD operations for student data
-- **Attendance Tracking**: Real-time attendance recording
-- **Face Recognition**: Face enrollment and verification
-- **Reporting**: Attendance statistics and hostel management
+- Comprehensive indexing strategy
+- Optimized queries with views
+- Efficient stored procedures
+- Automatic room occupancy updates
+- Cached attendance summaries
 
 ## Maintenance
 
 ### Regular Tasks
+1. Update room occupancy: `CALL UpdateRoomOccupancy();`
+2. Clean old logs: `DELETE FROM system_logs WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 YEAR);`
+3. Archive old attendance: Move records older than 2 years to archive tables
 
-1. **Update Room Occupancy**:
-   ```sql
-   CALL UpdateRoomOccupancy();
-   ```
+### Monitoring
+- Check attendance completion rates
+- Monitor face recognition accuracy
+- Review system logs for errors
+- Update student information regularly
 
-2. **Clean Old Audit Logs** (Optional):
-   ```sql
-   DELETE FROM audit_logs 
-   WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 YEAR);
-   ```
+## API Integration
 
-3. **Backup Database**:
-   ```bash
-   mysqldump -u root -p vista_attendance > vista_backup.sql
-   ```
-
-### Performance Monitoring
-
-Monitor these key metrics:
-- Attendance record count
-- Face enrollment completion rate
-- Room occupancy percentages
-- Database query performance
+The database is designed to work with REST APIs:
+- User authentication endpoints
+- Attendance marking endpoints
+- Student management endpoints
+- Reporting endpoints
+- Face enrollment endpoints
 
 ## Troubleshooting
 
 ### Common Issues
+1. **Face recognition failures** - Check confidence thresholds in settings
+2. **GPS verification issues** - Verify location coordinates in settings
+3. **WiFi verification problems** - Check SSID configuration
+4. **Room occupancy errors** - Run `UpdateRoomOccupancy()` procedure
 
-1. **Foreign Key Constraints**: Ensure parent records exist before inserting child records
-2. **Unique Constraints**: Check for duplicate roll numbers or emails
-3. **Date Formats**: Use proper DATE and TIME formats
-4. **Character Encoding**: Ensure UTF-8 support for international names
-
-### Reset Database
-
-To completely reset the database:
+### Support Queries
 ```sql
-DROP DATABASE vista_attendance;
-CREATE DATABASE vista_attendance;
-USE vista_attendance;
-SOURCE vista_database.sql;
+-- Check system health
+SELECT 
+    COUNT(*) as total_users,
+    COUNT(CASE WHEN is_active = 1 THEN 1 END) as active_users,
+    COUNT(CASE WHEN role = 'Student' THEN 1 END) as students
+FROM users;
+
+-- Check attendance completion
+SELECT 
+    DATE(attendance_date) as date,
+    COUNT(*) as total_records,
+    SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present,
+    SUM(CASE WHEN status = 'Late' THEN 1 ELSE 0 END) as late,
+    SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent
+FROM attendance_records 
+WHERE attendance_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+GROUP BY DATE(attendance_date)
+ORDER BY date DESC;
 ```
 
-## Support
+## Contact
 
-For database-related issues:
-1. Check the audit_logs table for recent changes
-2. Verify foreign key relationships
-3. Review stored procedure parameters
-4. Check MySQL error logs
-
----
-
-**Note**: This database schema is designed for the VISTA College Night Attendance System and includes all necessary tables, relationships, and sample data for immediate use.
+For database-related issues or questions, please refer to the system documentation or contact the development team.
