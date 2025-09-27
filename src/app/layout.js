@@ -33,8 +33,10 @@ export default function RootLayout({ children }) {
             <LocationTracingWrapper>
               <Navbar />
               <div className="container-app py-6 flex gap-6 min-h-screen">
-                <Sidebar />
-                <main className="flex-1 min-w-0 overflow-x-auto">{children}</main>
+                <div className="hidden lg:block">
+                  <Sidebar />
+                </div>
+                <main className="flex-1 min-w-0 overflow-x-auto px-4 lg:px-0">{children}</main>
               </div>
             </LocationTracingWrapper>
           </AuthProvider>

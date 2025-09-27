@@ -93,53 +93,47 @@ export default function Navbar() {
 						</button>
 					</div>
 					
-					{/* Mobile navigation */}
-					<nav className="p-6 space-y-6">
+					{/* Mobile navigation - simplified without quick stats */}
+					<nav className="p-4 space-y-2">
 						{role ? (
 							<>
-								<div className="space-y-4">
-									<Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+								<div className="space-y-2">
+									<Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-[color:var(--accent)]/10 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 										<span className="flex-1">Dashboard</span>
 									</Link>
 									{role !== "Student" && (
 										<>
-											<Link href="/students" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+											<Link href="/students" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-[color:var(--accent)]/10 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 												<span className="flex-1">Students</span>
 											</Link>
-											<Link href="/hostels" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+											<Link href="/hostels" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-[color:var(--accent)]/10 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 												<span className="flex-1">Hostels</span>
 											</Link>
 										</>
 									)}
-									<Link href="/attendance" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+									<Link href="/attendance" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-[color:var(--accent)]/10 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 										<span className="flex-1">Attendance</span>
 									</Link>
 									{role === "Student" && (
-										<Link href="/mark" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+										<Link href="/mark" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-[color:var(--accent)]/10 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 											<span className="flex-1">Mark Attendance</span>
 										</Link>
 									)}
 								</div>
 								
-								<div className="pt-6 border-t border-[color:var(--border)] space-y-4">
-									<div className="flex items-center justify-between px-4 py-2">
+								<div className="pt-4 border-t border-[color:var(--border)]">
+									<div className="flex items-center justify-between px-4 py-2 mb-4">
 										<span className="text-sm text-foreground/60">Role:</span>
 										<span className="text-xs px-3 py-1 rounded-full pill">{role}</span>
 									</div>
-									{/* <div className="px-4">
-										<ThemeToggle />
-									</div> */}
 									<button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full mx-4 btn">Logout</button>
 								</div>
 							</>
 						) : (
-							<div className="space-y-4">
-								<Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gradient-to-r hover:from-[color:var(--accent)]/10 hover:to-[color:var(--accent)]/5 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+							<div className="space-y-2">
+								<Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-[color:var(--accent)]/10 hover:text-[color:var(--accent)] transition-all" onClick={() => setIsMobileMenuOpen(false)}>
 									<span className="flex-1">Login</span>
 								</Link>
-								<div className="px-4">
-									<ThemeToggle />
-								</div>
 							</div>
 						)}
 					</nav>
