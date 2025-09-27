@@ -15,29 +15,29 @@ class GeofencingManager:
         self.hostel_center_lon = Config.HOSTEL_LONGITUDE
         self.accuracy_radius = Config.GPS_ACCURACY_RADIUS  # meters
         
-        # Define campus boundary (15-point polygon covering entire campus)
+        # Define campus boundary (14-point polygon covering entire campus)
         # Campus boundary for JKLU (Jagadguru Kripalu University)
-        # Points will be connected in order: Point1 -> Point2 -> Point3 -> ... -> Point15 -> Point1
+        # Points will be connected in order: Point1 -> Point2 -> Point3 -> ... -> Point14 -> Point1
         self.campus_boundary = {
-            'center': (26.2389, 73.0243),  # JKLU Campus Center
-            'radius': 1000,  # meters - campus radius (increased for better coverage)
+            'center': (26.8351, 75.6508),  # JKLU Campus Center (corrected)
+            'radius': 800,  # meters - campus radius (corrected)
             'polygon': [
                 # Campus boundary points forming a polygon around JKLU campus
                 (26.836760, 75.651187),  # Point 1 - Southwest corner
                 (26.837109, 75.649523),  # Point 2
-                (26.896678, 75.649331),  # Point 3
-                (26.836655, 75.648472),  # Point 4
-                (26.836079, 75.648307),  # Point 5
-                (26.835495, 75.650194),  # Point 6
-                (26.834788, 75.650150),  # Point 7
-                (26.834635, 75.650973),  # Point 8
-                (26.833430, 75.651435),  # Point 9
-                (26.832659, 75.652500),  # Point 10
-                (26.833776, 75.653021),  # Point 11
-                (26.834072, 75.652374),  # Point 12
-                (26.834935, 75.652472),  # Point 13
-                (26.835321, 75.651554),  # Point 14
-                (26.835838, 75.651320),  # Point 15 - Southeast corner
+                (26.836655, 75.648472),  # Point 3
+                (26.836079, 75.648307),  # Point 4
+                (26.835495, 75.650194),  # Point 5
+                (26.834788, 75.650150),  # Point 6
+                (26.834635, 75.650973),  # Point 7
+                (26.833430, 75.651435),  # Point 8
+                (26.832659, 75.652500),  # Point 9
+                (26.833776, 75.653021),  # Point 10
+                (26.834072, 75.652374),  # Point 11
+                (26.834935, 75.652472),  # Point 12
+                (26.835321, 75.651554),  # Point 13
+                (26.835838, 75.651320),  # Point 14 - Southeast corner
+                # Removed outlier coordinate (26.896678, 75.649331) which was 6.4km away
             ]
         }
     
