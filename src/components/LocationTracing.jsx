@@ -311,20 +311,15 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           <h2 className="text-2xl font-bold text-yellow-600 mb-2">Location Not Verified</h2>
           <p className="text-gray-600 mb-4">{verificationStatus.reason}</p>
           
-          {location && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <h3 className="font-medium text-gray-800 mb-2">Your Location:</h3>
-              <p className="text-sm text-gray-600">
-                Latitude: {location.latitude.toFixed(6)}
-              </p>
-              <p className="text-sm text-gray-600">
-                Longitude: {location.longitude.toFixed(6)}
-              </p>
-              <p className="text-sm text-gray-600">
-                Accuracy: {location.accuracy?.toFixed(0)}m
-              </p>
-            </div>
-          )}
+          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <h3 className="font-medium text-gray-800 mb-2">Location Status:</h3>
+            <p className="text-lg text-red-600 font-semibold">
+              Out of Campus
+            </p>
+            <p className="text-sm text-gray-600 mt-1">
+              You are currently outside the campus boundaries
+            </p>
+          </div>
           
           <div className="space-y-3">
             <button
@@ -352,20 +347,15 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           <h2 className="text-2xl font-bold text-green-600 mb-2">Location Verified</h2>
           <p className="text-gray-600 mb-4">{verificationStatus.reason}</p>
           
-          {location && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <h3 className="font-medium text-gray-800 mb-2">Your Location:</h3>
-              <p className="text-sm text-gray-600">
-                Latitude: {location.latitude.toFixed(6)}
-              </p>
-              <p className="text-sm text-gray-600">
-                Longitude: {location.longitude.toFixed(6)}
-              </p>
-              <p className="text-sm text-gray-600">
-                Accuracy: {location.accuracy?.toFixed(0)}m
-              </p>
-            </div>
-          )}
+          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <h3 className="font-medium text-gray-800 mb-2">Location Status:</h3>
+            <p className="text-lg text-green-600 font-semibold">
+              ✅ In Campus
+            </p>
+            <p className="text-sm text-gray-600 mt-1">
+              You are currently within the campus boundaries
+            </p>
+          </div>
           
           <div className="animate-pulse">
             <p className="text-sm text-gray-500">Redirecting to dashboard...</p>

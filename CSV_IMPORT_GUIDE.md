@@ -35,6 +35,7 @@ python standalone_csv_processor.py "../public/FINAL SHEET OF BH-2.csv" sql
 ```
 
 This generates:
+
 - `student_import.sql` - SQL statements ready for database import
 - Processing statistics and error reports
 
@@ -46,6 +47,7 @@ python standalone_csv_processor.py "../public/FINAL SHEET OF BH-2.csv" json
 ```
 
 This generates:
+
 - `student_data.json` - JSON data ready for API consumption
 
 ### Option 3: Database Integration (Requires Database Setup)
@@ -89,27 +91,32 @@ S.No.,Hostel,Floor,Room NO.,AC/NAC,Seater,Student's Name,Student Reg. no,Mobile 
 ## Data Processing Logic
 
 ### Name Processing
+
 - Splits full names into first and last names
 - Handles single names by using first name only
 - Removes extra spaces and special characters
 
 ### Roll Number Processing
+
 - Uses "Student Roll No." if available, otherwise uses "Student Reg. no"
 - Converts to uppercase and removes special characters
 - Validates format
 
 ### Email Generation
+
 - Format: `firstname.lastname@jklu.edu.in`
 - Handles single names: `firstname@jklu.edu.in`
 - Removes special characters from names
 
 ### Course/Branch Detection
+
 - **B.Tech**: Detected from "BTECH" or "B.TECH"
 - **B.Des**: Detected from "BDES" or "B.DES"  
 - **BBA**: Detected from "BBA"
 - **Branches**: CS, IT, EC/ECE, ME/MECH, CE/CIVIL
 
 ### Hostel Mapping
+
 - BH-2 → BH2
 - BH-1 → BH1
 - GH-1 → GH1
@@ -124,17 +131,20 @@ S.No.,Hostel,Floor,Room NO.,AC/NAC,Seater,Student's Name,Student Reg. no,Mobile 
 Upload a CSV file to import student data.
 
 **Headers:**
-```
+
+```http
 Authorization: Bearer <jwt_token>
 Content-Type: multipart/form-data
 ```
 
 **Body:**
-```
+
+```http
 file: <csv_file>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Students import completed successfully",
@@ -152,6 +162,7 @@ file: <csv_file>
 Retrieve student data (now includes imported BH-2 students).
 
 **Response:**
+
 ```json
 {
   "students": [
@@ -171,12 +182,14 @@ Retrieve student data (now includes imported BH-2 students).
 The imported data maps to the following database tables:
 
 ### Users Table
+
 ```sql
 INSERT INTO users (email, password_hash, role, first_name, last_name, phone, is_active)
 VALUES ('anirudh.choudhary@jklu.edu.in', '$2b$10$default_hash_for_csv_import', 'Student', 'Anirudh', 'Choudhary', '8690943532', TRUE);
 ```
 
 ### Students Table
+
 ```sql
 INSERT INTO students (user_id, roll_number, hostel_id, room_id, admission_year, course, branch, semester, emergency_contact, address, is_resident)
 SELECT LAST_INSERT_ID(), 'BTECH25/0231', 
@@ -190,12 +203,14 @@ SELECT LAST_INSERT_ID(), 'BTECH25/0231',
 The system provides comprehensive error reporting:
 
 ### Common Errors
+
 - **"Hostel BH-2 not found"**: Hostel not configured in database
 - **"No roll number found"**: Missing or invalid roll number
 - **"Room 101 not found"**: Room not configured in database
 - **"Student already exists"**: Duplicate roll number or email
 
 ### Error Statistics
+
 - Total rows processed
 - Successful imports
 - Failed imports
@@ -205,12 +220,14 @@ The system provides comprehensive error reporting:
 ## Testing Results
 
 ### BH-2 Import Test Results
+
 - **Total rows processed**: 385
 - **Valid records**: 294
 - **Invalid records**: 0
 - **Success rate**: 76.4%
 
 ### Sample Imported Students
+
 1. Anirudh Choudhary (BTECH25/0231) - Room 101
 2. Daksh Soni (BTECH25/2054) - Room 101
 3. Rohan Goyal (BTECH25/0121) - Room 101
@@ -236,16 +253,19 @@ The students page now displays the imported BH-2 data:
 ## Troubleshooting
 
 ### Database Connection Issues
+
 - Check database configuration in `backend/config.py`
 - Ensure database server is running
 - Verify credentials and permissions
 
 ### CSV Parsing Issues
+
 - Check CSV format matches expected structure
 - Ensure proper encoding (UTF-8)
 - Verify header row contains required columns
 
 ### Import Failures
+
 - Check error logs for specific issues
 - Verify hostel and room configurations
 - Ensure no duplicate roll numbers or emails
@@ -253,6 +273,7 @@ The students page now displays the imported BH-2 data:
 ## Support
 
 For issues or questions:
+
 1. Check the error logs in the console output
 2. Verify CSV format matches the expected structure
 3. Ensure database schema is properly set up

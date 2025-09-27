@@ -15,21 +15,25 @@ The BH-2 hostel data has been successfully processed and is ready for database i
 ## 📁 **Generated Files**
 
 ### 1. **SQL Import File** (`backend/student_import.sql`)
+
 - Ready-to-execute SQL statements for MySQL database
 - Contains INSERT statements for users and students tables
 - Handles foreign key relationships automatically
 
 ### 2. **JSON Data File** (`backend/student_data.json`)
+
 - Structured JSON data for API consumption
 - Contains all 294 student records with proper formatting
 - Ready for web application integration
 
 ### 3. **Mock Database** (`backend/imported_students.json`)
+
 - Demonstration database with 284 successfully imported students
 - Shows the import functionality working correctly
 - Can be used for testing without MySQL setup
 
 ### 4. **Public Data** (`public/bh2_students.json`)
+
 - Publicly accessible student data
 - Available for frontend consumption
 
@@ -52,23 +56,27 @@ The BH-2 hostel data has been successfully processed and is ready for database i
 ## 🔧 **Available Import Methods**
 
 ### Method 1: Direct Database Import (Recommended)
+
 ```bash
 cd backend
 python csv_import_script.py "../public/FINAL SHEET OF BH-2.csv"
 ```
 
 ### Method 2: SQL File Import
+
 ```bash
 cd backend
 mysql -u root -p vista_attendance < student_import.sql
 ```
 
 ### Method 3: API Upload
+
 - Use the `/import/students-csv` endpoint
 - Upload CSV file via web interface
 - Requires JWT authentication
 
 ### Method 4: Standalone Processing
+
 ```bash
 cd backend
 python standalone_csv_processor.py "../public/FINAL SHEET OF BH-2.csv" sql
@@ -79,12 +87,14 @@ python standalone_csv_processor.py "../public/FINAL SHEET OF BH-2.csv" sql
 The imported data maps perfectly to the existing database schema:
 
 ### Users Table
+
 ```sql
 INSERT INTO users (email, password_hash, role, first_name, last_name, phone, is_active)
 VALUES ('anirudh.choudhary@jklu.edu.in', '$2b$10$default_hash_for_csv_import', 'Student', 'Anirudh', 'Choudhary', '8690943532', TRUE);
 ```
 
 ### Students Table
+
 ```sql
 INSERT INTO students (user_id, roll_number, hostel_id, room_id, admission_year, course, branch, semester, emergency_contact, address, is_resident)
 SELECT LAST_INSERT_ID(), 'BTECH25/0231', 
@@ -104,9 +114,10 @@ The students page has been updated to show the imported BH-2 data:
 
 ## 🚀 **Next Steps**
 
-### For Production Use:
+### For Production Use
 
 1. **Set up MySQL Database**
+
    ```bash
    # Install MySQL if not already installed
    # Create database
@@ -115,6 +126,7 @@ The students page has been updated to show the imported BH-2 data:
    ```
 
 2. **Configure Database Connection**
+
    ```bash
    cd backend
    python create_env_file.py  # Interactive setup
@@ -122,11 +134,13 @@ The students page has been updated to show the imported BH-2 data:
    ```
 
 3. **Import Data**
+
    ```bash
    python csv_import_script.py "../public/FINAL SHEET OF BH-2.csv"
    ```
 
 4. **Start Backend Server**
+
    ```bash
    python app.py
    ```
@@ -136,9 +150,10 @@ The students page has been updated to show the imported BH-2 data:
    - Navigate to Students page
    - Filter by BH2 to see imported students
 
-### For Other Hostels:
+### For Other Hostels
 
 The same process can be used to import data for:
+
 - BH-1 (Boys Hostel 1)
 - GH-1 (Girls Hostel 1)  
 - GH-2 (Girls Hostel 2)
@@ -157,6 +172,7 @@ Just replace the CSV file path in the import commands.
 ## 🔍 **Error Handling**
 
 The import process includes comprehensive error handling:
+
 - Duplicate entry detection
 - Missing data validation
 - Database constraint checking
