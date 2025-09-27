@@ -13,7 +13,7 @@ export default function DashboardSwitch() {
     </div>
   );
   if (role === "Warden") return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       <Card title="Students" href="/students"><p className="text-sm">Manage assigned hostel students.</p></Card>
       <Card title="Attendance" href="/attendance"><p className="text-sm">Monitor present/late/absent.</p></Card>
       <Card title="Hostels" href="/hostels"><p className="text-sm">Overview across all hostels.</p></Card>

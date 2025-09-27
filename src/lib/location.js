@@ -1,8 +1,28 @@
 const locationService = {
+  // Detect if device is mobile
+  isMobileDevice: () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           window.innerWidth <= 768;
+  },
+
+  // Check if geofencing should be enabled (mobile only)
+  isGeofencingEnabled: () => {
+    return locationService.isMobileDevice();
+  },
+
   // Check if location permissions are available
   checkPermissions: async () => {
     if (!navigator.geolocation) {
       return { available: false, reason: 'Geolocation is not supported by your browser' };
+    }
+
+    // For desktop devices, allow access without geofencing
+    if (!locationService.isGeofencingEnabled()) {
+      return { 
+        available: true, 
+        reason: null,
+        skipGeofencing: true // Flag to indicate geofencing should be skipped
+      };
     }
 
     try {
@@ -33,6 +53,18 @@ const locationService = {
       const permissionCheck = await locationService.checkPermissions();
       if (!permissionCheck.available) {
         reject(new Error(permissionCheck.reason));
+        return;
+      }
+
+      // For desktop devices, return a mock location to allow access
+      if (permissionCheck.skipGeofencing) {
+        resolve({
+          latitude: 26.2389, // Default campus coordinates
+          longitude: 73.0243,
+          accuracy: 100, // Lower accuracy for desktop
+          timestamp: Date.now(),
+          isDesktop: true // Flag to indicate this is a desktop mock location
+        });
         return;
       }
 

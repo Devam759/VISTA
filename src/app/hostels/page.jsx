@@ -15,7 +15,8 @@ export default function HostelsPage() {
         <h1 className="text-xl font-semibold">Hostels</h1>
         <p className="text-sm text-foreground/70">List of hostels and wardens</p>
       </div>
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto rounded-xl bg-white shadow-sm">
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="text-left border-b border-black/[.06]">
@@ -36,6 +37,31 @@ export default function HostelsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {data.map((h) => (
+          <div key={h.hostelId} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900">{h.name}</h3>
+                <p className="text-sm text-gray-600">ID: {h.hostelId}</p>
+              </div>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                h.type === 'Boys' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : 'bg-pink-100 text-pink-800'
+              }`}>
+                {h.type}
+              </span>
+            </div>
+            <div className="text-sm">
+              <span className="text-gray-500">Warden:</span>
+              <span className="ml-2 font-medium text-gray-900">{h.warden}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
     </Protected>

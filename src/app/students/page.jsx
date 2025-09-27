@@ -61,7 +61,7 @@ export default function StudentsPage() {
       </div>
       
       {/* Filter Buttons */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap overflow-x-auto pb-2">
         <button
           onClick={() => setSelectedHostel("All Hostels")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
@@ -135,7 +135,8 @@ export default function StudentsPage() {
         </div>
       ) : null}
       
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50">
@@ -160,6 +161,31 @@ export default function StudentsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {data.map((s, index) => (
+          <div key={s.studentId} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900">{s.name}</h3>
+                <p className="text-sm text-gray-600 font-mono">{s.rollNo}</p>
+              </div>
+              <Badge>{s.hostel}</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">Room No:</span>
+                <span className="ml-2 font-medium text-gray-900">{s.roomNo}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">S.No:</span>
+                <span className="ml-2 font-medium text-gray-900">{s.studentId}</span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
     </Protected>

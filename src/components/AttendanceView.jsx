@@ -62,22 +62,22 @@ export default function AttendanceView() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-end justify-between gap-6">
+      <div className="space-y-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Attendance Records</h1>
           <p className="text-sm text-foreground/60">Daily logs with verification and confidence scores</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input 
             type="date" 
             value={dateFilter} 
             onChange={(e) => setDateFilter(e.target.value)} 
-            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors" 
+            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors flex-1" 
           />
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)} 
-            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors"
+            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors flex-1"
           >
             <option>All Status</option>
             <option>Present</option>
@@ -88,7 +88,7 @@ export default function AttendanceView() {
       </div>
 
       {/* Hostel Filter Buttons */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap overflow-x-auto pb-2">
         <button
           onClick={() => setHostelFilter("All Hostels")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
@@ -141,7 +141,8 @@ export default function AttendanceView() {
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl surface shadow-sm border border-[color:var(--border)]">
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-hidden rounded-2xl surface shadow-sm border border-[color:var(--border)]">
         <table className="w-full">
           <thead>
             <tr className="border-b border-[color:var(--border)] bg-[color:var(--muted)]/50">
@@ -174,6 +175,45 @@ export default function AttendanceView() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-4">
+        {filtered.map((r, index) => (
+          <div key={r.id} className="bg-[color:var(--card)] rounded-xl border border-[color:var(--border)] shadow-sm p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-foreground">{r.name || 'You'}</h3>
+                <p className="text-sm text-foreground/60 font-mono">{r.rollNo || 'N/A'}</p>
+              </div>
+              <StatusBadge status={r.status} />
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm mb-3">
+              <div>
+                <span className="text-foreground/60">Date:</span>
+                <span className="ml-2 font-medium text-foreground">{r.date}</span>
+              </div>
+              <div>
+                <span className="text-foreground/60">Time:</span>
+                <span className="ml-2 font-medium text-foreground font-mono">{r.time}</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div>
+                  <span className="text-foreground/60 text-xs">Hostel:</span>
+                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {r.hostel}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-foreground/60 text-xs">Room:</span>
+                  <span className="ml-2 font-medium text-foreground">{r.roomNo}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
