@@ -516,7 +516,6 @@ def mark_attendance():
 
 # Admin endpoints for database management
 @app.route('/admin/add-devam-gupta', methods=['POST'])
-@jwt_required()
 def add_devam_gupta():
     """Add Devam Gupta to the database"""
     try:
