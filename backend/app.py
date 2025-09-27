@@ -18,6 +18,7 @@ from PIL import Image
 import io
 from database_manager import db_manager, csv_manager
 from fallback_data import fallback_manager
+from csv_import_script import CSVImporter
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -527,6 +528,65 @@ def upload_attendance_csv():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/import/students-csv', methods=['POST'])
+@jwt_required()
+def import_students_csv():
+    """Import students from CSV file (supports hostel allocation sheets)"""
+    try:
+        # Check if user is authorized (Warden or Chief Warden)
+        current_user = get_jwt_identity()
+        if current_user['role'] == 'Student':
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Check file extension
+        if not file.filename.lower().endswith('.csv'):
+            return jsonify({'error': 'Only CSV files are allowed'}), 400
+        
+        # Save uploaded file temporarily
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode='w+b', suffix='.csv', delete=False) as temp_file:
+            file.save(temp_file.name)
+            temp_file_path = temp_file.name
+        
+        try:
+            # Use CSV importer to process the file
+            importer = CSVImporter()
+            success = importer.import_csv_file(temp_file_path)
+            
+            if success:
+                return jsonify({
+                    'message': 'Students import completed successfully',
+                    'success_count': importer.import_stats['successful_imports'],
+                    'failed_count': importer.import_stats['failed_imports'],
+                    'total_processed': importer.import_stats['total_rows'],
+                    'errors': importer.import_stats['errors'][:10]  # Limit errors shown
+                })
+            else:
+                return jsonify({
+                    'message': 'Import completed with errors',
+                    'success_count': importer.import_stats['successful_imports'],
+                    'failed_count': importer.import_stats['failed_imports'],
+                    'total_processed': importer.import_stats['total_rows'],
+                    'errors': importer.import_stats['errors'][:10]
+                }), 400
+                
+        finally:
+            # Clean up temporary file
+            try:
+                os.unlink(temp_file_path)
+            except:
+                pass
+        
+    except Exception as e:
+        return jsonify({'error': f'Import failed: {str(e)}'}), 500
 
 # =====================================================
 # HEALTH CHECK
