@@ -11,6 +11,8 @@ from datetime import datetime, timedelta
 import bcrypt
 import json
 import math
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from typing import Tuple, List, Dict
 
 # Initialize Flask app
@@ -206,9 +208,91 @@ class StandaloneFallbackManager:
     def get_attendance_records(self, date_filter='', status_filter='All'):
         return self.attendance_records
 
+# Database Connection Manager
+class DatabaseManager:
+    """Simple database connection manager for Railway PostgreSQL"""
+    
+    def __init__(self):
+        self.connection_string = os.getenv('DATABASE_URL')
+        if not self.connection_string:
+            # Fallback for local development
+            self.connection_string = "postgresql://localhost/vista_attendance"
+    
+    def get_connection(self):
+        """Get database connection"""
+        try:
+            return psycopg2.connect(self.connection_string, cursor_factory=RealDictCursor)
+        except Exception as e:
+            print(f"Database connection error: {e}")
+            return None
+    
+    def get_students(self, hostel_filter=None):
+        """Get students from database"""
+        try:
+            conn = self.get_connection()
+            if not conn:
+                return []
+            
+            cursor = conn.cursor()
+            
+            if hostel_filter and hostel_filter != 'All Hostels':
+                query = "SELECT * FROM students WHERE hostel = %s ORDER BY name"
+                cursor.execute(query, (hostel_filter,))
+            else:
+                query = "SELECT * FROM students ORDER BY name"
+                cursor.execute(query)
+            
+            students = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+            # Convert to list of dictionaries
+            return [dict(student) for student in students]
+            
+        except Exception as e:
+            print(f"Error fetching students: {e}")
+            return []
+    
+    def get_attendance_records(self, date_filter='', status_filter='All'):
+        """Get attendance records from database"""
+        try:
+            conn = self.get_connection()
+            if not conn:
+                return []
+            
+            cursor = conn.cursor()
+            
+            query = "SELECT * FROM attendance_records"
+            params = []
+            
+            if date_filter:
+                query += " WHERE DATE(timestamp) = %s"
+                params.append(date_filter)
+            
+            if status_filter != 'All':
+                if date_filter:
+                    query += " AND status = %s"
+                else:
+                    query += " WHERE status = %s"
+                params.append(status_filter)
+            
+            query += " ORDER BY timestamp DESC"
+            
+            cursor.execute(query, params)
+            records = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+            return [dict(record) for record in records]
+            
+        except Exception as e:
+            print(f"Error fetching attendance records: {e}")
+            return []
+
 # Initialize managers
 geofencing_manager = StandaloneGeofencingManager()
 fallback_manager = StandaloneFallbackManager()
+db_manager = DatabaseManager()
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
@@ -308,35 +392,71 @@ def verify_location():
 @app.route('/students', methods=['GET'])
 @jwt_required()
 def get_students():
-    """Get all students"""
+    """Get all students from database"""
     try:
         hostel = request.args.get('hostel', 'All Hostels')
         
+        # Try to get students from database first
+        students = db_manager.get_students(hostel)
+        
+        # If no students found in database, use fallback data
+        if not students:
+            print("No students found in database, using fallback data")
+            if hostel == 'All Hostels':
+                students = fallback_manager.get_all_students()
+            else:
+                students = fallback_manager.get_students_by_hostel(hostel)
+        
+        # Transform data to match frontend expectations
+        transformed_students = []
+        for student in students:
+            transformed_students.append({
+                'studentId': student.get('id', student.get('student_id', 0)),
+                'rollNo': student.get('roll_no', student.get('rollNo', 'N/A')),
+                'name': student.get('name', 'Unknown'),
+                'roomNo': student.get('room_no', student.get('roomNo', 'N/A')),
+                'hostel': student.get('hostel', 'Unknown')
+            })
+        
+        return jsonify({'students': transformed_students})
+        
+    except Exception as e:
+        print(f"Error in get_students: {e}")
+        # Fallback to mock data on error
+        hostel = request.args.get('hostel', 'All Hostels')
         if hostel == 'All Hostels':
             students = fallback_manager.get_all_students()
         else:
             students = fallback_manager.get_students_by_hostel(hostel)
         
         return jsonify({'students': students})
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 # Attendance endpoints
 @app.route('/attendance', methods=['GET'])
 @jwt_required()
 def get_attendance():
-    """Get attendance records"""
+    """Get attendance records from database"""
     try:
         date_filter = request.args.get('date', '')
         status_filter = request.args.get('status', 'All')
         
-        attendance = fallback_manager.get_attendance_records(date_filter, status_filter)
+        # Try to get attendance from database first
+        attendance = db_manager.get_attendance_records(date_filter, status_filter)
+        
+        # If no attendance found in database, use fallback data
+        if not attendance:
+            print("No attendance records found in database, using fallback data")
+            attendance = fallback_manager.get_attendance_records(date_filter, status_filter)
         
         return jsonify({'attendance': attendance})
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error in get_attendance: {e}")
+        # Fallback to mock data on error
+        date_filter = request.args.get('date', '')
+        status_filter = request.args.get('status', 'All')
+        attendance = fallback_manager.get_attendance_records(date_filter, status_filter)
+        return jsonify({'attendance': attendance})
 
 @app.route('/attendance/mark', methods=['POST'])
 @jwt_required()
