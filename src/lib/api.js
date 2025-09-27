@@ -4,6 +4,108 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 const isProduction = process.env.NODE_ENV === 'production';
 const isBackendAvailable = process.env.NEXT_PUBLIC_BACKEND_AVAILABLE === 'true';
 
+// Campus boundary configuration (same as backend)
+const CAMPUS_BOUNDARY = {
+  center: { latitude: 26.2389, longitude: 73.0243 },
+  radius: 1000, // meters
+  polygon: [
+    [26.836760, 75.651187], [26.837109, 75.649523], [26.896678, 75.649331],
+    [26.836655, 75.648472], [26.836079, 75.648307], [26.835495, 75.650194],
+    [26.834788, 75.650150], [26.834635, 75.650973], [26.833430, 75.651435],
+    [26.832659, 75.652500], [26.833776, 75.653021], [26.834072, 75.652374],
+    [26.834935, 75.652472], [26.835321, 75.651554], [26.835838, 75.651320]
+  ]
+};
+
+// Calculate distance between two points using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Earth's radius in meters
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Check if point is inside polygon using ray casting algorithm
+function isPointInPolygon(point, polygon) {
+  const x = point[0], y = point[1];
+  let inside = false;
+  
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i][0], yi = polygon[i][1];
+    const xj = polygon[j][0], yj = polygon[j][1];
+    
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+      inside = !inside;
+    }
+  }
+  
+  return inside;
+}
+
+// Check if location is within campus boundary
+function checkLocationInCampus(latitude, longitude, accuracy) {
+  try {
+    // Check if coordinates are valid
+    if (!(-90 <= latitude && latitude <= 90) || !(-180 <= longitude && longitude <= 180)) {
+      return {
+        valid: false,
+        reason: 'Invalid GPS coordinates',
+        distance: null
+      };
+    }
+    
+    // Check accuracy if provided
+    if (accuracy && accuracy > 200) {
+      return {
+        valid: false,
+        reason: `GPS accuracy too low: ${accuracy}m (required: <200m)`,
+        distance: null
+      };
+    }
+    
+    // Check distance from campus center
+    const distanceFromCenter = calculateDistance(
+      latitude, longitude,
+      CAMPUS_BOUNDARY.center.latitude, CAMPUS_BOUNDARY.center.longitude
+    );
+    
+    // Check if within campus radius
+    if (distanceFromCenter > CAMPUS_BOUNDARY.radius) {
+      return {
+        valid: false,
+        reason: `Too far from campus: ${distanceFromCenter.toFixed(1)}m (max: ${CAMPUS_BOUNDARY.radius}m)`,
+        distance: distanceFromCenter
+      };
+    }
+    
+    // Check if within campus polygon boundary
+    if (isPointInPolygon([longitude, latitude], CAMPUS_BOUNDARY.polygon)) {
+      return {
+        valid: true,
+        reason: 'Location verified within campus boundary',
+        distance: distanceFromCenter
+      };
+    }
+    
+    return {
+      valid: false,
+      reason: `Location outside campus boundary: ${distanceFromCenter.toFixed(1)}m from center`,
+      distance: distanceFromCenter
+    };
+    
+  } catch (error) {
+    return {
+      valid: false,
+      reason: `Location verification error: ${error.message}`,
+      distance: null
+    };
+  }
+}
+
 // Fallback request handler for when backend is not available
 async function handleFallbackRequest(path, options = {}) {
   console.log(`Using fallback for ${path} in production`);
@@ -34,13 +136,25 @@ async function handleFallbackRequest(path, options = {}) {
       }
 
       if (body.latitude && body.longitude) {
-        return {
-          gps_verified: true,
-          reason: "Location verified (production fallback mode)",
-          distance: 0,
-          campus: "Campus",
-          accuracy: body.accuracy || 10
-        };
+        // Implement proper geofencing logic in fallback mode
+        const isWithinCampus = checkLocationInCampus(body.latitude, body.longitude, body.accuracy);
+        
+        if (isWithinCampus.valid) {
+          return {
+            gps_verified: true,
+            reason: "Location verified within campus boundary (fallback mode)",
+            distance: isWithinCampus.distance,
+            campus: "Campus",
+            accuracy: body.accuracy || 10
+          };
+        } else {
+          return {
+            gps_verified: false,
+            reason: isWithinCampus.reason,
+            distance: isWithinCampus.distance,
+            campus: null
+          };
+        }
       }
       return {
         gps_verified: false,
