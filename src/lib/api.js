@@ -33,15 +33,25 @@ async function request(path, options = {}) {
 }
 
 export async function loginWithEmailPassword(email, password) {
-  // Mock login for development/demo purposes
-  if (email === "bhuwanesh@jklu.edu.in" && password === "123") {
-    return { 
-      token: "mock-token", 
-      user: { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" } 
-    };
+  // Use mock login endpoint for development
+  try {
+    return await request("/auth/mock-login", { body: { email, password } });
+  } catch (error) {
+    // Fallback to original mock for development
+    if (email === "bhuwanesh@jklu.edu.in" && password === "123") {
+      return { 
+        token: "mock-token", 
+        user: { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" } 
+      };
+    }
+    if (email === "devamgupta@jklu.edu.in" && password === "abc") {
+      return { 
+        token: "mock-token", 
+        user: { id: 2, email: "devamgupta@jklu.edu.in", role: "Student" } 
+      };
+    }
+    throw error;
   }
-  // Expect backend to return: { token, user: { id, email, role } }
-  return request("/auth/login", { body: { email, password } });
 }
 
 export async function getMe(token) {
@@ -50,6 +60,32 @@ export async function getMe(token) {
 
 export async function getStudents(token, hostel = "All Hostels") {
   const url = hostel === "All Hostels" ? "/students" : `/students?hostel=${hostel}`;
+  return request(url, { method: "GET", token });
+}
+
+// Geofencing API functions
+export async function getGeofencingBoundaries(token) {
+  return request("/geofencing/boundaries", { method: "GET", token });
+}
+
+export async function verifyLocation(token, latitude, longitude, accuracy) {
+  return request("/geofencing/verify", {
+    method: "POST",
+    token,
+    body: { latitude, longitude, accuracy }
+  });
+}
+
+export async function markAttendance(token, attendanceData) {
+  return request("/attendance/mark", {
+    method: "POST",
+    token,
+    body: attendanceData
+  });
+}
+
+export async function getAttendance(token, dateFilter = "", statusFilter = "All") {
+  const url = `/attendance?${dateFilter ? `date=${dateFilter}` : ''}${statusFilter !== 'All' ? `&status=${statusFilter}` : ''}`;
   return request(url, { method: "GET", token });
 }
 

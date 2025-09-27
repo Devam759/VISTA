@@ -12,6 +12,7 @@ import bcrypt
 import json
 from database_manager import db_manager, csv_manager
 from fallback_data import fallback_manager
+from geofencing import geofencing_manager
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -21,6 +22,34 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 # Initialize extensions
 CORS(app)
 jwt = JWTManager(app)
+
+# Mock authentication for development
+@app.route('/auth/mock-login', methods=['POST'])
+def mock_login():
+    """Mock login endpoint for development"""
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    
+    # Mock credentials
+    if email == "bhuwanesh@jklu.edu.in" and password == "123":
+        # Create a real JWT token
+        from flask_jwt_extended import create_access_token
+        token = create_access_token(identity=1)
+        return jsonify({
+            'token': token,
+            'user': {'id': 1, 'email': email, 'role': 'Warden', 'user_id': 1}
+        })
+    elif email == "devamgupta@jklu.edu.in" and password == "abc":
+        # Create a real JWT token for student
+        from flask_jwt_extended import create_access_token
+        token = create_access_token(identity=2)
+        return jsonify({
+            'token': token,
+            'user': {'id': 2, 'email': email, 'role': 'Student', 'user_id': 2}
+        })
+    else:
+        return jsonify({'error': 'Invalid credentials'}), 401
 
 def hash_password(password):
     """Hash password using bcrypt"""
@@ -212,6 +241,31 @@ def mark_attendance():
             confidence_score = 95.5
             verification_method = 'Face_Recognition'
         
+        # Verify GPS location if provided
+        gps_verified = False
+        gps_latitude = None
+        gps_longitude = None
+        gps_accuracy = None
+        
+        if 'latitude' in data and 'longitude' in data:
+            gps_latitude = float(data['latitude'])
+            gps_longitude = float(data['longitude'])
+            gps_accuracy = float(data.get('accuracy', 0))
+            
+            # Validate location within campus boundary
+            location_validation = geofencing_manager.validate_attendance_location(
+                gps_latitude, gps_longitude, gps_accuracy
+            )
+            
+            gps_verified = location_validation['gps_verified']
+            
+            if not gps_verified:
+                return jsonify({
+                    'error': 'Location verification failed',
+                    'reason': location_validation['reason'],
+                    'distance': location_validation.get('distance')
+                }), 400
+        
         # Determine status based on time
         current_time = datetime.now().time()
         deadline_time = datetime.strptime('22:30:00', '%H:%M:%S').time()
@@ -225,7 +279,7 @@ def mark_attendance():
         data_manager.mark_attendance(
             student_id, today, current_time, status, verification_method,
             confidence_score, data.get('wifi_verified', False), 
-            data.get('gps_verified', False), data.get('notes', ''),
+            gps_verified, data.get('notes', ''),
             current_user['user_id']
         )
         
@@ -260,6 +314,87 @@ def get_hostels():
         return jsonify({'hostels': hostels})
         
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# =====================================================
+# GEOFENCING ENDPOINTS
+# =====================================================
+
+@app.route('/geofencing/boundaries', methods=['GET'])
+def get_geofencing_boundaries():
+    """Get campus boundary for frontend"""
+    try:
+        # Get authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header required'}), 401
+        
+        # Handle mock token for development
+        if auth_header == 'Bearer mock-token':
+            current_user = {'user_id': 1, 'email': 'warden@jklu.edu.in', 'role': 'Warden'}
+        else:
+            # Try to get JWT identity for real tokens
+            try:
+                from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+                verify_jwt_in_request()
+                current_user = get_jwt_identity()
+            except Exception as e:
+                return jsonify({'error': 'Invalid token'}), 401
+        
+        boundary = geofencing_manager.get_campus_boundary()
+        return jsonify({'boundary': boundary})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/geofencing/verify', methods=['POST'])
+def verify_location():
+    """Verify if current location is within campus boundary"""
+    try:
+        # Get authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header required'}), 401
+        
+        # Handle mock token for development
+        if auth_header == 'Bearer mock-token':
+            current_user = {'user_id': 1, 'email': 'warden@jklu.edu.in', 'role': 'Warden'}
+        else:
+            # Try to get JWT identity for real tokens
+            try:
+                from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+                verify_jwt_in_request()
+                current_user = get_jwt_identity()
+            except Exception as e:
+                return jsonify({'error': 'Invalid token'}), 401
+        
+        data = request.get_json()
+        
+        # Debug logging
+        print(f"Received data: {data}")
+        print(f"Current user: {current_user}")
+        
+        # Check if data is valid
+        if not data:
+            return jsonify({'error': 'No data provided'}), 422
+        
+        if 'latitude' not in data or 'longitude' not in data:
+            return jsonify({'error': 'Missing latitude or longitude'}), 422
+        
+        latitude = float(data.get('latitude'))
+        longitude = float(data.get('longitude'))
+        accuracy = float(data.get('accuracy', 0))
+        
+        # Validate location within campus boundary
+        validation = geofencing_manager.validate_attendance_location(
+            latitude, longitude, accuracy
+        )
+        
+        return jsonify(validation)
+        
+    except ValueError as e:
+        return jsonify({'error': f'Invalid data format: {str(e)}'}), 422
+    except Exception as e:
+        print(f"Error in verify_location: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # =====================================================

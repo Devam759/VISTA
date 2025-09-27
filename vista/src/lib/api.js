@@ -46,4 +46,29 @@ export async function getStudents(token, hostel = "All Hostels") {
   return request(url, { method: "GET", token });
 }
 
+export async function getGeofencingBoundaries(token) {
+  return request("/geofencing/boundaries", { method: "GET", token });
+}
+
+export async function verifyLocation(token, latitude, longitude, accuracy) {
+  return request("/geofencing/verify", { 
+    method: "POST", 
+    token,
+    body: { latitude, longitude, accuracy }
+  });
+}
+
+export async function markAttendance(token, attendanceData) {
+  return request("/attendance/mark", { 
+    method: "POST", 
+    token,
+    body: attendanceData
+  });
+}
+
+export async function getAttendance(token, dateFilter = "", statusFilter = "All") {
+  const url = `/attendance?${dateFilter ? `date=${dateFilter}` : ''}${statusFilter !== 'All' ? `&status=${statusFilter}` : ''}`;
+  return request(url, { method: "GET", token });
+}
+
 

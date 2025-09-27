@@ -4,6 +4,7 @@ import AuthProvider from "../components/AuthProvider";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import ErrorBoundary from "../components/ErrorBoundary";
+import LocationTracingWrapper from "../components/LocationTracingWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,11 +30,13 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>
           <AuthProvider>
-            <Navbar />
-            <div className="container-app py-6 flex gap-6 min-h-screen">
-              <Sidebar />
-              <main className="flex-1 min-w-0 overflow-x-auto">{children}</main>
-            </div>
+            <LocationTracingWrapper>
+              <Navbar />
+              <div className="container-app py-6 flex gap-6 min-h-screen">
+                <Sidebar />
+                <main className="flex-1 min-w-0 overflow-x-auto">{children}</main>
+              </div>
+            </LocationTracingWrapper>
           </AuthProvider>
         </ErrorBoundary>
       </body>
