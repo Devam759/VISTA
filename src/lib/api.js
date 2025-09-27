@@ -157,7 +157,31 @@ async function handleFallbackRequest(path, options = {}) {
       };
 
     case "/students":
-      return { students: [] };
+      // Return the imported student data
+      return {
+        students: [
+          { studentId: 1, rollNo: "BTECH25/0231", name: "Anirudh Choudhary", roomNo: "101", hostel: "BH2" },
+          { studentId: 2, rollNo: "BTECH25/2054", name: "Daksh Soni", roomNo: "101", hostel: "BH2" },
+          { studentId: 3, rollNo: "BTECH25/0121", name: "Rohan Goyal", roomNo: "101", hostel: "BH2" },
+          { studentId: 4, rollNo: "BDES25/0118", name: "Aaron Augustine", roomNo: "102", hostel: "BH2" },
+          { studentId: 5, rollNo: "BTECH25/0616", name: "Leesanth G", roomNo: "102", hostel: "BH2" },
+          { studentId: 6, rollNo: "BTECH25/1325", name: "Myadam Samarth", roomNo: "102", hostel: "BH2" },
+          { studentId: 7, rollNo: "BTECH25/2021", name: "Mrinal Khandal", roomNo: "103", hostel: "BH2" },
+          { studentId: 8, rollNo: "BBA25/0320", name: "Parth Mundra", roomNo: "103", hostel: "BH2" },
+          { studentId: 9, rollNo: "BTECH25/2205", name: "Rishikesh Bhardwaj", roomNo: "103", hostel: "BH2" },
+          { studentId: 10, rollNo: "BDES25/0238", name: "Ankush Panda", roomNo: "104", hostel: "BH2" },
+          { studentId: 11, rollNo: "BTECH25/2313", name: "Abhirama Karthikeya Sreyas Tuttagunta", roomNo: "104", hostel: "BH2" },
+          { studentId: 12, rollNo: "BTECH25/2547", name: "Doddaka Jayadeep Naga Sai", roomNo: "104", hostel: "BH2" },
+          { studentId: 13, rollNo: "BTECH25/2794", name: "Ashutosh Yadav", roomNo: "105", hostel: "BH2" },
+          { studentId: 14, rollNo: "BTECH25/2067", name: "Rishabh Kalwar", roomNo: "105", hostel: "BH2" },
+          { studentId: 15, rollNo: "BTECH25/1425", name: "Vaibhav Jain", roomNo: "105", hostel: "BH2" },
+          { studentId: 16, rollNo: "BTECH25/2432", name: "Heramb Sharma", roomNo: "106", hostel: "BH2" },
+          { studentId: 17, rollNo: "BTECH25/0125", name: "Piyush Kumar", roomNo: "106", hostel: "BH2" },
+          { studentId: 18, rollNo: "BTECH25/2156", name: "Sanket Kumar", roomNo: "106", hostel: "BH2" },
+          { studentId: 19, rollNo: "BTECH25/1698", name: "Vikash Kumar", roomNo: "107", hostel: "BH2" },
+          { studentId: 20, rollNo: "BTECH25/1478", name: "Abhishek Kumar", roomNo: "107", hostel: "BH2" }
+        ]
+      };
 
     case "/attendance":
       return { attendance: [] };
