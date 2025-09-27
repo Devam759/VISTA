@@ -35,14 +35,10 @@ export default function AuthProvider({ children }) {
         setUser(null);
       }
     } else {
-      // Auto-login as Warden if no session exists
-      const mockUser = { id: 1, email: "warden@jklu.edu.in", role: "Warden" };
-      setToken("mock-token");
-      setRole("Warden");
-      setUser(mockUser);
-      window.localStorage.setItem("vista_token", "mock-token");
-      window.localStorage.setItem("vista_role", "Warden");
-      window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
+      // No auto-login - users must go through location tracing and login flow
+      setToken(null);
+      setRole(null);
+      setUser(null);
     }
     
     setIsInitialized(true);

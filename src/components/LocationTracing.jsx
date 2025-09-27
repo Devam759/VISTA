@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "./AuthProvider";
 import locationService from "../lib/location";
 import { verifyLocation } from "../lib/api";
@@ -15,6 +15,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
   const [retryCount, setRetryCount] = useState(0);
   const [maxRetries] = useState(3);
   const [showPermissionGuide, setShowPermissionGuide] = useState(false);
+  const callbackCalledRef = useRef(false);
 
   useEffect(() => {
     const getLocationAndVerify = async () => {
@@ -35,9 +36,8 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
 
         // For desktop users, skip geofencing verification
         if (position.isDesktop) {
-          onLocationVerified({
-            ...position,
-            verified: true,
+          setVerificationStatus({
+            gps_verified: true,
             reason: 'Desktop access granted (geofencing bypassed)'
           });
           return;
@@ -54,16 +54,6 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
             );
             
             setVerificationStatus(verificationResult);
-            
-            if (verificationResult.gps_verified) {
-              onLocationVerified({
-                ...position,
-                verified: true,
-                reason: verificationResult.reason
-              });
-            } else {
-              onLocationError(verificationResult.reason);
-            }
           } catch (apiError) {
             console.error('API verification error:', apiError);
             setError('Failed to verify location with server');
@@ -71,9 +61,8 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           }
         } else {
           // If no token, just proceed with location data without verification
-          onLocationVerified({
-            ...position,
-            verified: true,
+          setVerificationStatus({
+            gps_verified: true,
             reason: 'Location detected (no server verification)'
           });
         }
@@ -328,6 +317,21 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
             >
               Try Again
             </button>
+            <button
+              onClick={() => {
+                // Allow user to proceed to login even if out of campus
+                if (onLocationVerified) {
+                  onLocationVerified({
+                    ...location,
+                    verified: true,
+                    reason: 'Location verification bypassed by user'
+                  });
+                }
+              }}
+              className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors w-full"
+            >
+              Continue Anyway
+            </button>
             <p className="text-sm text-gray-500">
               Please ensure you are within the campus boundaries.
             </p>
@@ -336,6 +340,18 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
       </div>
     );
   }
+
+  // Handle location verification callback
+  useEffect(() => {
+    if (verificationStatus && verificationStatus.gps_verified && onLocationVerified && !callbackCalledRef.current) {
+      callbackCalledRef.current = true;
+      onLocationVerified({
+        ...location,
+        verified: true,
+        reason: verificationStatus.reason
+      });
+    }
+  }, [verificationStatus, location, onLocationVerified]);
 
   if (verificationStatus && verificationStatus.gps_verified) {
     return (
@@ -358,7 +374,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           </div>
           
           <div className="animate-pulse">
-            <p className="text-sm text-gray-500">Redirecting to dashboard...</p>
+            <p className="text-sm text-gray-500">Redirecting to login...</p>
           </div>
         </div>
       </div>
