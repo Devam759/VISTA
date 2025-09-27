@@ -195,6 +195,18 @@ class StandaloneFallbackManager:
                 'hostel': 'BH-1',
                 'room': '102',
                 'phone': '9876543212'
+            },
+            {
+                'id': 4,
+                'name': 'Devam Gupta',
+                'email': 'devamgupta@jklu.edu.in',
+                'hostel': 'BH2',
+                'room': '604',
+                'phone': '7340015201',
+                'roll_no': '2024btech014',
+                'year': '2nd year',
+                'course': 'AC',
+                'branch': '3 seater'
             }
         ]
         self.attendance_records = []
