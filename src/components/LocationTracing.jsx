@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "./AuthProvider";
 import locationService from "../lib/location";
 import { verifyLocation } from "../lib/api";
+import LocationPermissionGuide from "./LocationPermissionGuide";
 
 export default function LocationTracing({ onLocationVerified, onLocationError }) {
   const { token } = useAuth();
@@ -13,6 +14,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
   const [verificationStatus, setVerificationStatus] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   const [maxRetries] = useState(3);
+  const [showPermissionGuide, setShowPermissionGuide] = useState(false);
 
   useEffect(() => {
     const getLocationAndVerify = async () => {
@@ -21,8 +23,14 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
       setVerificationStatus(null);
 
       try {
-        // Get current location
-        const position = await locationService.getCurrentPosition();
+        // Check permissions first
+        const permissionCheck = await locationService.checkPermissions();
+        if (!permissionCheck.available) {
+          throw new Error(permissionCheck.reason);
+        }
+
+        // Get current location with retry
+        const position = await locationService.getCurrentPositionWithRetry();
         setLocation(position);
 
         // Verify location with backend
@@ -63,6 +71,11 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
         console.error('Location error:', locationError);
         setError(locationError.message);
         onLocationError(locationError.message);
+        
+        // Show permission guide for permission-related errors
+        if (locationError.message.includes('permission') || locationError.message.includes('denied')) {
+          setShowPermissionGuide(true);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -82,7 +95,14 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
         const getLocationAndVerify = async () => {
           setIsLoading(true);
           try {
-            const position = await locationService.getCurrentPosition();
+            // Check permissions first
+            const permissionCheck = await locationService.checkPermissions();
+            if (!permissionCheck.available) {
+              throw new Error(permissionCheck.reason);
+            }
+
+            // Get current location with retry
+            const position = await locationService.getCurrentPositionWithRetry();
             setLocation(position);
 
             if (token) {
@@ -147,15 +167,40 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
     );
   }
 
+  if (showPermissionGuide) {
+    return (
+      <LocationPermissionGuide
+        onPermissionGranted={() => {
+          setShowPermissionGuide(false);
+          setError(null);
+          handleRetry();
+        }}
+        onClose={() => {
+          setShowPermissionGuide(false);
+        }}
+      />
+    );
+  }
+
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-2xl">📍</span>
           </div>
-          <h2 className="text-2xl font-bold text-red-600 mb-2">Location Error</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Location Access Required</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          
+          <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
+            <h3 className="font-semibold text-blue-800 mb-2">How to Enable Location Access:</h3>
+            <ol className="text-sm text-blue-700 space-y-1">
+              <li>1. Look for the location icon (📍) in your browser's address bar</li>
+              <li>2. Click on it and select "Allow" for this site</li>
+              <li>3. Make sure your device's location services are enabled</li>
+              <li>4. Try again after granting permission</li>
+            </ol>
+          </div>
           
           {retryCount < maxRetries ? (
             <div className="space-y-4">
@@ -165,16 +210,28 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
               >
                 Try Again ({retryCount}/{maxRetries})
               </button>
+              <button
+                onClick={() => setShowPermissionGuide(true)}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors w-full"
+              >
+                Show Detailed Instructions
+              </button>
               <p className="text-sm text-gray-500">
-                Please ensure location services are enabled and permissions are granted.
+                After enabling location access, click "Try Again"
               </p>
             </div>
           ) : (
             <div className="space-y-4">
               <p className="text-red-600 font-medium">Maximum retries reached</p>
               <button
+                onClick={() => setShowPermissionGuide(true)}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors w-full"
+              >
+                Show Detailed Instructions
+              </button>
+              <button
                 onClick={() => window.location.reload()}
-                className="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors"
+                className="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors w-full"
               >
                 Refresh Page
               </button>

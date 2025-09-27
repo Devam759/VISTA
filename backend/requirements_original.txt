@@ -1,4 +1,4 @@
-# VISTA Backend Requirements for Railway (Simplified)
+# VISTA Backend Requirements
 # Python 3.8+ required
 
 # Web Framework
@@ -17,7 +17,13 @@ bcrypt==4.0.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
-# Utilities (without face recognition)
+# Face Recognition
+opencv-python==4.8.1.78
+face-recognition==1.3.0
+numpy==1.24.3
+Pillow==10.0.1
+
+# Utilities
 python-dotenv==1.0.0
 requests==2.31.0
 Werkzeug==2.3.7
