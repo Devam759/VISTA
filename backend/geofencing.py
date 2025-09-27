@@ -15,30 +15,17 @@ class GeofencingManager:
         self.hostel_center_lon = Config.HOSTEL_LONGITUDE
         self.accuracy_radius = Config.GPS_ACCURACY_RADIUS  # meters
         
-        # Define campus boundary (14-point polygon covering entire campus)
+        # Define campus boundary (rectangular boundary for reliability)
         # Campus boundary for JKLU (Jagadguru Kripalu University)
-        # Points will be connected in order: Point1 -> Point2 -> Point3 -> ... -> Point14 -> Point1
         self.campus_boundary = {
             'center': (26.8351, 75.6508),  # JKLU Campus Center (corrected)
             'radius': 800,  # meters - campus radius (corrected)
-            'polygon': [
-                # Campus boundary points forming a polygon around JKLU campus
-                (26.836760, 75.651187),  # Point 1 - Southwest corner
-                (26.837109, 75.649523),  # Point 2
-                (26.836655, 75.648472),  # Point 3
-                (26.836079, 75.648307),  # Point 4
-                (26.835495, 75.650194),  # Point 5
-                (26.834788, 75.650150),  # Point 6
-                (26.834635, 75.650973),  # Point 7
-                (26.833430, 75.651435),  # Point 8
-                (26.832659, 75.652500),  # Point 9
-                (26.833776, 75.653021),  # Point 10
-                (26.834072, 75.652374),  # Point 11
-                (26.834935, 75.652472),  # Point 12
-                (26.835321, 75.651554),  # Point 13
-                (26.835838, 75.651320),  # Point 14 - Southeast corner
-                # Removed outlier coordinate (26.896678, 75.649331) which was 6.4km away
-            ]
+            'bounds': {
+                'min_lat': 26.832659,
+                'max_lat': 26.837109,
+                'min_lon': 75.648307,
+                'max_lon': 75.653021
+            }
         }
     
     def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -59,27 +46,12 @@ class GeofencingManager:
         r = 6371000
         return c * r
     
-    def is_point_in_polygon(self, point: Tuple[float, float], polygon: List[Tuple[float, float]]) -> bool:
+    def is_point_in_bounds(self, latitude: float, longitude: float, bounds: Dict) -> bool:
         """
-        Check if a point is inside a polygon using ray casting algorithm
+        Check if a point is inside rectangular bounds
         """
-        x, y = point
-        n = len(polygon)
-        inside = False
-        
-        p1x, p1y = polygon[0]
-        for i in range(1, n + 1):
-            p2x, p2y = polygon[i % n]
-            if y > min(p1y, p2y):
-                if y <= max(p1y, p2y):
-                    if x <= max(p1x, p2x):
-                        if p1y != p2y:
-                            xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
-                        if p1x == p2x or x <= xinters:
-                            inside = not inside
-            p1x, p1y = p2x, p2y
-        
-        return inside
+        return (bounds['min_lat'] <= latitude <= bounds['max_lat'] and 
+                bounds['min_lon'] <= longitude <= bounds['max_lon'])
     
     def verify_location(self, latitude: float, longitude: float, accuracy: float = None) -> Dict:
         """
@@ -110,8 +82,8 @@ class GeofencingManager:
                 self.campus_boundary['center'][0], self.campus_boundary['center'][1]
             )
             
-            # Only check if within campus polygon boundary (no radius check)
-            if self.is_point_in_polygon((latitude, longitude), self.campus_boundary['polygon']):
+            # Only check if within campus rectangular boundary (no radius check)
+            if self.is_point_in_bounds(latitude, longitude, self.campus_boundary['bounds']):
                 return {
                     'valid': True,
                     'reason': 'Location verified within campus boundary',

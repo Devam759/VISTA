@@ -4,17 +4,23 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 const isProduction = process.env.NODE_ENV === 'production';
 const isBackendAvailable = process.env.NEXT_PUBLIC_BACKEND_AVAILABLE === 'true';
 
-// Campus boundary configuration (corrected center and radius)
+// Campus boundary configuration (rectangular boundary for reliability)
 const CAMPUS_BOUNDARY = {
   center: { latitude: 26.8351, longitude: 75.6508 }, // Calculated from actual coordinates
   radius: 800, // meters - covers the main campus area
+  // Use rectangular boundary for more reliable geofencing
+  bounds: {
+    minLat: 26.832659,
+    maxLat: 26.837109,
+    minLon: 75.648307,
+    maxLon: 75.653021
+  },
   polygon: [
-    [26.836760, 75.651187], [26.837109, 75.649523], [26.836655, 75.648472], 
-    [26.836079, 75.648307], [26.835495, 75.650194], [26.834788, 75.650150], 
-    [26.834635, 75.650973], [26.833430, 75.651435], [26.832659, 75.652500], 
-    [26.833776, 75.653021], [26.834072, 75.652374], [26.834935, 75.652472], 
-    [26.835321, 75.651554], [26.835838, 75.651320]
-    // Removed outlier coordinate (26.896678, 75.649331) which was 6.4km away
+    // Simple rectangular boundary using min/max coordinates
+    [26.832659, 75.648307], // Southwest corner
+    [26.837109, 75.648307], // Southeast corner  
+    [26.837109, 75.653021], // Northeast corner
+    [26.832659, 75.653021]  // Northwest corner
   ]
 };
 
@@ -39,6 +45,7 @@ function isPointInPolygon(point, polygon) {
     const xi = polygon[i][0], yi = polygon[i][1];
     const xj = polygon[j][0], yj = polygon[j][1];
     
+    // Ray casting algorithm - check if point is inside polygon
     if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
       inside = !inside;
     }
@@ -47,7 +54,13 @@ function isPointInPolygon(point, polygon) {
   return inside;
 }
 
-// Check if location is within campus boundary (polygon only)
+// Check if point is inside rectangular bounds
+function isPointInBounds(latitude, longitude, bounds) {
+  return latitude >= bounds.minLat && latitude <= bounds.maxLat && 
+         longitude >= bounds.minLon && longitude <= bounds.maxLon;
+}
+
+// Check if location is within campus boundary (rectangular boundary)
 function checkLocationInCampus(latitude, longitude, accuracy) {
   try {
     // Check if coordinates are valid
@@ -74,8 +87,8 @@ function checkLocationInCampus(latitude, longitude, accuracy) {
       CAMPUS_BOUNDARY.center.latitude, CAMPUS_BOUNDARY.center.longitude
     );
     
-    // Only check if within campus polygon boundary (no radius check)
-    if (isPointInPolygon([longitude, latitude], CAMPUS_BOUNDARY.polygon)) {
+    // Check if within campus rectangular boundary
+    if (isPointInBounds(latitude, longitude, CAMPUS_BOUNDARY.bounds)) {
       return {
         valid: true,
         reason: 'Location verified within campus boundary',
