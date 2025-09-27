@@ -514,6 +514,91 @@ def mark_attendance():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Admin endpoints for database management
+@app.route('/admin/add-devam-gupta', methods=['POST'])
+@jwt_required()
+def add_devam_gupta():
+    """Add Devam Gupta to the database"""
+    try:
+        # Create students table if it doesn't exist
+        conn = db_manager.get_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Create table
+        create_table_sql = """
+        CREATE TABLE IF NOT EXISTS students (
+            id SERIAL PRIMARY KEY,
+            roll_no VARCHAR(20) UNIQUE NOT NULL,
+            name VARCHAR(100) NOT NULL,
+            room_no VARCHAR(10),
+            hostel VARCHAR(10),
+            year VARCHAR(10),
+            course VARCHAR(50),
+            branch VARCHAR(50),
+            room_type VARCHAR(20),
+            mobile VARCHAR(15),
+            email VARCHAR(100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """
+        
+        cursor.execute(create_table_sql)
+        conn.commit()
+        
+        # Insert Devam Gupta
+        insert_sql = """
+        INSERT INTO students (roll_no, name, room_no, hostel, year, course, branch, room_type, mobile, email)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (roll_no) DO UPDATE SET
+            name = EXCLUDED.name,
+            room_no = EXCLUDED.room_no,
+            hostel = EXCLUDED.hostel,
+            year = EXCLUDED.year,
+            course = EXCLUDED.course,
+            branch = EXCLUDED.branch,
+            room_type = EXCLUDED.room_type,
+            mobile = EXCLUDED.mobile,
+            email = EXCLUDED.email;
+        """
+        
+        student_data = (
+            '2024BTech014',
+            'Devam Gupta',
+            '604',
+            'BH2',
+            '2nd year',
+            'AC',
+            '3 Seater',
+            'AC',
+            '7340015201',
+            'devamgupta@jklu.edu.in'
+        )
+        
+        cursor.execute(insert_sql, student_data)
+        conn.commit()
+        
+        # Verify insertion
+        cursor.execute("SELECT * FROM students WHERE roll_no = %s", ('2024BTech014',))
+        result = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Devam Gupta added successfully',
+                'student': dict(result)
+            })
+        else:
+            return jsonify({'error': 'Failed to verify insertion'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):
