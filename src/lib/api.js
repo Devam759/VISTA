@@ -47,7 +47,7 @@ function isPointInPolygon(point, polygon) {
   return inside;
 }
 
-// Check if location is within campus boundary
+// Check if location is within campus boundary (polygon only)
 function checkLocationInCampus(latitude, longitude, accuracy) {
   try {
     // Check if coordinates are valid
@@ -59,31 +59,22 @@ function checkLocationInCampus(latitude, longitude, accuracy) {
       };
     }
     
-    // Check accuracy if provided
-    if (accuracy && accuracy > 200) {
+    // Check accuracy if provided (relaxed requirement)
+    if (accuracy && accuracy > 500) {
       return {
         valid: false,
-        reason: `GPS accuracy too low: ${accuracy}m (required: <200m)`,
+        reason: `GPS accuracy too low: ${accuracy}m (required: <500m)`,
         distance: null
       };
     }
     
-    // Check distance from campus center
+    // Calculate distance from campus center for information
     const distanceFromCenter = calculateDistance(
       latitude, longitude,
       CAMPUS_BOUNDARY.center.latitude, CAMPUS_BOUNDARY.center.longitude
     );
     
-    // Check if within campus radius
-    if (distanceFromCenter > CAMPUS_BOUNDARY.radius) {
-      return {
-        valid: false,
-        reason: `Too far from campus: ${distanceFromCenter.toFixed(1)}m (max: ${CAMPUS_BOUNDARY.radius}m)`,
-        distance: distanceFromCenter
-      };
-    }
-    
-    // Check if within campus polygon boundary
+    // Only check if within campus polygon boundary (no radius check)
     if (isPointInPolygon([longitude, latitude], CAMPUS_BOUNDARY.polygon)) {
       return {
         valid: true,

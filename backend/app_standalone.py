@@ -80,7 +80,7 @@ class StandaloneGeofencingManager:
         return inside
     
     def verify_location(self, latitude: float, longitude: float, accuracy: float = None) -> Dict:
-        """Verify if the given coordinates are within campus boundary"""
+        """Verify if the given coordinates are within campus boundary (polygon only)"""
         try:
             if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
                 return {
@@ -90,10 +90,10 @@ class StandaloneGeofencingManager:
                     'campus': None
                 }
             
-            if accuracy and accuracy > 200:
+            if accuracy and accuracy > 500:  # Relaxed accuracy requirement
                 return {
                     'valid': False,
-                    'reason': f'GPS accuracy too low: {accuracy}m (required: <200m)',
+                    'reason': f'GPS accuracy too low: {accuracy}m (required: <500m)',
                     'distance': None,
                     'campus': None
                 }
@@ -103,14 +103,7 @@ class StandaloneGeofencingManager:
                 self.campus_boundary['center'][0], self.campus_boundary['center'][1]
             )
             
-            if distance_from_center > self.campus_boundary['radius']:
-                return {
-                    'valid': False,
-                    'reason': f'Too far from campus: {distance_from_center:.1f}m (max: {self.campus_boundary["radius"]}m)',
-                    'distance': distance_from_center,
-                    'campus': None
-                }
-            
+            # Only check polygon boundary (no radius check)
             if self.is_point_in_polygon((latitude, longitude), self.campus_boundary['polygon']):
                 return {
                     'valid': True,

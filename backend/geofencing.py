@@ -83,7 +83,7 @@ class GeofencingManager:
     
     def verify_location(self, latitude: float, longitude: float, accuracy: float = None) -> Dict:
         """
-        Verify if the given coordinates are within campus boundary
+        Verify if the given coordinates are within campus boundary (polygon only)
         """
         try:
             # Check if coordinates are valid
@@ -95,31 +95,22 @@ class GeofencingManager:
                     'campus': None
                 }
             
-            # Check accuracy if provided
-            if accuracy and accuracy > 200:  # Accuracy worse than 200 meters (more realistic for campus)
+            # Check accuracy if provided (relaxed requirement)
+            if accuracy and accuracy > 500:  # Accuracy worse than 500 meters
                 return {
                     'valid': False,
-                    'reason': f'GPS accuracy too low: {accuracy}m (required: <200m)',
+                    'reason': f'GPS accuracy too low: {accuracy}m (required: <500m)',
                     'distance': None,
                     'campus': None
                 }
             
-            # Check distance from campus center
+            # Calculate distance from campus center for information
             distance_from_center = self.calculate_distance(
                 latitude, longitude, 
                 self.campus_boundary['center'][0], self.campus_boundary['center'][1]
             )
             
-            # Check if within campus radius
-            if distance_from_center > self.campus_boundary['radius']:
-                return {
-                    'valid': False,
-                    'reason': f'Too far from campus: {distance_from_center:.1f}m (max: {self.campus_boundary["radius"]}m)',
-                    'distance': distance_from_center,
-                    'campus': None
-                }
-            
-            # Check if within campus polygon boundary
+            # Only check if within campus polygon boundary (no radius check)
             if self.is_point_in_polygon((latitude, longitude), self.campus_boundary['polygon']):
                 return {
                     'valid': True,
