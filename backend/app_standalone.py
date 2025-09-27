@@ -35,16 +35,19 @@ class StandaloneGeofencingManager:
         self.hostel_center_lon = float(os.getenv('HOSTEL_LONGITUDE', 73.0243))
         self.accuracy_radius = int(os.getenv('GPS_ACCURACY_RADIUS', 100))
         
-        # Define campus boundary (rectangular boundary for reliability)
+        # Define campus boundary (15-coordinate polygon)
         self.campus_boundary = {
             'center': (26.8351, 75.6508),  # JKLU Campus Center (corrected)
             'radius': 800,  # meters - campus radius (corrected)
-            'bounds': {
-                'min_lat': 26.832659,
-                'max_lat': 26.837109,
-                'min_lon': 75.648307,
-                'max_lon': 75.653021
-            }
+            'polygon': [
+                # 15-coordinate polygon using all original coordinates
+                # Format: (longitude, latitude) for the algorithm
+                (75.651187, 26.836760), (75.649523, 26.837109), (75.649331, 26.896678),
+                (75.648472, 26.836655), (75.648307, 26.836079), (75.650194, 26.835495),
+                (75.650150, 26.834788), (75.650973, 26.834635), (75.651435, 26.833430),
+                (75.652500, 26.832659), (75.653021, 26.833776), (75.652374, 26.834072),
+                (75.652472, 26.834935), (75.651554, 26.835321), (75.651320, 26.835838)
+            ]
         }
     
     def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -57,10 +60,25 @@ class StandaloneGeofencingManager:
         r = 6371000  # Radius of earth in meters
         return c * r
     
-    def is_point_in_bounds(self, latitude: float, longitude: float, bounds: Dict) -> bool:
-        """Check if a point is inside rectangular bounds"""
-        return (bounds['min_lat'] <= latitude <= bounds['max_lat'] and 
-                bounds['min_lon'] <= longitude <= bounds['max_lon'])
+    def is_point_in_polygon(self, point: Tuple[float, float], polygon: List[Tuple[float, float]]) -> bool:
+        """Check if a point is inside a polygon using ray casting algorithm"""
+        x, y = point
+        n = len(polygon)
+        inside = False
+        
+        p1x, p1y = polygon[0]
+        for i in range(1, n + 1):
+            p2x, p2y = polygon[i % n]
+            if y > min(p1y, p2y):
+                if y <= max(p1y, p2y):
+                    if x <= max(p1x, p2x):
+                        if p1y != p2y:
+                            xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                        if p1x == p2x or x <= xinters:
+                            inside = not inside
+            p1x, p1y = p2x, p2y
+        
+        return inside
     
     def verify_location(self, latitude: float, longitude: float, accuracy: float = None) -> Dict:
         """Verify if the given coordinates are within campus boundary (polygon only)"""
@@ -86,8 +104,8 @@ class StandaloneGeofencingManager:
                 self.campus_boundary['center'][0], self.campus_boundary['center'][1]
             )
             
-            # Only check rectangular boundary (no radius check)
-            if self.is_point_in_bounds(latitude, longitude, self.campus_boundary['bounds']):
+            # Only check polygon boundary (no radius check)
+            if self.is_point_in_polygon((longitude, latitude), self.campus_boundary['polygon']):
                 return {
                     'valid': True,
                     'reason': 'Location verified within campus boundary',
