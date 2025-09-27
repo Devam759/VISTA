@@ -1,3 +1,17 @@
 {
-  "framework": "nextjs"
+  "env": {
+    "NEXT_PUBLIC_BACKEND_AVAILABLE": "false",
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "src/app/api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
 }
