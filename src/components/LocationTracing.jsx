@@ -58,28 +58,20 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           return;
         }
 
-        // Verify location with backend for mobile users
-        if (token) {
-          try {
-            const verificationResult = await verifyLocation(
-              token,
-              position.latitude,
-              position.longitude,
-              position.accuracy
-            );
-            
-            setVerificationStatus(verificationResult);
-          } catch (apiError) {
-            console.error('API verification error:', apiError);
-            setError('Failed to verify location with server');
-            onLocationError('Failed to verify location with server');
-          }
-        } else {
-          // If no token, just proceed with location data without verification
-          setVerificationStatus({
-            gps_verified: true,
-            reason: 'Location detected (no server verification)'
-          });
+        // Verify location with backend for mobile users (always verify, regardless of token)
+        try {
+          const verificationResult = await verifyLocation(
+            token || "mock-token", // Use mock token if no real token available
+            position.latitude,
+            position.longitude,
+            position.accuracy
+          );
+          
+          setVerificationStatus(verificationResult);
+        } catch (apiError) {
+          console.error('API verification error:', apiError);
+          setError('Failed to verify location with server');
+          onLocationError('Failed to verify location with server');
         }
       } catch (locationError) {
         console.error('Location error:', locationError);
@@ -141,32 +133,24 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
               return;
             }
 
-            if (token) {
-              const verificationResult = await verifyLocation(
-                token,
-                position.latitude,
-                position.longitude,
-                position.accuracy
-              );
-              
-              setVerificationStatus(verificationResult);
-              
-              if (verificationResult.gps_verified) {
-                onLocationVerified({
-                  ...position,
-                  verified: true,
-                  reason: verificationResult.reason
-                });
-              } else {
-                onLocationError(verificationResult.reason);
-              }
-            } else {
-              // If no token, just proceed with location data without verification
+            // Always verify location for mobile users
+            const verificationResult = await verifyLocation(
+              token || "mock-token", // Use mock token if no real token available
+              position.latitude,
+              position.longitude,
+              position.accuracy
+            );
+            
+            setVerificationStatus(verificationResult);
+            
+            if (verificationResult.gps_verified) {
               onLocationVerified({
                 ...position,
                 verified: true,
-                reason: 'Location detected (no server verification)'
+                reason: verificationResult.reason
               });
+            } else {
+              onLocationError(verificationResult.reason);
             }
           } catch (err) {
             setError(err.message);
@@ -412,7 +396,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           </div>
           
           <div className="animate-pulse">
-            <p className="text-sm text-gray-500">Redirecting to login...</p>
+            <p className="text-sm text-gray-500">Location verified! Redirecting...</p>
           </div>
         </div>
       </div>
