@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 
 export default function Protected({ children, allow = ["Student", "Warden"] }) {
-  const { role } = useAuth();
+  const { role, token } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // No redirect; app auto-logs in as Warden via AuthProvider
-  }, [role, router]);
+    // Redirect to login if not authenticated
+    if (role === null && !token) {
+      router.push("/login");
+    }
+  }, [role, token, router]);
 
   // Show loading state while auth is initializing
   if (role === null) {

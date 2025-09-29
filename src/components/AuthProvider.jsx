@@ -33,19 +33,13 @@ export default function AuthProvider({ children }) {
         setUser(JSON.parse(savedUser));
       } catch {
         setUser(null);
-      }
-    } else {
-      // Auto-login as Warden for development/testing
-      const mockUser = { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" };
-      setToken("mock-token");
-      setRole("Warden");
-      setUser(mockUser);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("vista_token", "mock-token");
-        window.localStorage.setItem("vista_role", "Warden");
-        window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
+        // Clear invalid data
+        window.localStorage.removeItem("vista_token");
+        window.localStorage.removeItem("vista_role");
+        window.localStorage.removeItem("vista_user");
       }
     }
+    // No auto-login - let users authenticate properly
     
     setIsInitialized(true);
   }, []);
@@ -58,16 +52,22 @@ export default function AuthProvider({ children }) {
           setUser(me?.user || null);
           if (me?.user?.role) setRole(me.user.role);
         } catch {
-          // If API call fails, don't logout - just use mock data for development
-          console.warn('API call failed, using mock data for development');
-          const mockUser = { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" };
-          setUser(mockUser);
-          setRole("Warden");
+          // If API call fails, clear the session and redirect to login
+          console.warn('API call failed, clearing session');
+          setToken(null);
+          setUser(null);
+          setRole(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem("vista_token");
+            window.localStorage.removeItem("vista_user");
+            window.localStorage.removeItem("vista_role");
+          }
+          router.push("/login");
         }
       }
     }
     hydrate();
-  }, [token, user]);
+  }, [token, user, router]);
 
   function setSession(nextToken, nextUser) {
     setToken(nextToken || null);
