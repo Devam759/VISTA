@@ -35,10 +35,16 @@ export default function AuthProvider({ children }) {
         setUser(null);
       }
     } else {
-      // No auto-login - users must go through location tracing and login flow
-      setToken(null);
-      setRole(null);
-      setUser(null);
+      // Auto-login as Warden for development/testing
+      const mockUser = { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" };
+      setToken("mock-token");
+      setRole("Warden");
+      setUser(mockUser);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("vista_token", "mock-token");
+        window.localStorage.setItem("vista_role", "Warden");
+        window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
+      }
     }
     
     setIsInitialized(true);
@@ -52,8 +58,11 @@ export default function AuthProvider({ children }) {
           setUser(me?.user || null);
           if (me?.user?.role) setRole(me.user.role);
         } catch {
-          // invalid token
-          logout();
+          // If API call fails, don't logout - just use mock data for development
+          console.warn('API call failed, using mock data for development');
+          const mockUser = { id: 1, email: "bhuwanesh@jklu.edu.in", role: "Warden" };
+          setUser(mockUser);
+          setRole("Warden");
         }
       }
     }
@@ -80,17 +89,7 @@ export default function AuthProvider({ children }) {
       window.localStorage.removeItem("vista_user");
       window.localStorage.removeItem("vista_role");
     }
-    // Immediately auto-login as Warden again to keep the app usable without login
-    const mockUser = { id: 1, email: "warden@jklu.edu.in", role: "Warden" };
-    setToken("mock-token");
-    setRole("Warden");
-    setUser(mockUser);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("vista_token", "mock-token");
-      window.localStorage.setItem("vista_role", "Warden");
-      window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
-    }
-    router.push("/");
+    router.push("/login");
   }
 
   const value = useMemo(() => ({ role, token, user, setSession, logout }), [role, token, user]);

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthProvider";
 import LocationTracing from "./LocationTracing";
+import locationService from "../lib/location";
 
 export default function LocationTracingWrapper({ children }) {
   const { token } = useAuth();
@@ -11,9 +12,16 @@ export default function LocationTracingWrapper({ children }) {
   const [showLocationTracing, setShowLocationTracing] = useState(false);
 
   useEffect(() => {
-    // Show location tracing for authenticated users only
+    // Show location tracing for authenticated users only, but skip for desktop users
     if (token) {
-      setShowLocationTracing(true);
+      // Check if this is a desktop device - if so, skip location tracing
+      if (locationService.isMobileDevice()) {
+        setShowLocationTracing(true);
+      } else {
+        // For desktop users, automatically mark location as verified and skip the popup
+        setLocationVerified(true);
+        setShowLocationTracing(false);
+      }
     } else {
       setShowLocationTracing(false);
     }
@@ -35,8 +43,8 @@ export default function LocationTracingWrapper({ children }) {
     setLocationVerified(false);
   };
 
-  // Show location tracing interface for authenticated users
-  if (showLocationTracing && token) {
+  // Show location tracing interface for authenticated mobile users only
+  if (showLocationTracing && token && locationService.isMobileDevice()) {
     return (
       <LocationTracing
         onLocationVerified={handleLocationVerified}

@@ -27,7 +27,6 @@ export default function Sidebar() {
 	const pathname = usePathname();
 	const { role } = useAuth();
 	const isActive = (href) => pathname === href;
-	const showStats = role === "Warden";
 	const navItems = getNavItems(role);
 	
 	return (
@@ -54,24 +53,6 @@ export default function Sidebar() {
 						))}
 					</nav>
 				</div>
-				
-				{showStats && (
-					<div className="pt-4 border-t border-foreground/10">
-						<div className="px-3 py-2">
-							<div className="text-xs text-foreground/50 mb-2">Quick Stats</div>
-							<div className="space-y-2 text-xs">
-								<div className="flex justify-between">
-									<span className="text-foreground/60">Total Students</span>
-									<span className="font-medium">1,247</span>
-								</div>
-								<div className="flex justify-between">
-									<span className="text-foreground/60">Present Today</span>
-									<span className="font-medium text-green-600">89%</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				)}
 			</div>
 		</aside>
 	);

@@ -30,7 +30,7 @@ This directory contains the complete database schema and sample data for the VIS
 - **Face Recognition** - Biometric attendance verification
 - **GPS Verification** - Location-based attendance validation
 - **WiFi Verification** - Network-based attendance confirmation
-- **Role-based Access** - Student, Warden, ChiefWarden roles
+- **Role-based Access** - Student, Warden roles
 - **Audit Logging** - Complete system activity tracking
 - **Notifications** - System notification management
 
@@ -83,7 +83,6 @@ SELECT COUNT(*) as Total_Attendance_Records FROM attendance_records;
 ### User Roles
 - **Student** - Can mark attendance, view own records
 - **Warden** - Can view hostel attendance, manage students
-- **ChiefWarden** - Full system access, all hostels
 
 ### Attendance Verification Methods
 - **Face_Recognition** - Biometric verification

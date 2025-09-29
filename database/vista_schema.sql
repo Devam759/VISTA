@@ -18,7 +18,7 @@ CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('Student', 'Warden', 'ChiefWarden') NOT NULL,
+    role ENUM('Student', 'Warden') NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(15),
@@ -267,7 +267,6 @@ INSERT INTO attendance_settings (setting_name, setting_value, setting_type, desc
 INSERT INTO users (email, password_hash, role, first_name, last_name, phone) VALUES
 -- Warden users
 ('bhuwanesh@jklu.edu.in', '$2b$10$example_hash_for_warden', 'Warden', 'Bhuwanesh', 'Sharma', '9876543210'),
-('chief.warden@jklu.edu.in', '$2b$10$example_hash_for_chief', 'ChiefWarden', 'Chief', 'Warden', '9876543200'),
 
 -- Student users
 ('devamgupta@jklu.edu.in', '$2b$10$example_hash_for_student', 'Student', 'Devam', 'Gupta', '9876543211'),
