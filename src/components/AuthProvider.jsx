@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getMe } from "../lib/api";
 
-const AuthContext = createContext({ role: null, token: null, user: null, setSession: () => {}, logout: () => {} });
+const AuthContext = createContext({ role: null, token: null, user: null, isInitialized: false, setSession: () => {}, logout: () => {}, clearAuth: () => {} });
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -92,7 +92,18 @@ export default function AuthProvider({ children }) {
     router.push("/login");
   }
 
-  const value = useMemo(() => ({ role, token, user, setSession, logout }), [role, token, user]);
+  function clearAuth() {
+    setToken(null);
+    setUser(null);
+    setRole(null);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("vista_token");
+      window.localStorage.removeItem("vista_user");
+      window.localStorage.removeItem("vista_role");
+    }
+  }
+
+  const value = useMemo(() => ({ role, token, user, isInitialized, setSession, logout, clearAuth }), [role, token, user, isInitialized]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

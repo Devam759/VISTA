@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../components/AuthProvider";
 import { loginWithEmailPassword } from "../../lib/api";
+import { clearAuthenticationData } from "../../utils/clearAuth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { setSession, role: existingRole } = useAuth();
+  const { setSession, role: existingRole, clearAuth } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [autoFilled, setAutoFilled] = useState(false);
@@ -46,6 +47,22 @@ export default function LoginPage() {
       </div>
       <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Welcome to VISTA</h2>
       <p className="text-gray-600 mb-6 text-center">Please sign in to continue</p>
+      
+      {/* Development: Clear Auth Button */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mb-4">
+          <button
+            onClick={() => {
+              clearAuth();
+              clearAuthenticationData();
+              window.location.reload();
+            }}
+            className="w-full bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            🗑️ Clear Authentication Data (Dev)
+          </button>
+        </div>
+      )}
       
       {/* Test Credentials */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -129,6 +146,7 @@ export default function LoginPage() {
         )}
         
         <button 
+          type="submit"
           disabled={loading} 
           className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
         >

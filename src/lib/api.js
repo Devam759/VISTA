@@ -234,11 +234,11 @@ async function request(path, options = {}) {
 }
 
 export async function loginWithEmailPassword(email, password) {
-  // Use mock login endpoint for development
+  // Use the correct login endpoint
   try {
-    return await request("/auth/mock-login", { body: { email, password } });
+    return await request("/auth/login", { body: { email, password } });
   } catch (error) {
-    // Fallback to original mock for development
+    // Fallback to mock credentials for development when backend is not available
     if (email === "bhuwanesh@jklu.edu.in" && password === "123") {
       return { 
         token: "mock-token", 
