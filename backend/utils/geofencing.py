@@ -7,7 +7,7 @@ from typing import Tuple, List, Dict, Optional
 class GeofencingManager:
     """Geofencing manager for location verification"""
     
-    def __init__(self, campus_lat: float = 26.2389, campus_lon: float = 73.0243, 
+    def __init__(self, campus_lat: float = 26.8351, campus_lon: float = 75.6508, 
                  accuracy_radius: int = 100):
         self.campus_center_lat = campus_lat
         self.campus_center_lon = campus_lon
@@ -16,11 +16,11 @@ class GeofencingManager:
         # Define JK Lakshmipat University campus boundary polygon
         # These coordinates define the actual campus boundary
         self.campus_boundary = [
-            (73.0230, 26.2395), (73.0240, 26.2395), (73.0250, 26.2390),
-            (73.0255, 26.2385), (73.0255, 26.2380), (73.0250, 26.2375),
-            (73.0245, 26.2370), (73.0240, 26.2365), (73.0235, 26.2365),
-            (73.0230, 26.2370), (73.0225, 26.2375), (73.0225, 26.2380),
-            (73.0230, 26.2385), (73.0230, 26.2390), (73.0230, 26.2395)
+            (75.651187, 26.836760), (75.649523, 26.837109), (75.649331, 26.836678),
+            (75.648472, 26.836655), (75.648307, 26.836079), (75.650194, 26.835495),
+            (75.650150, 26.834788), (75.650973, 26.834635), (75.651435, 26.833430),
+            (75.652500, 26.832659), (75.653021, 26.833776), (75.652374, 26.834072),
+            (75.652472, 26.834935), (75.651554, 26.835321), (75.651320, 26.835838)
         ]
     
     def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
