@@ -83,6 +83,18 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
     getLocationAndVerify();
   }, [token, onLocationVerified, onLocationError]);
 
+  // Handle location verification callback
+  useEffect(() => {
+    if (verificationStatus && verificationStatus.gps_verified && onLocationVerified && !callbackCalledRef.current) {
+      callbackCalledRef.current = true;
+      onLocationVerified({
+        ...location,
+        verified: true,
+        reason: verificationStatus.reason
+      });
+    }
+  }, [verificationStatus, location, onLocationVerified]);
+
   const handleRetry = () => {
     if (retryCount < maxRetries) {
       setRetryCount(prev => prev + 1);
@@ -340,18 +352,6 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
       </div>
     );
   }
-
-  // Handle location verification callback
-  useEffect(() => {
-    if (verificationStatus && verificationStatus.gps_verified && onLocationVerified && !callbackCalledRef.current) {
-      callbackCalledRef.current = true;
-      onLocationVerified({
-        ...location,
-        verified: true,
-        reason: verificationStatus.reason
-      });
-    }
-  }, [verificationStatus, location, onLocationVerified]);
 
   if (verificationStatus && verificationStatus.gps_verified) {
     return (

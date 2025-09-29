@@ -1,41 +1,30 @@
 """
-VISTA Geofencing Module
-Handles location-based attendance verification
+Geofencing Utility - Location Verification
 """
-
 import math
-from typing import Tuple, List, Dict
-from config import Config
+from typing import Tuple, List, Dict, Optional
 
 class GeofencingManager:
-    """Manages geofencing for attendance verification"""
+    """Geofencing manager for location verification"""
     
-    def __init__(self):
-        self.hostel_center_lat = Config.HOSTEL_LATITUDE
-        self.hostel_center_lon = Config.HOSTEL_LONGITUDE
-        self.accuracy_radius = Config.GPS_ACCURACY_RADIUS  # meters
+    def __init__(self, campus_lat: float = 26.2389, campus_lon: float = 73.0243, 
+                 accuracy_radius: int = 100):
+        self.campus_center_lat = campus_lat
+        self.campus_center_lon = campus_lon
+        self.accuracy_radius = accuracy_radius
         
-        # Define campus boundary (15-coordinate polygon)
-        # Campus boundary for JKLU (Jagadguru Kripalu University)
-        self.campus_boundary = {
-            'center': (26.8351, 75.6508),  # JKLU Campus Center (corrected)
-            'radius': 800,  # meters - campus radius (corrected)
-            'polygon': [
-                # 15-coordinate polygon using all original coordinates
-                # Format: (longitude, latitude) for the algorithm
-                (75.651187, 26.836760), (75.649523, 26.837109), (75.649331, 26.896678),
-                (75.648472, 26.836655), (75.648307, 26.836079), (75.650194, 26.835495),
-                (75.650150, 26.834788), (75.650973, 26.834635), (75.651435, 26.833430),
-                (75.652500, 26.832659), (75.653021, 26.833776), (75.652374, 26.834072),
-                (75.652472, 26.834935), (75.651554, 26.835321), (75.651320, 26.835838)
-            ]
-        }
+        # Define JK Lakshmipat University campus boundary polygon
+        # These coordinates define the actual campus boundary
+        self.campus_boundary = [
+            (73.0230, 26.2395), (73.0240, 26.2395), (73.0250, 26.2390),
+            (73.0255, 26.2385), (73.0255, 26.2380), (73.0250, 26.2375),
+            (73.0245, 26.2370), (73.0240, 26.2365), (73.0235, 26.2365),
+            (73.0230, 26.2370), (73.0225, 26.2375), (73.0225, 26.2380),
+            (73.0230, 26.2385), (73.0230, 26.2390), (73.0230, 26.2395)
+        ]
     
     def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-        """
-        Calculate distance between two GPS coordinates using Haversine formula
-        Returns distance in meters
-        """
+        """Calculate distance between two GPS coordinates using Haversine formula"""
         # Convert to radians
         lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
         
@@ -44,15 +33,11 @@ class GeofencingManager:
         dlon = lon2 - lon1
         a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
         c = 2 * math.asin(math.sqrt(a))
-        
-        # Radius of earth in meters
-        r = 6371000
+        r = 6371000  # Radius of earth in meters
         return c * r
     
     def is_point_in_polygon(self, point: Tuple[float, float], polygon: List[Tuple[float, float]]) -> bool:
-        """
-        Check if a point is inside a polygon using ray casting algorithm
-        """
+        """Check if a point is inside a polygon using ray casting algorithm"""
         x, y = point
         n = len(polygon)
         inside = False
@@ -71,12 +56,10 @@ class GeofencingManager:
         
         return inside
     
-    def verify_location(self, latitude: float, longitude: float, accuracy: float = None) -> Dict:
-        """
-        Verify if the given coordinates are within campus boundary (polygon only)
-        """
+    def verify_location(self, latitude: float, longitude: float, accuracy: Optional[float] = None) -> Dict:
+        """Verify if the given coordinates are within campus boundary"""
         try:
-            # Check if coordinates are valid
+            # Validate coordinates
             if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
                 return {
                     'valid': False,
@@ -85,8 +68,8 @@ class GeofencingManager:
                     'campus': None
                 }
             
-            # Check accuracy if provided (relaxed requirement)
-            if accuracy and accuracy > 500:  # Accuracy worse than 500 meters
+            # Check GPS accuracy if provided
+            if accuracy and accuracy > 500:  # Relaxed accuracy requirement
                 return {
                     'valid': False,
                     'reason': f'GPS accuracy too low: {accuracy}m (required: <500m)',
@@ -94,14 +77,14 @@ class GeofencingManager:
                     'campus': None
                 }
             
-            # Calculate distance from campus center for information
+            # Calculate distance from campus center
             distance_from_center = self.calculate_distance(
                 latitude, longitude, 
-                self.campus_boundary['center'][0], self.campus_boundary['center'][1]
+                self.campus_center_lat, self.campus_center_lon
             )
             
-            # Only check if within campus polygon boundary (no radius check)
-            if self.is_point_in_polygon((longitude, latitude), self.campus_boundary['polygon']):
+            # Check if point is within campus boundary polygon
+            if self.is_point_in_polygon((longitude, latitude), self.campus_boundary):
                 return {
                     'valid': True,
                     'reason': 'Location verified within campus boundary',
@@ -129,18 +112,16 @@ class GeofencingManager:
         """Get campus boundary information for frontend"""
         return {
             'center': {
-                'latitude': self.campus_boundary['center'][0],
-                'longitude': self.campus_boundary['center'][1]
+                'latitude': self.campus_center_lat,
+                'longitude': self.campus_center_lon
             },
-            'radius': self.campus_boundary['radius'],
-            'polygon': self.campus_boundary['polygon']
+            'radius': self.accuracy_radius,
+            'polygon': self.campus_boundary
         }
     
     def validate_attendance_location(self, latitude: float, longitude: float, 
-                                       accuracy: float = None, student_hostel: str = None) -> Dict:
-        """
-        Validate location for attendance marking within campus boundary
-        """
+                                   accuracy: Optional[float] = None, student_hostel: Optional[str] = None) -> Dict:
+        """Validate location for attendance marking within campus boundary"""
         verification = self.verify_location(latitude, longitude, accuracy)
         
         if not verification['valid']:
@@ -158,6 +139,3 @@ class GeofencingManager:
             'campus': verification['campus'],
             'accuracy': verification.get('accuracy')
         }
-
-# Global geofencing manager
-geofencing_manager = GeofencingManager()
