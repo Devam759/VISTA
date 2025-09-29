@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "./AuthProvider";
 import locationService from "../lib/location";
-import { verifyLocation } from "../lib/api";
+import { verifyGeofence } from "../lib/geofence"; // Import our new geofence utility
 import LocationPermissionGuide from "./LocationPermissionGuide";
 
 export default function LocationTracing({ onLocationVerified, onLocationError }) {
-  const { token } = useAuth();
   const [location, setLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,29 +41,14 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           return;
         }
 
-        // Verify location with backend for mobile users
-        if (token) {
-          try {
-            const verificationResult = await verifyLocation(
-              token,
-              position.latitude,
-              position.longitude,
-              position.accuracy
-            );
-            
-            setVerificationStatus(verificationResult);
-          } catch (apiError) {
-            console.error('API verification error:', apiError);
-            setError('Failed to verify location with server');
-            onLocationError('Failed to verify location with server');
-          }
-        } else {
-          // If no token, just proceed with location data without verification
-          setVerificationStatus({
-            gps_verified: true,
-            reason: 'Location detected (no server verification)'
-          });
-        }
+        // Verify location with client-side geofencing for mobile users
+        const verificationResult = verifyGeofence(
+          position.latitude,
+          position.longitude
+        );
+        
+        setVerificationStatus(verificationResult);
+
       } catch (locationError) {
         console.error('Location error:', locationError);
         setError(locationError.message);
@@ -81,7 +64,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
     };
 
     getLocationAndVerify();
-  }, [token, onLocationVerified, onLocationError]);
+  }, [onLocationVerified, onLocationError]);
 
   // Handle location verification callback
   useEffect(() => {
@@ -126,32 +109,22 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
               return;
             }
 
-            if (token) {
-              const verificationResult = await verifyLocation(
-                token,
-                position.latitude,
-                position.longitude,
-                position.accuracy
-              );
-              
-              setVerificationStatus(verificationResult);
-              
-              if (verificationResult.gps_verified) {
-                onLocationVerified({
-                  ...position,
-                  verified: true,
-                  reason: verificationResult.reason
-                });
-              } else {
-                onLocationError(verificationResult.reason);
-              }
-            } else {
-              // If no token, just proceed with location data without verification
+            // Verify location with client-side geofencing
+            const verificationResult = verifyGeofence(
+              position.latitude,
+              position.longitude
+            );
+            
+            setVerificationStatus(verificationResult);
+            
+            if (verificationResult.gps_verified) {
               onLocationVerified({
                 ...position,
                 verified: true,
-                reason: 'Location detected (no server verification)'
+                reason: verificationResult.reason
               });
+            } else {
+              onLocationError(verificationResult.reason);
             }
           } catch (err) {
             setError(err.message);
