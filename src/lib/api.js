@@ -11,7 +11,7 @@ const CAMPUS_BOUNDARY = {
   polygon: [
     // 15-coordinate polygon using all your original coordinates
     // Format: [longitude, latitude] for the algorithm
-    [75.651187, 26.836760], [75.649523, 26.837109], [75.649331, 26.896678],
+    [75.651187, 26.836760], [75.649523, 26.837109], [75.649331, 26.836678],
     [75.648472, 26.836655], [75.648307, 26.836079], [75.650194, 26.835495],
     [75.650150, 26.834788], [75.650973, 26.834635], [75.651435, 26.833430],
     [75.652500, 26.832659], [75.653021, 26.833776], [75.652374, 26.834072],
@@ -109,14 +109,14 @@ async function handleFallbackRequest(path, options = {}) {
 
     case "/geofencing/boundaries":
       return {
-        center: { latitude: 26.2389, longitude: 73.0243 },
-        radius: 1000,
+        center: { latitude: 26.8351, longitude: 75.6508 },
+        radius: 100,
         polygon: [
-          [26.836760, 75.651187], [26.837109, 75.649523], [26.896678, 75.649331],
-          [26.836655, 75.648472], [26.836079, 75.648307], [26.835495, 75.650194],
-          [26.834788, 75.650150], [26.834635, 75.650973], [26.833430, 75.651435],
-          [26.832659, 75.652500], [26.833776, 75.653021], [26.834072, 75.652374],
-          [26.834935, 75.652472], [26.835321, 75.651554], [26.835838, 75.651320]
+          [75.651187, 26.836760], [75.649523, 26.837109], [75.649331, 26.836678],
+          [75.648472, 26.836655], [75.648307, 26.836079], [75.650194, 26.835495],
+          [75.650150, 26.834788], [75.650973, 26.834635], [75.651435, 26.833430],
+          [75.652500, 26.832659], [75.653021, 26.833776], [75.652374, 26.834072],
+          [75.652472, 26.834935], [75.651554, 26.835321], [75.651320, 26.835838]
         ]
       };
 
@@ -234,11 +234,11 @@ async function request(path, options = {}) {
 }
 
 export async function loginWithEmailPassword(email, password) {
-  // Use mock login endpoint for development
+  // Use the correct login endpoint
   try {
-    return await request("/auth/mock-login", { body: { email, password } });
+    return await request("/auth/login", { body: { email, password } });
   } catch (error) {
-    // Fallback to original mock for development
+    // Fallback to mock credentials for development when backend is not available
     if (email === "bhuwanesh@jklu.edu.in" && password === "123") {
       return { 
         token: "mock-token", 

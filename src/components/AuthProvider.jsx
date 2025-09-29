@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getMe } from "../lib/api";
 
-const AuthContext = createContext({ role: null, token: null, user: null, setSession: () => {}, logout: () => {} });
+const AuthContext = createContext({ role: null, token: null, user: null, isInitialized: false, setSession: () => {}, logout: () => {}, clearAuth: () => {} });
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -33,13 +33,13 @@ export default function AuthProvider({ children }) {
         setUser(JSON.parse(savedUser));
       } catch {
         setUser(null);
+        // Clear invalid data
+        window.localStorage.removeItem("vista_token");
+        window.localStorage.removeItem("vista_role");
+        window.localStorage.removeItem("vista_user");
       }
-    } else {
-      // No auto-login - users must go through location tracing and login flow
-      setToken(null);
-      setRole(null);
-      setUser(null);
     }
+    // No auto-login - let users authenticate properly
     
     setIsInitialized(true);
   }, []);
@@ -52,13 +52,22 @@ export default function AuthProvider({ children }) {
           setUser(me?.user || null);
           if (me?.user?.role) setRole(me.user.role);
         } catch {
-          // invalid token
-          logout();
+          // If API call fails, clear the session and redirect to login
+          console.warn('API call failed, clearing session');
+          setToken(null);
+          setUser(null);
+          setRole(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem("vista_token");
+            window.localStorage.removeItem("vista_user");
+            window.localStorage.removeItem("vista_role");
+          }
+          router.push("/login");
         }
       }
     }
     hydrate();
-  }, [token, user]);
+  }, [token, user, router]);
 
   function setSession(nextToken, nextUser) {
     setToken(nextToken || null);
@@ -80,20 +89,21 @@ export default function AuthProvider({ children }) {
       window.localStorage.removeItem("vista_user");
       window.localStorage.removeItem("vista_role");
     }
-    // Immediately auto-login as Warden again to keep the app usable without login
-    const mockUser = { id: 1, email: "warden@jklu.edu.in", role: "Warden" };
-    setToken("mock-token");
-    setRole("Warden");
-    setUser(mockUser);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("vista_token", "mock-token");
-      window.localStorage.setItem("vista_role", "Warden");
-      window.localStorage.setItem("vista_user", JSON.stringify(mockUser));
-    }
-    router.push("/");
+    router.push("/login");
   }
 
-  const value = useMemo(() => ({ role, token, user, setSession, logout }), [role, token, user]);
+  function clearAuth() {
+    setToken(null);
+    setUser(null);
+    setRole(null);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("vista_token");
+      window.localStorage.removeItem("vista_user");
+      window.localStorage.removeItem("vista_role");
+    }
+  }
+
+  const value = useMemo(() => ({ role, token, user, isInitialized, setSession, logout, clearAuth }), [role, token, user, isInitialized]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

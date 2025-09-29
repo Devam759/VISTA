@@ -56,7 +56,8 @@ export default function AttendanceView() {
   const filtered = data.filter((r) => {
     if (statusFilter !== "All Status" && r.status !== statusFilter) return false;
     if (dateFilter && r.date !== dateFilter) return false;
-    if (hostelFilter !== "All Hostels" && r.hostel !== hostelFilter) return false;
+    // Only apply hostel filter for Wardens, not for Students
+    if (!isStudent && hostelFilter !== "All Hostels" && r.hostel !== hostelFilter) return false;
     return true;
   });
 
@@ -68,16 +69,24 @@ export default function AttendanceView() {
           <p className="text-sm text-foreground/60">Daily logs with verification and confidence scores</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
-          <input 
-            type="date" 
-            value={dateFilter} 
-            onChange={(e) => setDateFilter(e.target.value)} 
-            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors flex-1" 
-          />
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input 
+              type="date" 
+              value={dateFilter} 
+              onChange={(e) => setDateFilter(e.target.value)} 
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md" 
+              placeholder="Select date"
+            />
+          </div>
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)} 
-            className="px-4 py-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/20 focus:border-[color:var(--accent)] transition-colors flex-1"
+            className="px-4 py-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md flex-1"
           >
             <option>All Status</option>
             <option>Present</option>
@@ -87,59 +96,61 @@ export default function AttendanceView() {
         </div>
       </div>
 
-      {/* Hostel Filter Buttons */}
-      <div className="flex gap-2 flex-wrap overflow-x-auto pb-2">
-        <button
-          onClick={() => setHostelFilter("All Hostels")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-            hostelFilter === "All Hostels"
-              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
-        >
-          All Hostels
-        </button>
-        <button
-          onClick={() => setHostelFilter("BH1")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-            hostelFilter === "BH1"
-              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
-        >
-          BH1
-        </button>
-        <button
-          onClick={() => setHostelFilter("BH2")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-            hostelFilter === "BH2"
-              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
-        >
-          BH2
-        </button>
-        <button
-          onClick={() => setHostelFilter("GH1")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-            hostelFilter === "GH1"
-              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
-        >
-          GH1
-        </button>
-        <button
-          onClick={() => setHostelFilter("GH2")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-            hostelFilter === "GH2"
-              ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
-        >
-          GH2
-        </button>
-      </div>
+      {/* Hostel Filter Buttons - Only show for Wardens */}
+      {!isStudent && (
+        <div className="flex gap-2 flex-wrap overflow-x-auto pb-2">
+          <button
+            onClick={() => setHostelFilter("All Hostels")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              hostelFilter === "All Hostels"
+                ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            All Hostels
+          </button>
+          <button
+            onClick={() => setHostelFilter("BH1")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              hostelFilter === "BH1"
+                ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            BH1
+          </button>
+          <button
+            onClick={() => setHostelFilter("BH2")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              hostelFilter === "BH2"
+                ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            BH2
+          </button>
+          <button
+            onClick={() => setHostelFilter("GH1")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              hostelFilter === "GH1"
+                ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            GH1
+          </button>
+          <button
+            onClick={() => setHostelFilter("GH2")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              hostelFilter === "GH2"
+                ? "bg-black text-white shadow-sm dark:bg-white dark:text-black"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            GH2
+          </button>
+        </div>
+      )}
 
       {/* Desktop Table View */}
       <div className="hidden lg:block overflow-hidden rounded-2xl surface shadow-sm border border-[color:var(--border)]">

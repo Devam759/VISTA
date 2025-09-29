@@ -18,7 +18,7 @@ def enroll_face():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can enroll faces
+        # Only Wardens can enroll faces
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -133,7 +133,7 @@ def get_face_enrollments(student_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can view enrollments
+        # Only Wardens can view enrollments
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -160,7 +160,7 @@ def delete_face_enrollment(enrollment_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can delete enrollments
+        # Only Wardens can delete enrollments
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         

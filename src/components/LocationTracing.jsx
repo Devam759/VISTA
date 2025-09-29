@@ -13,6 +13,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
   const [retryCount, setRetryCount] = useState(0);
   const [maxRetries] = useState(3);
   const [showPermissionGuide, setShowPermissionGuide] = useState(false);
+  const [debugInfo, setDebugInfo] = useState({});
   const callbackCalledRef = useRef(false);
 
   useEffect(() => {
@@ -20,10 +21,24 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
       setIsLoading(true);
       setError(null);
       setVerificationStatus(null);
+      
+      // Collect debug information
+      const debug = {
+        userAgent: navigator.userAgent,
+        isMobile: locationService.isMobileDevice(),
+        geolocationSupported: !!navigator.geolocation,
+        permissionsAPI: !!navigator.permissions,
+        protocol: window.location.protocol,
+        host: window.location.host
+      };
+      setDebugInfo(debug);
+      console.log('Location debugging info:', debug);
 
       try {
         // Check permissions first
         const permissionCheck = await locationService.checkPermissions();
+        console.log('Permission check result:', permissionCheck);
+        
         if (!permissionCheck.available) {
           throw new Error(permissionCheck.reason);
         }
@@ -68,13 +83,17 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
 
   // Handle location verification callback
   useEffect(() => {
+    console.log('Verification status changed:', verificationStatus);
     if (verificationStatus && verificationStatus.gps_verified && onLocationVerified && !callbackCalledRef.current) {
+      console.log('Calling onLocationVerified callback');
       callbackCalledRef.current = true;
       onLocationVerified({
         ...location,
         verified: true,
         reason: verificationStatus.reason
       });
+    } else if (verificationStatus && !verificationStatus.gps_verified) {
+      console.log('Location verification failed:', verificationStatus.reason);
     }
   }, [verificationStatus, location, onLocationVerified]);
 
@@ -196,6 +215,20 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           </h2>
           <p className="text-gray-600 mb-6">{error}</p>
           
+          {/* Debug Information */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+              <h3 className="font-semibold text-gray-800 mb-2">Debug Information:</h3>
+              <div className="text-xs text-gray-600 space-y-1">
+                <div>Mobile Device: {debugInfo.isMobile ? 'Yes' : 'No'}</div>
+                <div>Geolocation Support: {debugInfo.geolocationSupported ? 'Yes' : 'No'}</div>
+                <div>Permissions API: {debugInfo.permissionsAPI ? 'Yes' : 'No'}</div>
+                <div>Protocol: {debugInfo.protocol}</div>
+                <div>User Agent: {debugInfo.userAgent?.substring(0, 50)}...</div>
+              </div>
+            </div>
+          )}
+          
           {isDesktopError ? (
             <div className="bg-orange-50 rounded-lg p-4 mb-6 text-left">
               <h3 className="font-semibold text-orange-800 mb-2">Why is this happening?</h3>
@@ -220,6 +253,15 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
                 <li>3. Make sure your device's location services are enabled</li>
                 <li>4. Try again after granting permission</li>
               </ol>
+              
+              {debugInfo.protocol === 'http:' && (
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-yellow-800 text-sm font-medium">⚠️ HTTPS Required</p>
+                  <p className="text-yellow-700 text-xs mt-1">
+                    Mobile browsers require HTTPS for location access. Please access this site via HTTPS.
+                  </p>
+                </div>
+              )}
             </div>
           )}
           
@@ -302,23 +344,8 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
             >
               Try Again
             </button>
-            <button
-              onClick={() => {
-                // Allow user to proceed to login even if out of campus
-                if (onLocationVerified) {
-                  onLocationVerified({
-                    ...location,
-                    verified: true,
-                    reason: 'Location verification bypassed by user'
-                  });
-                }
-              }}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors w-full"
-            >
-              Continue Anyway
-            </button>
             <p className="text-sm text-gray-500">
-              Please ensure you are within the campus boundaries.
+              You must be within the campus boundaries to access the system.
             </p>
           </div>
         </div>
@@ -347,7 +374,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
           </div>
           
           <div className="animate-pulse">
-            <p className="text-sm text-gray-500">Redirecting to login...</p>
+            <p className="text-sm text-gray-500">Location verified! Redirecting...</p>
           </div>
         </div>
       </div>

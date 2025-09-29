@@ -96,7 +96,6 @@ The system comes with sample data including:
 
 **Sample Users:**
 - Warden: `warden@jklu.edu.in` / `warden123`
-- Chief Warden: `chiefwarden@jklu.edu.in` / `chiefwarden123`
 - Student: `student@jklu.edu.in` / `student123`
 
 **Sample Hostels:**

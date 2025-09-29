@@ -15,7 +15,7 @@ def get_hostels():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can access
+        # Only Wardens can access
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -34,8 +34,8 @@ def create_hostel():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only ChiefWardens can create hostels
-        if current_user.role != 'ChiefWarden':
+        # Only Wardens can create hostels
+        if current_user.role != 'Warden':
             return jsonify({'error': 'Access denied'}), 403
         
         data = request.get_json()
@@ -85,7 +85,7 @@ def get_hostel(hostel_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can access
+        # Only Wardens can access
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -107,7 +107,7 @@ def get_hostel_rooms(hostel_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can access
+        # Only Wardens can access
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -131,7 +131,7 @@ def get_hostel_students(hostel_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can access
+        # Only Wardens can access
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -155,7 +155,7 @@ def create_room():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can create rooms
+        # Only Wardens can create rooms
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         

@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import ErrorBoundary from "../components/ErrorBoundary";
 import LocationTracingWrapper from "../components/LocationTracingWrapper";
+import ConditionalLayout from "../components/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,6 +22,8 @@ export const metadata = {
   description: "VISTA college night attendance system",
   icons: {
     icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
@@ -30,15 +33,9 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>
           <AuthProvider>
-            <LocationTracingWrapper>
-              <Navbar />
-              <div className="container-app py-6 flex gap-6 min-h-screen">
-                <div className="hidden lg:block">
-                  <Sidebar />
-                </div>
-                <main className="flex-1 min-w-0 overflow-x-auto px-4 lg:px-0">{children}</main>
-              </div>
-            </LocationTracingWrapper>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
           </AuthProvider>
         </ErrorBoundary>
       </body>
