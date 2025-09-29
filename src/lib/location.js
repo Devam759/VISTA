@@ -1,8 +1,15 @@
 const locationService = {
   // Detect if device is mobile
   isMobileDevice: () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-           window.innerWidth <= 768;
+    // Check user agent for mobile devices
+    const mobileUserAgents = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
+    
+    // Check screen width and touch capability
+    const isSmallScreen = window.innerWidth <= 768;
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    // Check if it's a mobile device based on multiple factors
+    return mobileUserAgents || (isSmallScreen && isTouchDevice);
   },
 
   // Check if geofencing should be enabled (mobile only)
@@ -13,7 +20,7 @@ const locationService = {
   // Check if location permissions are available
   checkPermissions: async () => {
     if (!navigator.geolocation) {
-      return { available: false, reason: 'Geolocation is not supported by your browser' };
+      return { available: false, reason: 'Geolocation is not supported by your browser. Please use a modern mobile browser like Chrome, Safari, or Firefox.' };
     }
 
     // For desktop devices, allow access without geofencing
@@ -29,14 +36,20 @@ const locationService = {
       // Check if permissions API is available
       if (navigator.permissions) {
         const permission = await navigator.permissions.query({ name: 'geolocation' });
+        const state = permission.state;
+        
         return { 
-          available: permission.state !== 'denied', 
-          state: permission.state,
-          reason: permission.state === 'denied' ? 'Location permission is denied. Please enable location access in your browser settings.' : null
+          available: state !== 'denied', 
+          state: state,
+          reason: state === 'denied' ? 'Location permission is denied. Please enable location access in your browser settings.' : 
+                 state === 'prompt' ? 'Location permission is required. Please allow location access when prompted.' : null
         };
       }
+      
+      // If permissions API is not available, assume we can request permission
       return { available: true, reason: null };
     } catch (error) {
+      console.warn('Permission check failed:', error);
       return { available: true, reason: null }; // Fallback if permissions API fails
     }
   },
@@ -70,6 +83,7 @@ const locationService = {
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('Location obtained:', position);
           resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -78,6 +92,7 @@ const locationService = {
           });
         },
         (error) => {
+          console.error('Geolocation error:', error);
           let errorMessage = 'Unknown location error';
           let instructions = '';
           
@@ -88,11 +103,11 @@ const locationService = {
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = 'Location information is unavailable';
-              instructions = 'Please ensure your device\'s location services are enabled and try again.';
+              instructions = 'Please ensure your device\'s location services are enabled and try again. You may need to move to an area with better GPS signal.';
               break;
             case error.TIMEOUT:
               errorMessage = 'Location request timed out';
-              instructions = 'Please try again. Make sure you\'re in an area with good GPS signal.';
+              instructions = 'Please try again. Make sure you\'re in an area with good GPS signal and that your device\'s location services are enabled.';
               break;
           }
           
@@ -101,8 +116,8 @@ const locationService = {
         },
         {
           enableHighAccuracy: true,
-          timeout: 15000, // Increased timeout
-          maximumAge: 30000, // Allow cached location for 30 seconds
+          timeout: 20000, // Increased timeout for mobile devices
+          maximumAge: 60000, // Allow cached location for 1 minute
         }
       );
     });

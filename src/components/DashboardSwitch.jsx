@@ -124,18 +124,18 @@ export default function DashboardSwitch() {
   if (role === "Student") return (
     <div className="space-y-6">
       {/* Welcome Back Section for Students */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Welcome Back, {getDisplayName()}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Manage your attendance and stay connected with your hostel
             </p>
           </div>
           <div className="flex flex-col sm:items-end">
-            <div className="text-2xl font-mono font-medium text-gray-800 mb-1">
+            <div className="text-2xl font-mono font-medium text-gray-800 dark:text-gray-200 mb-1">
               {currentTime.toLocaleTimeString('en-US', { 
                 hour12: false,
                 hour: '2-digit',
@@ -143,7 +143,7 @@ export default function DashboardSwitch() {
                 second: '2-digit'
               })}
             </div>
-            <div className="text-gray-500 text-sm">
+            <div className="text-gray-500 dark:text-gray-400 text-sm">
               {currentTime.toLocaleDateString('en-US', { 
                 weekday: 'long',
                 year: 'numeric',
@@ -166,18 +166,18 @@ export default function DashboardSwitch() {
   if (role === "Warden") return (
     <div className="space-y-6">
       {/* Welcome Back Section */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Welcome back, {getDisplayName()} {getWardenTitle()}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Here's what's happening with your hostel attendance today
             </p>
           </div>
           <div className="flex flex-col sm:items-end">
-            <div className="text-2xl font-mono font-medium text-gray-800 mb-1">
+            <div className="text-2xl font-mono font-medium text-gray-800 dark:text-gray-200 mb-1">
               {currentTime.toLocaleTimeString('en-US', { 
                 hour12: false,
                 hour: '2-digit',
@@ -185,7 +185,7 @@ export default function DashboardSwitch() {
                 second: '2-digit'
               })}
             </div>
-            <div className="text-gray-500 text-sm">
+            <div className="text-gray-500 dark:text-gray-400 text-sm">
               {currentTime.toLocaleDateString('en-US', { 
                 weekday: 'long',
                 year: 'numeric',
@@ -205,15 +205,15 @@ export default function DashboardSwitch() {
       </div>
       
       {/* Recent Activity Section */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Activity</h3>
             <div className="flex items-center gap-3">
               <button
                 onClick={fetchRecentActivity}
                 disabled={isLoading}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
                 title="Refresh data"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +222,7 @@ export default function DashboardSwitch() {
               </button>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-gray-600">Live Updates</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Live Updates</span>
               </div>
             </div>
           </div>
@@ -255,22 +255,22 @@ export default function DashboardSwitch() {
             </div>
           ) : recentActivity.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-gray-400 text-lg mb-2">No recent activity</div>
-              <div className="text-sm text-gray-500">Attendance updates will appear here in real-time</div>
+              <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">No recent activity</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Attendance updates will appear here in real-time</div>
             </div>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-semibold text-sm">
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">
                         {activity.studentName.split(' ').map(n => n[0]).join('')}
                       </span>
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">{activity.studentName}</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{activity.studentName}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
                         {activity.rollNo} • Room {activity.roomNo}
                       </div>
                     </div>
@@ -278,12 +278,12 @@ export default function DashboardSwitch() {
                   <div className="text-right">
                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       activity.status === 'Present' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' 
+                        : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
                     }`}>
                       {activity.status}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {formatTimeAgo(activity.timestamp)}
                     </div>
                   </div>

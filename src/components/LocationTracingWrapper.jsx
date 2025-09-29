@@ -12,20 +12,16 @@ export default function LocationTracingWrapper({ children }) {
   const [showLocationTracing, setShowLocationTracing] = useState(false);
 
   useEffect(() => {
-    // Show location tracing for authenticated users only, but skip for desktop users
-    if (token) {
-      // Check if this is a desktop device - if so, skip location tracing
-      if (locationService.isMobileDevice()) {
-        setShowLocationTracing(true);
-      } else {
-        // For desktop users, automatically mark location as verified and skip the popup
-        setLocationVerified(true);
-        setShowLocationTracing(false);
-      }
+    // Show location tracing for mobile devices, regardless of authentication status
+    // This ensures location is verified before login
+    if (locationService.isMobileDevice()) {
+      setShowLocationTracing(true);
     } else {
+      // For desktop users, automatically mark location as verified and skip the popup
+      setLocationVerified(true);
       setShowLocationTracing(false);
     }
-  }, [token]);
+  }, []);
 
   const handleLocationVerified = (locationData) => {
     console.log('Location verified:', locationData);
@@ -43,8 +39,8 @@ export default function LocationTracingWrapper({ children }) {
     setLocationVerified(false);
   };
 
-  // Show location tracing interface for authenticated mobile users only
-  if (showLocationTracing && token && locationService.isMobileDevice()) {
+  // Show location tracing interface for mobile users (before authentication)
+  if (showLocationTracing && locationService.isMobileDevice() && !locationVerified) {
     return (
       <LocationTracing
         onLocationVerified={handleLocationVerified}
@@ -53,6 +49,6 @@ export default function LocationTracingWrapper({ children }) {
     );
   }
 
-  // Show main content after location verification or for non-authenticated users
+  // Show main content after location verification or for desktop users
   return <>{children}</>;
 }

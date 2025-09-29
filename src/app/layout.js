@@ -22,6 +22,8 @@ export const metadata = {
   description: "VISTA college night attendance system",
   icons: {
     icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
