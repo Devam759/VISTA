@@ -161,6 +161,23 @@ export default function TestLocationPage() {
             >
               Test Campus Center
             </button>
+            
+            <button
+              onClick={() => {
+                // Test with coordinates outside campus
+                const outsideCoords = { latitude: 26.0000, longitude: 75.0000, accuracy: 10 };
+                setLocation(outsideCoords);
+                const directTest = testGeofencing(outsideCoords.latitude, outsideCoords.longitude, outsideCoords.accuracy);
+                setDirectGeofencingTest(directTest);
+                
+                verifyLocation("mock-token", outsideCoords.latitude, outsideCoords.longitude, outsideCoords.accuracy)
+                  .then(setVerification)
+                  .catch(err => setError(err.message));
+              }}
+              className="bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
+            >
+              Test Outside Campus
+            </button>
           </div>
 
           {/* Debug Information */}

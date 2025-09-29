@@ -60,6 +60,12 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
 
         // Verify location with backend for mobile users (always verify, regardless of token)
         try {
+          console.log('Verifying location:', {
+            latitude: position.latitude,
+            longitude: position.longitude,
+            accuracy: position.accuracy
+          });
+          
           const verificationResult = await verifyLocation(
             token || "mock-token", // Use mock token if no real token available
             position.latitude,
@@ -67,6 +73,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
             position.accuracy
           );
           
+          console.log('Verification result:', verificationResult);
           setVerificationStatus(verificationResult);
         } catch (apiError) {
           console.error('API verification error:', apiError);
@@ -92,13 +99,17 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
 
   // Handle location verification callback
   useEffect(() => {
+    console.log('Verification status changed:', verificationStatus);
     if (verificationStatus && verificationStatus.gps_verified && onLocationVerified && !callbackCalledRef.current) {
+      console.log('Calling onLocationVerified callback');
       callbackCalledRef.current = true;
       onLocationVerified({
         ...location,
         verified: true,
         reason: verificationStatus.reason
       });
+    } else if (verificationStatus && !verificationStatus.gps_verified) {
+      console.log('Location verification failed:', verificationStatus.reason);
     }
   }, [verificationStatus, location, onLocationVerified]);
 
@@ -142,16 +153,7 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
             );
             
             setVerificationStatus(verificationResult);
-            
-            if (verificationResult.gps_verified) {
-              onLocationVerified({
-                ...position,
-                verified: true,
-                reason: verificationResult.reason
-              });
-            } else {
-              onLocationError(verificationResult.reason);
-            }
+            // Don't call callbacks here - let the useEffect handle it
           } catch (err) {
             setError(err.message);
             onLocationError(err.message);
@@ -351,23 +353,8 @@ export default function LocationTracing({ onLocationVerified, onLocationError })
             >
               Try Again
             </button>
-            <button
-              onClick={() => {
-                // Allow user to proceed to login even if out of campus
-                if (onLocationVerified) {
-                  onLocationVerified({
-                    ...location,
-                    verified: true,
-                    reason: 'Location verification bypassed by user'
-                  });
-                }
-              }}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors w-full"
-            >
-              Continue Anyway
-            </button>
             <p className="text-sm text-gray-500">
-              Please ensure you are within the campus boundaries.
+              You must be within the campus boundaries to access the system.
             </p>
           </div>
         </div>
