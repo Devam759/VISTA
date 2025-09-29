@@ -54,7 +54,7 @@ class Attendance(db.Model):
         return {
             'id': self.id,
             'student_id': self.student_id,
-            'attendance_date': self.attendance_date.isoformat() if self.attendance_date else None,
+            'attendance_date': self.attendance_date.strftime('%d/%m/%Y') if self.attendance_date else None,
             'attendance_time': self.attendance_time.isoformat() if self.attendance_time else None,
             'status': self.status,
             'verification_method': self.verification_method,

@@ -90,14 +90,6 @@ def init_db():
         phone='9876543211'
     )
     
-    chief_warden_user = User(
-        email='chiefwarden@jklu.edu.in',
-        password='chiefwarden123',
-        first_name='Dr. Rajesh',
-        last_name='Kumar',
-        role='ChiefWarden',
-        phone='9876543210'
-    )
     
     student_user = User(
         email='student@jklu.edu.in',
@@ -108,7 +100,7 @@ def init_db():
         phone='9876543213'
     )
     
-    db.session.add_all([warden_user, chief_warden_user, student_user])
+    db.session.add_all([warden_user, student_user])
     db.session.commit()
     
     print("Creating sample student...")
@@ -130,7 +122,6 @@ def init_db():
     print("Database initialized successfully!")
     print("Sample credentials:")
     print("Warden: warden@jklu.edu.in / warden123")
-    print("Chief Warden: chiefwarden@jklu.edu.in / chiefwarden123")
     print("Student: student@jklu.edu.in / student123")
 
 if __name__ == '__main__':

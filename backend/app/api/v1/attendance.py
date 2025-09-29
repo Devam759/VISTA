@@ -8,6 +8,22 @@ from utils.validators import Validators
 from utils.geofencing import GeofencingManager
 from datetime import datetime, date, time
 
+def parse_date_string(date_string):
+    """Parse date string in DD/MM/YYYY format to date object"""
+    try:
+        # Try DD/MM/YYYY format first
+        return datetime.strptime(date_string, '%d/%m/%Y').date()
+    except ValueError:
+        try:
+            # Fallback to YYYY-MM-DD format for backward compatibility
+            return datetime.strptime(date_string, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValueError('Invalid date format. Use DD/MM/YYYY or YYYY-MM-DD')
+
+def format_date_for_response(date_obj):
+    """Format date object to DD/MM/YYYY string"""
+    return date_obj.strftime('%d/%m/%Y')
+
 attendance_bp = Blueprint('attendance', __name__)
 geofencing_manager = GeofencingManager()
 
@@ -35,10 +51,10 @@ def get_attendance():
             
             if date_filter:
                 try:
-                    filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+                    filter_date = parse_date_string(date_filter)
                     query = query.filter_by(attendance_date=filter_date)
-                except ValueError:
-                    return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+                except ValueError as e:
+                    return jsonify({'error': str(e)}), 400
             
             if status_filter != 'All':
                 query = query.filter_by(status=status_filter)
@@ -46,15 +62,15 @@ def get_attendance():
             records = query.order_by(Attendance.attendance_date.desc(), Attendance.attendance_time.desc()).all()
             
         else:
-            # Wardens and ChiefWardens can see all attendance
+            # Wardens can see all attendance
             query = Attendance.query
             
             if date_filter:
                 try:
-                    filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+                    filter_date = parse_date_string(date_filter)
                     query = query.filter_by(attendance_date=filter_date)
-                except ValueError:
-                    return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+                except ValueError as e:
+                    return jsonify({'error': str(e)}), 400
             
             if status_filter != 'All':
                 query = query.filter_by(status=status_filter)
@@ -166,7 +182,7 @@ def get_attendance_stats():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can view stats
+        # Only Wardens can view stats
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -176,9 +192,9 @@ def get_attendance_stats():
             return jsonify({'error': 'Date parameter is required'}), 400
         
         try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-        except ValueError:
-            return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+            filter_date = parse_date_string(date_filter)
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
         
         # Get total students
         total_students = Student.query.filter_by(is_active=True).count()
@@ -192,7 +208,7 @@ def get_attendance_stats():
         absent_count = total_students - len(attendance_records)
         
         return jsonify({
-            'date': filter_date.isoformat(),
+            'date': format_date_for_response(filter_date),
             'total_students': total_students,
             'present': present_count,
             'late': late_count,

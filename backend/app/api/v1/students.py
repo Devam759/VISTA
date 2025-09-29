@@ -29,7 +29,7 @@ def get_students():
             else:
                 students = []
         else:
-            # Wardens and ChiefWardens can see all students
+            # Wardens can see all students
             if hostel_filter != 'All Hostels':
                 hostel = Hostel.query.filter_by(name=hostel_filter).first()
                 if hostel:
@@ -52,7 +52,7 @@ def create_student():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can create students
+        # Only Wardens can create students
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -144,7 +144,7 @@ def update_student(student_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens and ChiefWardens can update students
+        # Only Wardens can update students
         if current_user.role == 'Student':
             return jsonify({'error': 'Access denied'}), 403
         
@@ -200,8 +200,8 @@ def delete_student(student_id):
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only ChiefWardens can delete students
-        if current_user.role != 'ChiefWarden':
+        # Only Wardens can delete students
+        if current_user.role != 'Warden':
             return jsonify({'error': 'Access denied'}), 403
         
         student = Student.query.get(student_id)
