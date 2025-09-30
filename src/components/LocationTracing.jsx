@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import locationService from "../lib/location";
-import { verifyGeofence } from "../lib/geofence"; // Import our new geofence utility
+import { verifyGeofence } from "./geofence"; // Import our new geofence utility
 import LocationPermissionGuide from "./LocationPermissionGuide";
 
 export default function LocationTracing({ onLocationVerified, onLocationError }) {
