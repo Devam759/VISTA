@@ -191,7 +191,7 @@ async function handleFallbackRequest(path, options = {}) {
   }
 }
 
-async function request(path, options = {}) {
+export async function request(path, options = {}) {
   try {
     // If in production and backend is not available, use fallback
     if (isProduction && !isBackendAvailable) {

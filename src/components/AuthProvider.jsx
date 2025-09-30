@@ -52,7 +52,7 @@ export default function AuthProvider({ children }) {
           setUser(me?.user || null);
           if (me?.user?.role) setRole(me.user.role);
         } catch {
-          // If API call fails, clear the session and redirect to login
+          // If API call fails, clear the session
           console.warn('API call failed, clearing session');
           setToken(null);
           setUser(null);
@@ -62,12 +62,15 @@ export default function AuthProvider({ children }) {
             window.localStorage.removeItem("vista_user");
             window.localStorage.removeItem("vista_role");
           }
-          router.push("/login");
+          // Only redirect to login if we're not already on the login page
+          if (pathname !== "/login") {
+            router.push("/login");
+          }
         }
       }
     }
     hydrate();
-  }, [token, user, router]);
+  }, [token, user, router, pathname]);
 
   function setSession(nextToken, nextUser) {
     setToken(nextToken || null);

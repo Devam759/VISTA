@@ -28,13 +28,7 @@ export default function LoginPage() {
       setSession(token, user);
       router.replace("/");
     } catch (err) {
-      // Fallback sample credentials for Student role
-      if (email === "devamgupta@jklu.edu.in" && password === "abc") {
-        setSession("mock-token", { id: 1, email, role: "Student" });
-        router.replace("/");
-      } else {
-        setError(err.message || "Login failed");
-      }
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
