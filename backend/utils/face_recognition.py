@@ -11,7 +11,7 @@ try:
     import face_recognition
     import numpy as np
     FACE_RECOGNITION_AVAILABLE = True
-except ImportError:
+except ImportError:  # pragma: no cover - handled at runtime
     FACE_RECOGNITION_AVAILABLE = False
     face_recognition = None
     np = None
@@ -23,10 +23,15 @@ class FaceRecognitionManager:
         self.tolerance = tolerance
         self.model = model
     
+    def _ensure_available(self) -> None:
+        if not FACE_RECOGNITION_AVAILABLE:
+            raise RuntimeError(
+                "face_recognition dependency missing. Install via 'pip install face-recognition dlib'."
+            )
+    
     def decode_base64_image(self, image_data: str) -> Optional['np.ndarray']:
         """Decode base64 image data to numpy array"""
-        if not FACE_RECOGNITION_AVAILABLE:
-            return None
+        self._ensure_available()
             
         try:
             # Remove data URL prefix if present
@@ -52,9 +57,7 @@ class FaceRecognitionManager:
     
     def extract_face_encoding(self, image: 'np.ndarray') -> Optional[List[float]]:
         """Extract face encoding from image"""
-        if not FACE_RECOGNITION_AVAILABLE:
-            # Return a dummy encoding for testing
-            return [0.1] * 128
+        self._ensure_available()
         
         try:
             # Find face locations
@@ -78,9 +81,7 @@ class FaceRecognitionManager:
     
     def compare_faces(self, known_encoding: List[float], unknown_encoding: List[float]) -> Tuple[bool, float]:
         """Compare two face encodings"""
-        if not FACE_RECOGNITION_AVAILABLE:
-            # Return dummy result for testing
-            return True, 95.0
+        self._ensure_available()
         
         try:
             # Convert to numpy arrays
@@ -105,6 +106,7 @@ class FaceRecognitionManager:
     def process_attendance_image(self, image_data: str, known_encodings: List[List[float]]) -> Dict:
         """Process attendance image and compare with known face encodings"""
         try:
+            self._ensure_available()
             # Decode image
             image = self.decode_base64_image(image_data)
             if image is None:
@@ -154,6 +156,7 @@ class FaceRecognitionManager:
     def enroll_face(self, image_data: str) -> Dict:
         """Enroll a new face from image data"""
         try:
+            self._ensure_available()
             # Decode image
             image = self.decode_base64_image(image_data)
             if image is None:

@@ -25,6 +25,12 @@ export default function StudentsPage() {
   const { token } = useAuth();
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      setData([]);
+      setFilteredData([]);
+      return;
+    }
     fetchStudents();
   }, [selectedHostel, token]);
 
@@ -57,39 +63,17 @@ export default function StudentsPage() {
     try {
       setLoading(true);
       setError(null);
+      if (!token) {
+        return;
+      }
       const response = await getStudents(token, selectedHostel);
       setData(response.students || []);
       setFilteredData(response.students || []);
     } catch (err) {
       console.error("Error fetching students:", err);
-      setError("Failed to load student data");
-      // Fallback to mock data if API fails
-      setData([
-        { studentId: 1, rollNo: "23BCS001", name: "Aarav Patel", roomNo: "B-205", hostel: "BH1" },
-        { studentId: 2, rollNo: "23BCS002", name: "Isha Sharma", roomNo: "G-310", hostel: "GH1" },
-        { studentId: 3, rollNo: "23BCS003", name: "Rohan Mehta", roomNo: "B-110", hostel: "BH2" },
-        { studentId: 4, rollNo: "23BCS004", name: "Priya Singh", roomNo: "B-206", hostel: "BH1" },
-        { studentId: 5, rollNo: "23BCS005", name: "Arjun Kumar", roomNo: "B-111", hostel: "BH2" },
-        { studentId: 6, rollNo: "23BCS006", name: "Sneha Reddy", roomNo: "B-207", hostel: "BH1" },
-        { studentId: 7, rollNo: "23BCS007", name: "Vikram Joshi", roomNo: "B-112", hostel: "BH2" },
-        { studentId: 8, rollNo: "23BCS008", name: "Ananya Gupta", roomNo: "G-311", hostel: "GH1" },
-        { studentId: 9, rollNo: "23BCS009", name: "Kavya Nair", roomNo: "G-401", hostel: "GH2" },
-        { studentId: 10, rollNo: "23BCS010", name: "Meera Joshi", roomNo: "G-402", hostel: "GH2" },
-        { studentId: 11, rollNo: "23BCS011", name: "Riya Agarwal", roomNo: "G-403", hostel: "GH2" },
-      ]);
-      setFilteredData([
-        { studentId: 1, rollNo: "23BCS001", name: "Aarav Patel", roomNo: "B-205", hostel: "BH1" },
-        { studentId: 2, rollNo: "23BCS002", name: "Isha Sharma", roomNo: "G-310", hostel: "GH1" },
-        { studentId: 3, rollNo: "23BCS003", name: "Rohan Mehta", roomNo: "B-110", hostel: "BH2" },
-        { studentId: 4, rollNo: "23BCS004", name: "Priya Singh", roomNo: "B-206", hostel: "BH1" },
-        { studentId: 5, rollNo: "23BCS005", name: "Arjun Kumar", roomNo: "B-111", hostel: "BH2" },
-        { studentId: 6, rollNo: "23BCS006", name: "Sneha Reddy", roomNo: "B-207", hostel: "BH1" },
-        { studentId: 7, rollNo: "23BCS007", name: "Vikram Joshi", roomNo: "B-112", hostel: "BH2" },
-        { studentId: 8, rollNo: "23BCS008", name: "Ananya Gupta", roomNo: "G-311", hostel: "GH1" },
-        { studentId: 9, rollNo: "23BCS009", name: "Kavya Nair", roomNo: "G-401", hostel: "GH2" },
-        { studentId: 10, rollNo: "23BCS010", name: "Meera Joshi", roomNo: "G-402", hostel: "GH2" },
-        { studentId: 11, rollNo: "23BCS011", name: "Riya Agarwal", roomNo: "G-403", hostel: "GH2" },
-      ]);
+      setError(`Failed to load student data: ${err.message}`);
+      setData([]);
+      setFilteredData([]);
     } finally {
       setLoading(false);
     }
@@ -230,7 +214,7 @@ export default function StudentsPage() {
               <h3 className="text-sm font-medium text-red-800">Error loading data</h3>
               <div className="mt-2 text-sm text-red-700">
                 <p>{error}</p>
-                <p className="mt-1">Showing fallback data instead.</p>
+                <p className="mt-1">Please check your connection and try again.</p>
               </div>
             </div>
           </div>

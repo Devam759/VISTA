@@ -8,12 +8,12 @@ from utils.validators import Validators
 
 students_bp = Blueprint('students', __name__)
 
-@students_bp.route('/', methods=['GET'])
+@students_bp.route('', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_students():
     """Get students list with optional hostel filter"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         if not current_user:
@@ -44,12 +44,12 @@ def get_students():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@students_bp.route('/', methods=['POST'])
+@students_bp.route('', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def create_student():
     """Create new student"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         # Only Wardens can create students
@@ -111,12 +111,12 @@ def create_student():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@students_bp.route('/<int:student_id>', methods=['GET'])
+@students_bp.route('/<int:student_id>', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_student(student_id):
     """Get specific student by ID"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         if not current_user:
@@ -136,12 +136,12 @@ def get_student(student_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@students_bp.route('/<int:student_id>', methods=['PUT'])
+@students_bp.route('/<int:student_id>', methods=['PUT'], strict_slashes=False)
 @jwt_required()
 def update_student(student_id):
     """Update student information"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         # Only Wardens can update students
@@ -192,12 +192,12 @@ def update_student(student_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@students_bp.route('/<int:student_id>', methods=['DELETE'])
+@students_bp.route('/<int:student_id>', methods=['DELETE'], strict_slashes=False)
 @jwt_required()
 def delete_student(student_id):
     """Delete student"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         # Only Wardens can delete students

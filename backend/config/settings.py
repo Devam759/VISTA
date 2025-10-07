@@ -49,10 +49,11 @@ class Config:
     FACE_RECOGNITION_TOLERANCE = float(os.getenv('FACE_RECOGNITION_TOLERANCE', 0.6))
     FACE_RECOGNITION_MODEL = os.getenv('FACE_RECOGNITION_MODEL', 'hog')
     
-    # GPS Configuration
+    # GPS / Geofencing Configuration
     CAMPUS_LATITUDE = float(os.getenv('CAMPUS_LATITUDE', 26.8351))
     CAMPUS_LONGITUDE = float(os.getenv('CAMPUS_LONGITUDE', 75.6508))
     GPS_ACCURACY_RADIUS = int(os.getenv('GPS_ACCURACY_RADIUS', 100))
+    CAMPUS_POLYGON = os.getenv('CAMPUS_POLYGON', '')  # JSON array of [lat, lon]
     
     # WiFi Configuration
     REQUIRED_WIFI_SSID = os.getenv('REQUIRED_WIFI_SSID', 'JKLU-Hostel')

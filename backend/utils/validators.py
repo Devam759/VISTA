@@ -89,7 +89,7 @@ class Validators:
         errors = []
         
         # Required fields
-        required_fields = ['student_id', 'latitude', 'longitude']
+        required_fields = ['latitude', 'longitude']
         for field in required_fields:
             if field not in data or data[field] is None:
                 errors.append(f'{field} is required')
@@ -101,8 +101,14 @@ class Validators:
         
         # Validate accuracy if provided
         if 'accuracy' in data and data['accuracy'] is not None:
-            if data['accuracy'] > 500:  # 500 meters
-                errors.append('GPS accuracy too low (must be less than 500m)')
+            try:
+                from flask import current_app
+                accuracy_limit = current_app.config.get('GPS_ACCURACY_RADIUS', 100) if current_app else 100
+            except RuntimeError:
+                accuracy_limit = 100
+
+            if data['accuracy'] > accuracy_limit:
+                errors.append(f'GPS accuracy too low (must be <= {accuracy_limit}m)')
         
         return {
             'valid': len(errors) == 0,

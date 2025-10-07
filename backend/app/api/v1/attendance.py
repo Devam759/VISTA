@@ -3,10 +3,12 @@ Attendance API Endpoints
 """
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, User, Student, Attendance
-from utils.validators import Validators
-from utils.geofencing import GeofencingManager
+from models import db, User, Student, Attendance, FaceEnrollment
+from utils import GeofencingManager, Validators
+from utils.face_attendance import FaceAttendanceValidator
+from utils.face_recognition import FaceRecognitionManager
 from datetime import datetime, date, time
+import json
 
 def parse_date_string(date_string):
     """Parse date string in DD/MM/YYYY format to date object"""
@@ -25,14 +27,37 @@ def format_date_for_response(date_obj):
     return date_obj.strftime('%d/%m/%Y')
 
 attendance_bp = Blueprint('attendance', __name__)
-geofencing_manager = GeofencingManager()
+face_manager = FaceRecognitionManager()
 
-@attendance_bp.route('/', methods=['GET'])
+@attendance_bp.route('/recent', methods=['GET'], strict_slashes=False)
+@jwt_required()
+def get_recent_attendance():
+    """Get recent attendance activity"""
+    try:
+        current_user_id = int(get_jwt_identity())
+        current_user = User.query.get(current_user_id)
+        
+        if not current_user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get recent attendance records (last 10)
+        recent_records = Attendance.query.order_by(
+            Attendance.created_at.desc()
+        ).limit(10).all()
+        
+        return jsonify({
+            'activities': [record.to_dict() for record in recent_records]
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@attendance_bp.route('', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_attendance():
     """Get attendance records"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         if not current_user:
@@ -87,7 +112,7 @@ def get_attendance():
 def mark_attendance():
     """Mark attendance for a student"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         if not current_user:
@@ -101,9 +126,13 @@ def mark_attendance():
         
         if not data:
             return jsonify({'error': 'No data provided'}), 400
+
+        face_image = data.get('face_image')
+        if not face_image:
+            return jsonify({'error': 'Face image required for attendance marking'}), 400
         
-        # Validate attendance data
-        validation = Validators.validate_attendance_data(data)
+        # Validate face attendance payload
+        validation = FaceAttendanceValidator.validate_submission(data)
         if not validation['valid']:
             return jsonify({'error': 'Validation failed', 'details': validation['errors']}), 400
         
@@ -122,18 +151,62 @@ def mark_attendance():
         if existing_attendance:
             return jsonify({'error': 'Attendance already marked for today'}), 400
         
-        # Verify GPS location
-        location_validation = geofencing_manager.validate_attendance_location(
-            data['latitude'],
-            data['longitude'],
-            data.get('accuracy')
-        )
-        
-        if not location_validation['gps_verified']:
+        # Parse location data
+        try:
+            latitude = float(data['latitude'])
+            longitude = float(data['longitude'])
+            accuracy = float(data['accuracy']) if data.get('accuracy') is not None else None
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid location data provided'}), 400
+
+        if not Validators.validate_gps_coordinates(latitude, longitude):
+            return jsonify({'error': 'Invalid GPS coordinates'}), 400
+
+        geofence_manager = GeofencingManager()
+        location_verification = geofence_manager.verify_location(latitude, longitude, accuracy)
+
+        if not location_verification.get('gps_verified'):
             return jsonify({
                 'error': 'Location verification failed',
-                'reason': location_validation['reason'],
-                'distance': location_validation.get('distance')
+                'reason': location_verification.get('reason'),
+                'distance': location_verification.get('distance')
+            }), 403
+
+        # Verify face image against enrolled encodings
+        face_enrollments = FaceEnrollment.query.filter_by(
+            student_id=student.id,
+            is_active=True
+        ).all()
+
+        if not face_enrollments:
+            return jsonify({'error': 'No active face enrollment found for student'}), 400
+
+        known_encodings = []
+        for enrollment in face_enrollments:
+            try:
+                encoding = json.loads(enrollment.face_encoding_data)
+                if encoding:
+                    known_encodings.append(encoding)
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+        if not known_encodings:
+            return jsonify({'error': 'Face enrollment data is invalid'}), 400
+
+        verification_result = face_manager.process_attendance_image(face_image, known_encodings)
+
+        if not verification_result.get('success'):
+            return jsonify({
+                'error': 'Face verification failed',
+                'reason': verification_result.get('reason'),
+                'confidence': verification_result.get('confidence', 0.0)
+            }), 400
+
+        if not verification_result.get('match'):
+            return jsonify({
+                'error': 'Face does not match enrolled profile',
+                'reason': verification_result.get('reason'),
+                'confidence': verification_result.get('confidence', 0.0)
             }), 400
         
         # Determine status based on time
@@ -151,14 +224,14 @@ def mark_attendance():
             attendance_date=today,
             attendance_time=current_time,
             status=status,
-            verification_method=data.get('verification_method', 'Manual'),
-            confidence_score=data.get('confidence_score', 0.0),
+            verification_method='Face',
+            confidence_score=verification_result.get('confidence', 0.0),
             wifi_verified=data.get('wifi_verified', False),
-            gps_verified=location_validation['gps_verified'],
-            latitude=data['latitude'],
-            longitude=data['longitude'],
-            accuracy=data.get('accuracy'),
-            notes=data.get('notes', ''),
+            gps_verified=True,
+            latitude=latitude,
+            longitude=longitude,
+            accuracy=accuracy,
+            notes=data.get('notes', 'Face verified attendance'),
             marked_by=current_user_id
         )
         
@@ -167,7 +240,9 @@ def mark_attendance():
         
         return jsonify({
             'message': 'Attendance marked successfully',
-            'attendance': attendance.to_dict()
+            'attendance': attendance.to_dict(),
+            'verification': verification_result,
+            'location_verification': location_verification
         })
         
     except Exception as e:
@@ -179,7 +254,7 @@ def mark_attendance():
 def get_attendance_stats():
     """Get attendance statistics"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
         
         # Only Wardens can view stats
@@ -219,31 +294,3 @@ def get_attendance_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@attendance_bp.route('/verify-location', methods=['POST'])
-@jwt_required()
-def verify_location():
-    """Verify if location is within campus boundary"""
-    try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        latitude = data.get('latitude')
-        longitude = data.get('longitude')
-        accuracy = data.get('accuracy')
-        
-        if latitude is None or longitude is None:
-            return jsonify({'error': 'Latitude and longitude are required'}), 400
-        
-        # Validate GPS coordinates
-        if not Validators.validate_gps_coordinates(latitude, longitude):
-            return jsonify({'error': 'Invalid GPS coordinates'}), 400
-        
-        # Verify location
-        result = geofencing_manager.validate_attendance_location(latitude, longitude, accuracy)
-        
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500

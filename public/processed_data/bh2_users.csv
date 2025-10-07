@@ -1,0 +1,292 @@
+id,email,password_hash,role,first_name,last_name,phone,is_active,created_at
+1000,anirudh.choudhary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Anirudh,Choudhary,8690943532,True,2025-07-20 00:00:00
+1001,daksh.soni@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Daksh,Soni,6350264020,True,2025-07-21 00:00:00
+1002,rohan.goyal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rohan,Goyal,9729309927,True,2025-07-21 00:00:00
+1003,aaron.augustine@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aaron,Augustine,7093504232,True,2025-07-21 00:00:00
+1004,leesanth.g@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Leesanth,G,7093504232,True,2025-07-21 00:00:00
+1005,myadam.samarth@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Myadam,Samarth,9182501817,True,2025-07-21 00:00:00
+1006,mrinal.khandal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mrinal,Khandal,8875903661,True,2025-07-23 00:00:00
+1007,parth.mundra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Parth,Mundra,9664098829,True,2025-07-23 00:00:00
+1008,rishikesh.bhardwaj@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rishikesh,Bhardwaj,9204425929,True,2025-07-23 00:00:00
+1009,ankush.panda@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ankush,Panda,8240832834,True,2025-07-21 00:00:00
+1010,abhirama.karthikeyasreyastuttagunta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Abhirama,Karthikeya Sreyas Tuttagunta,9100668862,True,2025-07-22 00:00:00
+1011,doddaka.jayadeepnagasai@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Doddaka,Jayadeep Naga Sai,7997485729,True,2025-07-23 00:00:00
+1012,ashutosh.yadav@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ashutosh,Yadav,9259068512,True,2025-07-21 00:00:00
+1013,rishabh.kalwar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rishabh,Kalwar,6377130687,True,2025-07-22 00:00:00
+1014,vaibhav.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vaibhav,Jain,8740080070,True,2025-07-22 00:00:00
+1015,heramb.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Heramb,Sharma,6377827962,True,2025-07-22 00:00:00
+1016,krish.bhola@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Krish,Bhola,7073517788,True,2025-07-23 00:00:00
+1017,lakshay.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Lakshay,Student,9817856544,True,2025-07-23 00:00:00
+1018,aman.anchaliya@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aman,Anchaliya,9549696968,True,2025-07-22 00:00:00
+1019,bhavya.doshi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhavya,Doshi,7014763106,True,2025-07-22 00:00:00
+1020,vansh.doshi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vansh,Doshi,8302159015,True,2025-07-25 00:00:00
+1021,nakkalapally.omruthik@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Nakkalapally,Omruthik,9014857921,True,2025-07-23 00:00:00
+1022,parth.dhoot@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Parth,Dhoot,9145941190,True,2025-07-23 00:00:00
+1023,sunay.kundalwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Sunay,Kundalwal,8619804776,True,2025-07-23 00:00:00
+1024,abhishek.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Abhishek,Student,9235245386,True,2025-07-20 00:00:00
+1025,chirag.kumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Chirag,Kumar,7488645235,True,2025-07-21 00:00:00
+1026,rahul.tahid@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rahul,Tahid,9079940294,True,2025-07-22 00:00:00
+1027,badrinadh.goru@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Badrinadh,Goru,7013288812,True,2025-07-22 00:00:00
+1028,manant.srivastava@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Manant,Srivastava,9451021467,True,2025-07-23 00:00:00
+1029,shivam.srivastava@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shivam,Srivastava,7460932017,True,2025-07-23 00:00:00
+1030,manan.verma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Manan,Verma,9662349319,True,2025-07-23 00:00:00
+1031,shivang.singhal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shivang,Singhal,9784032687,True,2025-07-23 00:00:00
+1032,swarn.joshi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Swarn,Joshi,9371061051,True,2025-07-23 00:00:00
+1033,pedapalli.bhaskar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pedapalli,Bhaskar,6303236298,True,2025-07-23 00:00:00
+1034,raghuraj.singhshekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Raghuraj,Singh Shekhawat,8955983385,True,2025-07-23 00:00:00
+1035,rudrapal.singhshekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rudrapal,Singh Shekhawat,7737472264,True,2025-07-23 00:00:00
+1036,annu.kumarhadi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Annu,Kumar Hadi,8102694896,True,2025-07-23 00:00:00
+1037,brijesh.kumarkoiri@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Brijesh,Kumar Koiri,6295277386,True,2025-07-25 00:00:00
+1038,kota.reddykarthikreddy@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kota,Reddy Karthik Reddy,7032839289,True,2025-07-25 00:00:00
+1039,kuntrapakam.nipunprathisthreddy@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kuntrapakam,Nipun Prathisth Reddy,7386871155,True,2025-07-24 00:00:00
+1040,mukesh.chinthamani@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mukesh,Chinthamani,8074703767,True,2025-07-24 00:00:00
+1041,hemanth.harinageshwarvanapalli@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Hemanth,Harinageshwar Vanapalli,9440262666,True,2025-07-26 00:00:00
+1042,amit.ranjanpradhan@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Amit,Ranjan Pradhan,9801253005,True,2025-07-24 00:00:00
+1043,ayush.jaiswal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ayush,Jaiswal,9473326155,True,2025-07-24 00:00:00
+1044,yuvraj.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yuvraj,Singh,9166884991,True,2025-07-25 00:00:00
+1045,harshawardhan.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Harshawardhan,Student,9460652938,True,2025-07-25 00:00:00
+1046,mohit.suwalka@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mohit,Suwalka,8005961269,True,2025-07-25 00:00:00
+1047,priyanshu.kumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Priyanshu,Kumar,9891660352,True,2025-07-25 00:00:00
+1048,valmiki.rishi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Valmiki,Rishi,9353908651,True,2025-07-21 00:00:00
+1049,kallu.ashwinreddy@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kallu,Ashwin Reddy,9704896270,True,2025-07-21 00:00:00
+1050,veda.prakashdevalapalli@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Veda,Prakash Devalapalli,7075150829,True,2025-07-22 00:00:00
+1051,gandla.vipuleshwar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Gandla,Vipuleshwar,9666120156,True,2025-07-21 00:00:00
+1052,sirimamilla.abhishek@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Sirimamilla,Abhishek,7075356599,True,2025-07-21 00:00:00
+1053,varun.raothumula@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Varun,Rao Thumula,8309740155,True,2025-07-23 00:00:00
+1054,avneesh.kumardubey@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Avneesh,Kumar Dubey,8448172686,True,2025-07-23 00:00:00
+1055,hardik.kumawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Hardik,Kumawat,9001023997,True,2025-07-23 00:00:00
+1056,shouryaveer.bishnoi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shouryaveer,Bishnoi,9828692129,True,2025-07-23 00:00:00
+1057,arunil.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arunil,Jain,8890301492,True,2025-07-23 00:00:00
+1058,udit.mishra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Udit,Mishra,9509908119,True,2025-07-23 00:00:00
+1059,shabd.srivastava@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shabd,Srivastava,7011114613,True,2025-07-23 00:00:00
+1060,akshat.murarka@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Akshat,Murarka,9153498719,True,2025-07-23 00:00:00
+1061,bhukya.srikanthnayak@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhukya,Srikanth Nayak,7675094480,True,2025-07-23 00:00:00
+1062,tanishq.daiya@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tanishq,Daiya,7611964099,True,2025-07-23 00:00:00
+1063,bhavya.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhavya,Jain,9672750183,True,2025-07-23 00:00:00
+1064,chandan.pritsingh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Chandan,Prit Singh,8003055834,True,2025-07-23 00:00:00
+1065,kanishk.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kanishk,Gupta,8233018941,True,2025-07-23 00:00:00
+1066,pradhuman.thanvi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pradhuman,Thanvi,6375455266,True,2025-07-23 00:00:00
+1067,srinivasa.sangeethaddepalli@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Srinivasa,Sangeeth Addepalli,8977868159,True,2025-07-23 00:00:00
+1068,yashwanth.chandaka@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yashwanth,Chandaka,,True,2025-07-26 00:00:00
+1069,tanmay.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tanmay,Sharma,6367830722,True,2025-07-23 00:00:00
+1070,yashwardhan.khatri@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yashwardhan,Khatri,8000437511,True,2025-07-23 00:00:00
+1071,yatharth.chaturvedi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yatharth,Chaturvedi,8529958544,True,2025-07-23 00:00:00
+1072,karan.nishad@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Karan,Nishad,9198721362,True,2025-07-25 00:00:00
+1073,rampe.varun@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rampe,Varun,6300045447,True,2025-07-25 00:00:00
+1074,uduthala.ashwit@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Uduthala,Ashwit,9347487107,True,2025-07-25 00:00:00
+1075,konda.trigun@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Konda,Trigun,9063042223,True,2025-07-28 00:00:00
+1076,duppalapudi.hruday@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Duppalapudi,Hruday,9491975608,True,2025-08-01 00:00:00
+1077,kolluri.jeshwanth@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kolluri,Jeshwanth,7093467925,True,2025-07-30 00:00:00
+1078,sahil.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Sahil,Student,9053480115,True,2025-07-31 00:00:00
+1079,naveen.tholiya@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Naveen,Tholiya,,True,2025-08-03 00:00:00
+1080,deepak.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Deepak,Student,8854904497,True,2025-08-01 00:00:00
+1081,pendota.daiwik@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pendota,Daiwik,9849860859,True,2025-07-30 00:00:00
+1082,vanikuppala.dinesh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vanikuppala,Dinesh,8341912025,True,2025-07-30 00:00:00
+1083,a.tarundeep@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,A.,Tarundeep,7675074126,True,2025-07-30 00:00:00
+1084,aman.kumawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aman,Kumawat,9509120066,True,2025-08-01 00:00:00
+1085,manan.pancholi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Manan,pancholi,7300165971,True,2025-08-28 00:00:00
+1086,chirag.data@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Chirag,Data,6367739953,True,2025-08-02 00:00:00
+1087,shiva.ch@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shiva,Ch,6303766034,True,2025-08-02 00:00:00
+1088,k.abhayranjithreddy@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,K.,Abhay Ranjith Reddy,6303766034,True,2025-08-02 00:00:00
+1089,janapaati.rohit@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Janapaati,Rohit,8309571278,True,2025-08-02 00:00:00
+1090,arpulu.saisiddartha@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arpulu,Saisiddartha,,True,2025-08-03 00:00:00
+1091,boggarapu.luthergraham@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Boggarapu,Luthergraham,6309334175,True,2025-08-04 00:00:00
+1092,siva.prasadpenneti@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Siva,Prasadpenneti,8639218840,True,2025-08-04 00:00:00
+1093,daksh.vashistha@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Daksh,Vashistha,8306693215,True,2025-08-07 00:00:00
+1094,shashank.sangwan@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shashank,Sangwan,958883901,True,2025-08-03 00:00:00
+1095,jayesh.agarwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Jayesh,Agarwal,9251077811,True,2025-08-03 00:00:00
+1096,arham.bothra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arham,Bothra,9079933040,True,2025-07-23 00:00:00
+1097,bhavy.raj@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhavy,Raj,7300076056,True,2025-07-23 00:00:00
+1098,naman.mahlawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Naman,Mahlawat,8114413997,True,2025-07-23 00:00:00
+1099,anuj.swarnkar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Anuj,Swarnkar,7568776359,True,2025-07-23 00:00:00
+1100,arnav.rawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arnav,Rawat,9682601220,True,2025-07-24 00:00:00
+1101,mallareddi.charan@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mallareddi,Charan,9692912166,True,2025-07-24 00:00:00
+1102,a.varunteja@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,A.,Varun Teja,9573857352,True,2025-07-24 00:00:00
+1103,baratam.sankarnarayana@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Baratam,Sankar Narayana,9603419007,True,2025-07-25 00:00:00
+1104,gottimukkala.vishwaroopachary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Gottimukkala,Vishwaroopa Chary,9849676054,True,2025-07-25 00:00:00
+1105,aditya.chaudhary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aditya,Chaudhary,9596524810,True,2025-07-24 00:00:00
+1106,aditya.saxena@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aditya,Saxena,9685325591,True,2025-07-24 00:00:00
+1107,prabhav.goyal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Prabhav,Goyal,9971105431,True,2025-07-24 00:00:00
+1108,eishit.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Eishit,Gupta,7292013525,True,2025-07-24 00:00:00
+1109,ishan.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ishan,Sharma,7851897206,True,2025-07-24 00:00:00
+1110,mradul.saxena@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mradul,Saxena,8767289743,True,2025-07-24 00:00:00
+1111,divit.chaturvedi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Divit,Chaturvedi,9602138785,True,2025-07-24 00:00:00
+1112,kunal.singhshekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kunal,Singh Shekhawat,9414174221,True,2025-07-24 00:00:00
+1113,ritik.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ritik,Sharma,8306936227,True,2025-07-24 00:00:00
+1114,ashutosh.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ashutosh,Gupta,9509619872,True,2025-07-24 00:00:00
+1115,ishvit.bharadwaj@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ishvit,Bharadwaj,6375056015,True,2025-07-25 00:00:00
+1116,tarun.kumarsaini@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tarun,Kumar Saini,8302833015,True,2025-07-24 00:00:00
+1117,bhanupratap.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhanupratap,Singh,9256609205,True,2025-07-24 00:00:00
+1118,mohammed.abdulzuhaib@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mohammed,Abdul Zuhaib,7337008129,True,2025-07-24 00:00:00
+1119,purushottam.kumarsingh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Purushottam,Kumar Singh,7007619284,True,2025-07-25 00:00:00
+1120,priyanshu.singhshekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Priyanshu,Singh Shekhawat,8529950424,True,2025-08-04 00:00:00
+1121,prince.pincha@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Prince,Pincha,6376437613,True,2025-08-04 00:00:00
+1122,kaushal.malvi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kaushal,Malvi,9644679988,True,2025-08-07 00:00:00
+1123,ajay.kumarajaythorati@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ajay,Kumar Ajaythorati,,True,2025-08-04 00:00:00
+1124,kokkanda.hemendrasri@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kokkanda,Hemendra sri,8143567394,True,2025-08-07 00:00:00
+1125,bhanu.pratapsinghkhangarot@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhanu,Pratap Singh Khangarot,9799850952,True,2025-07-25 00:00:00
+1126,bhavishya.kathpalia@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhavishya,Kathpalia,7988868012,True,2025-07-25 00:00:00
+1127,kunal.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kunal,Singh,,True,2025-07-26 00:00:00
+1128,ayush.kherada@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ayush,Kherada,,True,2025-07-25 00:00:00
+1129,naman.maheshwari@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Naman,Maheshwari,,True,2025-07-25 00:00:00
+1130,shivam.kerwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shivam,Kerwal,,True,2025-07-25 00:00:00
+1131,abhimanyu.singhkatiyar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Abhimanyu,Singh Katiyar,,True,2025-07-25 00:00:00
+1132,vibhor.vyas@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vibhor,Vyas,,True,2025-07-26 00:00:00
+1133,chirayu.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,CHIRAYU,SHARMA,,True,2025-07-29 00:00:00
+1134,chanchal.karanani@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Chanchal,Karanani,,True,2025-07-27 00:00:00
+1135,arjun.giri@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arjun,Giri,,True,2025-07-27 00:00:00
+1136,anurag.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Anurag,Singh,9166863747,True,2025-07-29 00:00:00
+1137,kamalakar.abhisek@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kamalakar,Abhisek,7842915292,True,2025-07-28 00:00:00
+1138,muppaneni.nandakishor@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Muppaneni,Nanda Kishor,,True,2025-08-04 00:00:00
+1139,m.jaiavivesh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,M,Jai Avivesh,,True,2025-07-29 00:00:00
+1140,k.govrdhanreddy@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,K.,Govrdhan Reddy,8328070620,True,2025-07-30 00:00:00
+1141,nandamuri.nagasaimanikantadhanush@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Nandamuri,Naga Sai manikanta dhanush,,True,2025-07-29 00:00:00
+1142,moksha.achyutakumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Moksha,Achyuta Kumar,,True,2025-07-29 00:00:00
+1143,pankaj.singhmahta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pankaj,singh Mahta,,True,2025-07-28 00:00:00
+1144,atharv.mandal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Atharv,Mandal,,True,2025-08-01 00:00:00
+1145,raghav.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Raghav,Sharma,,True,2025-08-01 00:00:00
+1146,jainam.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Jainam,Jain,,True,2025-07-28 00:00:00
+1147,sneh.toshniwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Sneh,Toshniwal,,True,2025-07-28 00:00:00
+1148,krish.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Krish,gupta,,True,2025-07-28 00:00:00
+1149,muriki.praneeth@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Muriki,Praneeth,8179053216,True,2025-08-02 00:00:00
+1150,devendra.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Devendra,Student,8003010663,True,2025-08-05 00:00:00
+1151,adesh.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Adesh,Singh,8081961884,True,2025-08-02 00:00:00
+1152,vikash.saran@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vikash,Saran,,True,2025-08-03 00:00:00
+1153,tarun.saran@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tarun,Saran,8905119974,True,2025-08-03 00:00:00
+1154,yash.gill@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yash,Gill,9521734317,True,2025-08-03 00:00:00
+1155,achal.manojchoudhari@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Achal,Manoj Choudhari,8830586152,True,2025-08-02 00:00:00
+1156,deepak.kumarnehrta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Deepak,Kumar Nehrta,7842655429,True,2025-08-02 00:00:00
+1157,arshey.rai@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arshey,Rai,,True,2025-08-02 00:00:00
+1158,vakamalla.sasidhar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vakamalla,Sasidhar,,True,2025-08-02 00:00:00
+1159,mandava.rohitchowdary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mandava,Rohit Chowdary,9963566067,True,2025-08-02 00:00:00
+1160,bonthu.rajeshnaidu@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bonthu,Rajeshnaidu,9347194279,True,2025-08-02 00:00:00
+1161,kartiken.ranjan@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kartiken,Ranjan,8521634961,True,2025-08-04 00:00:00
+1162,tanish.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tanish,Jain,9462679538,True,2025-08-02 00:00:00
+1163,saransh.patidar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Saransh,Patidar,,True,2025-08-01 00:00:00
+1164,nellori.revanthsai@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Nellori,Revanth Sai,8500862614,True,2025-07-30 00:00:00
+1165,kurugodu.paalisaathvik@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kurugodu,Paali Saathvik,,True,2025-07-30 00:00:00
+1166,paturi.thripurasatyasai@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Paturi,Thripura Satya Sai,8639474645,True,2025-07-31 00:00:00
+1167,raavi.narendrachowdary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Raavi,Narendra Chowdary,,True,2025-08-03 00:00:00
+1168,kamboji.venkatasaisathwik@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kamboji,Venkatasai Sathwik,9492717940,True,2025-08-01 00:00:00
+1169,pandilla.rohithkrishna@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pandilla,Rohithkrishna,,True,2025-08-02 00:00:00
+1170,pradeep.choudhary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pradeep,Choudhary,9414409336,True,2025-08-03 00:00:00
+1171,ashok.choudhary@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ashok,Choudhary,9785886071,True,2025-08-03 00:00:00
+1172,nakul.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Nakul,Gupta,6367716135,True,2025-08-02 00:00:00
+1173,aman.prakash@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aman,Prakash,7033676488,True,2025-08-01 00:00:00
+1174,sk.wasimalam@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,SK,Wasim Alam,6203563955,True,2025-08-02 00:00:00
+1175,tejendra.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tejendra,Student,0,True,2025-08-07 00:00:00
+1176,d.vskushalkumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,D,V S Kushal Kumar,8820039944,True,2025-08-02 00:00:00
+1177,shaik.farooqafrooz@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shaik,Farooq Afrooz,6300230521,True,2025-08-02 00:00:00
+1178,avula.shivashankar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Avula,Shiva Shankar,9177672381,True,2025-08-02 00:00:00
+1179,raj.kamoi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Raj,Kamoi,8107254224,True,2025-08-02 00:00:00
+1180,advet.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Advet,Gupta,9179783789,True,2025-08-02 00:00:00
+1181,ankit.kumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ankit,Kumar,6204201966,True,2025-08-04 00:00:00
+1182,deepanshu.singhsekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Deepanshu,Singh Sekhawat,0,True,2025-08-02 00:00:00
+1183,bhawesh.chandnani@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhawesh,Chandnani,7877775484,True,2025-08-03 00:00:00
+1184,garv.panwar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Garv,Panwar,7300295081,True,2025-08-04 00:00:00
+1185,jayesh.kumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Jayesh,Kumar,6376522947,True,2025-10-07 12:48:54
+1186,yuvaraj.singhrathore@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yuvaraj,Singh Rathore,9680053904,True,2025-10-07 12:48:54
+1187,mayank.shankarpathak@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mayank,Shankar Pathak,9131171030,True,2025-08-03 00:00:00
+1188,saksham.saini@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Saksham,Saini,6377334561,True,2025-08-03 00:00:00
+1189,pragyansh.mishra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Pragyansh,Mishra,7597291845,True,2025-08-02 00:00:00
+1190,dhananjay.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Dhananjay,Sharma,7357904367,True,2025-08-02 00:00:00
+1191,sharma.lokesh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Sharma,Lokesh,9898230461,True,2025-08-02 00:00:00
+1192,anuj.singhsekhwat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Anuj,Singh Sekhwat,7073831107,True,2025-08-03 00:00:00
+1193,ishit.agarwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ishit,Agarwal,9783590261,True,2025-08-03 00:00:00
+1194,parv.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Parv,Sharma,9116501747,True,2025-08-03 00:00:00
+1195,priyank.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Priyank,Sharma,6367145607,True,2025-08-03 00:00:00
+1196,aman.pratapsingh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aman,Pratap Singh,9456608637,True,2025-08-02 00:00:00
+1197,kartavya.garhwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kartavya,Garhwal,8233848184,True,2025-08-02 00:00:00
+1198,harshvardhan.singhshekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Harshvardhan,singh Shekhawat,7239866875,True,2025-08-03 00:00:00
+1199,bhavishy.garg@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhavishy,Garg,7742810096,True,2025-08-02 00:00:00
+1200,devansh.pundir@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Devansh,pundir,8439505770,True,2025-08-02 00:00:00
+1201,yojit.lohar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yojit,Lohar,8003383599,True,2025-08-03 00:00:00
+1202,prashant.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Prashant,singh,8302840321,True,2025-08-03 00:00:00
+1203,devam.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Devam,Gupta,7340015201,True,2025-08-02 00:00:00
+1204,yash.mangal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yash,mangal,8306755102,True,2025-08-04 00:00:00
+1205,rakshit.khandelwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rakshit,Khandelwal,7849999713,True,2025-08-02 00:00:00
+1206,parag.milindtonape@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Parag,milind tonape,,True,2025-08-03 00:00:00
+1207,ansh.paul@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ansh,Paul,9424446681,True,2025-08-02 00:00:00
+1208,zuber.khan@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Zuber,khan,9549474606,True,2025-08-04 00:00:00
+1209,budige.gurusatrath@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Budige,Guru Satrath,9032422764,True,2025-08-02 00:00:00
+1210,yash.mishra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yash,Mishra,7007689708,True,2025-08-05 00:00:00
+1211,ayaan.mathur@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ayaan,Mathur,6378136157,True,2025-08-04 00:00:00
+1212,nikhilesh.singhpanwar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Nikhilesh,Singh Panwar,6377966199,True,2025-08-04 00:00:00
+1213,ashish.beniwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ashish,Beniwal,8696459416,True,2025-08-03 00:00:00
+1214,keshav.maheswari@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Keshav,Maheswari,7877227621,True,2025-08-03 00:00:00
+1215,ayush.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ayush,Sharma,8936860125,True,2025-08-07 00:00:00
+1216,darshil.garg@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Darshil,Garg,9376772392,True,2025-08-03 00:00:00
+1217,roshan.jangir@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Roshan,jangir,7877552810,True,2025-08-02 00:00:00
+1218,yug.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Yug,jain,9358210803,True,2025-08-02 00:00:00
+1219,navdeep.shrishrimal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Navdeep,Shrishrimal,7568500730,True,2025-08-03 00:00:00
+1220,vansh.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vansh,Sharma,0,True,2025-08-02 00:00:00
+1221,sajal.kumarmishra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Sajal,Kumar Mishra,7000962912,True,2025-08-03 00:00:00
+1222,atharv.mehrotra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Atharv,Mehrotra,6387183983,True,2025-08-05 00:00:00
+1223,vaibhav.khandelwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vaibhav,Khandelwal,6367511127,True,2025-08-03 00:00:00
+1224,nikunj.katta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Nikunj,Katta,6375198706,True,2025-10-07 12:48:54
+1225,mohit.khurana@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mohit,Khurana,8905744728,True,2025-08-02 00:00:00
+1226,harshit.mundra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Harshit,Mundra,8562088149,True,2025-08-03 00:00:00
+1227,priyanshu.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Priyanshu,Jain,9256868293,True,2025-08-02 00:00:00
+1228,lakshya.agarwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Lakshya,Agarwal,8529592955,True,2025-08-02 00:00:00
+1229,aditya.nayak@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aditya,Nayak,9116727168,True,2025-08-02 00:00:00
+1230,aryan.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aryan,Gupta,8302958564,True,2025-08-02 00:00:00
+1231,syed.faizalizaidi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Syed,Faiz Ali Zaidi,6350612878,True,2025-08-03 00:00:00
+1232,aryan.jain@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aryan,Jain,6377317903,True,2025-08-03 00:00:00
+1233,parth.lavit@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Parth,Lavit,7340215561,True,2025-08-03 00:00:00
+1234,hardik.lavti@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Hardik,Lavti,9216388389,True,2025-08-03 00:00:00
+1235,lakshit.pareek@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Lakshit,Pareek,9216333707,True,2025-08-03 00:00:00
+1236,jayash.gahlot@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Jayash,Gahlot,8306274199,True,2025-08-03 00:00:00
+1237,ankit.joshi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ankit,Joshi,9354116261,True,2025-08-02 00:00:00
+1238,harshwardhan.singhdeora@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Harshwardhan,singh Deora,8955769287,True,2025-08-04 00:00:00
+1239,anant.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Anant,Gupta,8764880898,True,2025-08-04 00:00:00
+1240,tanmay.joshi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tanmay,joshi,9024720510,True,2025-08-05 00:00:00
+1241,akshit.singhal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Akshit,Singhal,8890976061,True,2025-08-03 00:00:00
+1242,devansh.srivastava@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Devansh,Srivastava,7050260475,True,2025-08-04 00:00:00
+1243,bhanu.pratp@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Bhanu,Pratp,9343794029,True,2025-10-07 12:48:54
+1244,vaibhav.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vaibhav,Sharma,9413240808,True,2025-08-03 00:00:00
+1245,tanmay.shekhawat@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tanmay,Shekhawat,7627061003,True,2025-08-03 00:00:00
+1246,tejendra.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tejendra,Singh,6377506786,True,2025-10-07 12:48:54
+1247,divyam.saini@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Divyam,Saini,7014112565,True,2025-08-01 00:00:00
+1248,kartik.singh@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kartik,Singh,9997727827,True,2025-08-01 00:00:00
+1249,rudra.spavanfanindram@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rudra,S pavan Fanindra M,9912207455,True,2025-08-03 00:00:00
+1250,mahesh.gehlot@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mahesh,Gehlot,9636340953,True,2025-08-02 00:00:00
+1251,anmol.anuragi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Anmol,Anuragi,6267625174,True,2025-08-02 00:00:00
+1252,mayank.gautam@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mayank,Gautam,8949349516,True,2025-08-03 00:00:00
+1253,gourang.tak@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Gourang,Tak,8058477540,True,2025-08-03 00:00:00
+1254,arjun.singhtanwar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arjun,Singh Tanwar,9166130402,True,2025-08-03 00:00:00
+1255,aman.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aman,Gupta,8950739040,True,2025-08-01 00:00:00
+1256,adityavarvardan.singhchouhan@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Adityavarvardan,singh chouhan,8955738808,True,2025-08-02 00:00:00
+1257,krishna.agarwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Krishna,Agarwal,8279263509,True,2025-08-02 00:00:00
+1258,aditya.somani@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aditya,Somani,8233116585,True,2025-08-04 00:00:00
+1259,aryan.chaturvedi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Aryan,Chaturvedi,9368644137,True,2025-08-03 00:00:00
+1260,kartik.phulwari@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kartik,Phulwari,7877080919,True,2025-08-04 00:00:00
+1261,harsh.bindal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Harsh,Bindal,7597713625,True,2025-08-02 00:00:00
+1262,madhav.garg@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Madhav,garg,7017198900,True,2025-08-04 00:00:00
+1263,mayank.soni@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mayank,Soni,9799901191,True,2025-08-04 00:00:00
+1264,satvik.agarwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Satvik,Agarwal,8272031402,True,2025-08-01 00:00:00
+1265,kartik.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kartik,Sharma,8769329369,True,2025-08-01 00:00:00
+1266,rahul.verma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rahul,Verma,0,True,2025-08-02 00:00:00
+1267,shivam.lakshkar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Shivam,Lakshkar,9929935561,True,2025-08-02 00:00:00
+1268,ayush.sharma1@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ayush,Sharma,,True,2025-08-02 00:00:00
+1269,rohit.kumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rohit,kumar,7878898535,True,2025-08-01 00:00:00
+1270,udit.yadav@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Udit,Yadav,8607143505,True,2025-08-04 00:00:00
+1271,naman.goyal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Naman,Goyal,6377992203,True,2025-08-02 00:00:00
+1272,vivaan.mishra@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vivaan,Mishra,9336785425,True,2025-08-03 00:00:00
+1273,lokesh.dhariwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Lokesh,Dhariwal,6371599630,True,2025-08-02 00:00:00
+1274,ansh.gupta@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ansh,Gupta,9166083618,True,2025-08-02 00:00:00
+1275,garv.sharma@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Garv,Sharma,7852865011,True,2025-08-02 00:00:00
+1276,mehul.maheshwari@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mehul,Maheshwari,7976901518,True,2025-08-03 00:00:00
+1277,keshav.bilwal@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Keshav,Bilwal,8233008805,True,2025-08-03 00:00:00
+1278,kashar.dagdi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kashar,Dagdi,9829030999,True,2025-08-03 00:00:00
+1279,tawab.student@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Tawab,Student,7300003990,True,2025-08-04 00:00:00
+1280,arjun.rajaram@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Arjun,Rajaram,9310480690,True,2025-08-03 00:00:00
+1281,parikshit.jangid@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Parikshit,Jangid,9887650405,True,2025-08-03 00:00:00
+1282,vidhaan.pshah@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Vidhaan,Pshah,7357252112,True,2025-08-06 00:00:00
+1283,kushal.jangir@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Kushal,Jangir,9509489793,True,2025-08-07 00:00:00
+1284,rishi.jangid@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Rishi,Jangid,75681919942,True,2025-10-07 12:48:54
+1285,ravi.teja@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Ravi,Teja,7416090030,True,2025-08-04 00:00:00
+1286,mangu.nihas@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mangu,Nihas,8008659769,True,2025-10-07 12:48:54
+1287,k.akshenderrddy@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,K.,Akshenderrddy,,True,2025-08-04 00:00:00
+1288,dhru.kumar@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Dhru,Kumar,,True,2025-08-04 00:00:00
+1289,mohammed.ozairshah@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Mohammed,Ozair Shah,8829852070,True,2025-08-04 00:00:00
+1290,chirag.negi@jklu.edu.in,$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW,Student,Chirag,Negi,9829633388,True,2025-08-04 00:00:00

@@ -3,8 +3,8 @@ Authentication API Endpoints
 """
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from models import db, User
-from utils.validators import Validators
+from models import db, User, Student
+from utils import GeofencingManager, Validators
 from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__)
@@ -20,16 +20,32 @@ def login():
         
         email = data.get('email', '').strip().lower()
         password = data.get('password', '')
+        latitude_raw = data.get('latitude')
+        longitude_raw = data.get('longitude')
+        accuracy_raw = data.get('accuracy')
         
         if not email or not password:
             return jsonify({'error': 'Email and password required'}), 400
         
+        if latitude_raw is None or longitude_raw is None:
+            return jsonify({'error': 'Latitude and longitude are required for login'}), 400
+        
+        try:
+            latitude = float(latitude_raw)
+            longitude = float(longitude_raw)
+            accuracy = float(accuracy_raw) if accuracy_raw is not None else None
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid location data provided'}), 400
+        
         if not Validators.validate_email(email):
             return jsonify({'error': 'Invalid email format'}), 400
         
+        if not Validators.validate_gps_coordinates(latitude, longitude):
+            return jsonify({'error': 'Invalid GPS coordinates'}), 400
+        
         # Find user by email
         user = User.query.filter_by(email=email).first()
-        
+
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
         
@@ -39,17 +55,29 @@ def login():
         # Verify password
         if not user.verify_password(password):
             return jsonify({'error': 'Invalid credentials'}), 401
-        
-        # Update last login
+
+        # Verify location within campus boundary
+        geofence_manager = GeofencingManager()
+        location_verification = geofence_manager.verify_location(latitude, longitude, accuracy)
+
+        if not location_verification.get('gps_verified'):
+            return jsonify({
+                'error': 'Location verification failed',
+                'reason': location_verification.get('reason'),
+                'distance': location_verification.get('distance')
+            }), 403
+
+        # Update last login metadata
         user.last_login = datetime.utcnow()
         db.session.commit()
-        
+
         # Create JWT token
-        token = create_access_token(identity=user.id)
-        
+        token = create_access_token(identity=str(user.id))
+
         return jsonify({
             'token': token,
-            'user': user.to_dict()
+            'user': user.to_dict(),
+            'location_verification': location_verification
         })
         
     except Exception as e:
@@ -97,7 +125,7 @@ def signup():
         db.session.commit()
         
         # Create JWT token
-        token = create_access_token(identity=user.id)
+        token = create_access_token(identity=str(user.id))
         
         return jsonify({
             'success': True,

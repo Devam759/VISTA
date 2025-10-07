@@ -1,141 +1,149 @@
 """
-Geofencing Utility - Location Verification
+Geofencing utilities for campus boundary verification.
 """
+from __future__ import annotations
+
+import json
 import math
-from typing import Tuple, List, Dict, Optional
+from typing import Dict, List, Optional, Tuple
+
+from flask import current_app
+
 
 class GeofencingManager:
-    """Geofencing manager for location verification"""
-    
-    def __init__(self, campus_lat: float = 26.8351, campus_lon: float = 75.6508, 
-                 accuracy_radius: int = 100):
-        self.campus_center_lat = campus_lat
-        self.campus_center_lon = campus_lon
-        self.accuracy_radius = accuracy_radius
-        
-        # Define JK Lakshmipat University campus boundary polygon
-        # These coordinates define the actual campus boundary
-        self.campus_boundary = [
-            (75.651187, 26.836760), (75.649523, 26.837109), (75.649331, 26.836678),
-            (75.648472, 26.836655), (75.648307, 26.836079), (75.650194, 26.835495),
-            (75.650150, 26.834788), (75.650973, 26.834635), (75.651435, 26.833430),
-            (75.652500, 26.832659), (75.653021, 26.833776), (75.652374, 26.834072),
-            (75.652472, 26.834935), (75.651554, 26.835321), (75.651320, 26.835838)
-        ]
-    
-    def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-        """Calculate distance between two GPS coordinates using Haversine formula"""
-        # Convert to radians
-        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-        
-        # Haversine formula
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-        c = 2 * math.asin(math.sqrt(a))
-        r = 6371000  # Radius of earth in meters
-        return c * r
-    
-    def is_point_in_polygon(self, point: Tuple[float, float], polygon: List[Tuple[float, float]]) -> bool:
-        """Check if a point is inside a polygon using ray casting algorithm"""
-        x, y = point
-        n = len(polygon)
+    """Manager responsible for campus geofence verification."""
+
+    def __init__(
+        self,
+        campus_lat: Optional[float] = None,
+        campus_lon: Optional[float] = None,
+        accuracy_radius: Optional[int] = None,
+        polygon: Optional[List[Tuple[float, float]]] = None,
+    ) -> None:
+        config = current_app.config if current_app else {}
+        self.campus_lat = campus_lat or config.get("CAMPUS_LATITUDE", 0.0)
+        self.campus_lon = campus_lon or config.get("CAMPUS_LONGITUDE", 0.0)
+        self.accuracy_radius = accuracy_radius or config.get("GPS_ACCURACY_RADIUS", 150)
+
+        if polygon is not None:
+            self.campus_polygon = polygon
+        else:
+            raw_polygon = config.get("CAMPUS_POLYGON", "")
+            if isinstance(raw_polygon, str) and raw_polygon:
+                try:
+                    self.campus_polygon = json.loads(raw_polygon)
+                except json.JSONDecodeError:
+                    self.campus_polygon = []
+            else:
+                self.campus_polygon = raw_polygon or []
+
+    # ------------------------------------------------------------------
+    # Geometry helpers
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        """Return distance in meters between two geo coordinates."""
+        radius = 6371000  # Earth radius in meters
+        d_lat = math.radians(lat2 - lat1)
+        d_lon = math.radians(lon2 - lon1)
+
+        a = (
+            math.sin(d_lat / 2) ** 2
+            + math.cos(math.radians(lat1))
+            * math.cos(math.radians(lat2))
+            * math.sin(d_lon / 2) ** 2
+        )
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return radius * c
+
+    @staticmethod
+    def _point_in_polygon(lat: float, lon: float, polygon: List[Tuple[float, float]]) -> bool:
+        """Ray-casting algorithm to check if point is inside polygon."""
+        if not polygon:
+            return False
+
         inside = False
-        
-        p1x, p1y = polygon[0]
-        for i in range(1, n + 1):
-            p2x, p2y = polygon[i % n]
-            if y > min(p1y, p2y):
-                if y <= max(p1y, p2y):
-                    if x <= max(p1x, p2x):
-                        if p1y != p2y:
-                            xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
-                        if p1x == p2x or x <= xinters:
-                            inside = not inside
-            p1x, p1y = p2x, p2y
-        
-        return inside
-    
-    def verify_location(self, latitude: float, longitude: float, accuracy: Optional[float] = None) -> Dict:
-        """Verify if the given coordinates are within campus boundary"""
-        try:
-            # Validate coordinates
-            if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
-                return {
-                    'valid': False,
-                    'reason': 'Invalid GPS coordinates',
-                    'distance': None,
-                    'campus': None
-                }
-            
-            # Check GPS accuracy if provided
-            if accuracy and accuracy > 500:  # Relaxed accuracy requirement
-                return {
-                    'valid': False,
-                    'reason': f'GPS accuracy too low: {accuracy}m (required: <500m)',
-                    'distance': None,
-                    'campus': None
-                }
-            
-            # Calculate distance from campus center
-            distance_from_center = self.calculate_distance(
-                latitude, longitude, 
-                self.campus_center_lat, self.campus_center_lon
+        x, y = lon, lat
+        n = len(polygon)
+
+        for i in range(n):
+            j = (i - 1) % n
+            xi, yi = polygon[i][1], polygon[i][0]
+            xj, yj = polygon[j][1], polygon[j][0]
+
+            intersects = ((yi > y) != (yj > y)) and (
+                x < (xj - xi) * (y - yi) / (yj - yi + 1e-12) + xi
             )
-            
-            # Check if point is within campus boundary polygon
-            if self.is_point_in_polygon((longitude, latitude), self.campus_boundary):
-                return {
-                    'valid': True,
-                    'reason': 'Location verified within campus boundary',
-                    'distance': distance_from_center,
-                    'campus': 'Campus',
-                    'accuracy': accuracy
-                }
-            
-            return {
-                'valid': False,
-                'reason': f'Location outside campus boundary: {distance_from_center:.1f}m from center',
-                'distance': distance_from_center,
-                'campus': None
-            }
-            
-        except Exception as e:
-            return {
-                'valid': False,
-                'reason': f'Location verification error: {str(e)}',
-                'distance': None,
-                'campus': None
-            }
-    
-    def get_campus_boundary(self) -> Dict:
-        """Get campus boundary information for frontend"""
+            if intersects:
+                inside = not inside
+        return inside
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+    def get_campus_boundary(self) -> Dict[str, object]:
+        """Return configured campus boundary information."""
         return {
-            'center': {
-                'latitude': self.campus_center_lat,
-                'longitude': self.campus_center_lon
+            "center": {
+                "latitude": self.campus_lat,
+                "longitude": self.campus_lon,
             },
-            'radius': self.accuracy_radius,
-            'polygon': self.campus_boundary
+            "radius": self.accuracy_radius,
+            "polygon": self.campus_polygon,
         }
-    
-    def validate_attendance_location(self, latitude: float, longitude: float, 
-                                   accuracy: Optional[float] = None, student_hostel: Optional[str] = None) -> Dict:
-        """Validate location for attendance marking within campus boundary"""
-        verification = self.verify_location(latitude, longitude, accuracy)
-        
-        if not verification['valid']:
+
+    def verify_location(
+        self, latitude: float, longitude: float, accuracy: Optional[float] = None
+    ) -> Dict[str, object]:
+        """Verify whether the coordinates fall within the campus boundary."""
+        if latitude is None or longitude is None:
             return {
-                'gps_verified': False,
-                'reason': verification['reason'],
-                'distance': verification['distance'],
-                'campus': verification['campus']
+                "gps_verified": False,
+                "reason": "Latitude and longitude are required",
             }
-        
+
+        # Check polygon containment if available
+        inside_polygon = False
+        if self.campus_polygon:
+            inside_polygon = self._point_in_polygon(latitude, longitude, self.campus_polygon)
+
+        # Distance from center
+        distance = self._haversine_distance(latitude, longitude, self.campus_lat, self.campus_lon)
+
+        # Determine accuracy constraint
+        if accuracy is not None and accuracy > self.accuracy_radius:
+            return {
+                "gps_verified": False,
+                "reason": f"GPS accuracy too low ({accuracy:.1f}m > {self.accuracy_radius}m)",
+                "distance": round(distance, 2),
+            }
+
+        if self.campus_polygon:
+            if inside_polygon:
+                return {
+                    "gps_verified": True,
+                    "reason": "Location inside campus boundary polygon",
+                    "distance": round(distance, 2),
+                }
+            return {
+                "gps_verified": False,
+                "reason": f"Outside campus polygon ({distance:.1f}m from center)",
+                "distance": round(distance, 2),
+            }
+
+        # Fallback to radius check if no polygon configured
+        if distance <= self.accuracy_radius:
+            return {
+                "gps_verified": True,
+                "reason": "Location within campus radius",
+                "distance": round(distance, 2),
+            }
+
         return {
-            'gps_verified': True,
-            'reason': verification['reason'],
-            'distance': verification['distance'],
-            'campus': verification['campus'],
-            'accuracy': verification.get('accuracy')
+            "gps_verified": False,
+            "reason": f"Outside campus radius ({distance:.1f}m from center)",
+            "distance": round(distance, 2),
         }
+
+
+__all__ = ["GeofencingManager"]

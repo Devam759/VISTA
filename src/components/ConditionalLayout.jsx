@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import LocationTracingWrapper from "./LocationTracingWrapper";
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
@@ -35,7 +34,7 @@ export default function ConditionalLayout({ children }) {
   
   // Default layout for all other pages
   return (
-    <LocationTracingWrapper>
+    <>
       <Navbar />
       <div className="container-app py-6 flex gap-6 min-h-screen">
         <div className="hidden lg:block">
@@ -43,6 +42,6 @@ export default function ConditionalLayout({ children }) {
         </div>
         <main className="flex-1 min-w-0 overflow-x-auto px-4 lg:px-0">{children}</main>
       </div>
-    </LocationTracingWrapper>
+    </>
   );
 }

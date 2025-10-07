@@ -19,7 +19,7 @@ class Room(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
-    students = db.relationship('Student', backref='room')
+    # Note: backref is defined in Student model
     
     # Unique constraint on hostel_id and room_number
     __table_args__ = (db.UniqueConstraint('hostel_id', 'room_number', name='_hostel_room_uc'),)

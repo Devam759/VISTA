@@ -28,14 +28,12 @@ def create_app(config_name=None):
     from app.api.v1.attendance import attendance_bp
     from app.api.v1.hostels import hostels_bp
     from app.api.v1.face import face_bp
-    from app.api.v1.geofencing import geofencing_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
     app.register_blueprint(students_bp, url_prefix='/api/v1/students')
     app.register_blueprint(attendance_bp, url_prefix='/api/v1/attendance')
     app.register_blueprint(hostels_bp, url_prefix='/api/v1/hostels')
     app.register_blueprint(face_bp, url_prefix='/api/v1/face')
-    app.register_blueprint(geofencing_bp, url_prefix='/api/v1/geofencing')
     
     # Health check endpoint
     @app.route('/health')

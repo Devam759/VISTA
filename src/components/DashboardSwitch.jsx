@@ -23,29 +23,17 @@ export default function DashboardSwitch() {
       // Call backend API to get recent attendance activity
       const response = await request("/attendance/recent", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        token,
       });
       
-      if (response && response.activities) {
+      if (response && Array.isArray(response.activities)) {
         setRecentActivity(response.activities);
         setLastUpdated(new Date());
       }
     } catch (err) {
       console.error("Error fetching recent activity:", err);
       setError("Failed to load recent activity");
-      
-      // Fallback to mock data for development
-      const mockData = [
-        { id: 1, studentName: "Aarav Patel", rollNo: "23BCS001", roomNo: "B-205", timestamp: new Date(Date.now() - 2 * 60 * 1000), status: "Present" },
-        { id: 2, studentName: "Isha Sharma", rollNo: "23BCS002", roomNo: "G-310", timestamp: new Date(Date.now() - 5 * 60 * 1000), status: "Present" },
-        { id: 3, studentName: "Rohan Mehta", rollNo: "23BCS003", roomNo: "B-110", timestamp: new Date(Date.now() - 8 * 60 * 1000), status: "Late" },
-        { id: 4, studentName: "Priya Singh", rollNo: "23BCS004", roomNo: "B-206", timestamp: new Date(Date.now() - 12 * 60 * 1000), status: "Present" },
-        { id: 5, studentName: "Arjun Kumar", rollNo: "23BCS005", roomNo: "B-111", timestamp: new Date(Date.now() - 15 * 60 * 1000), status: "Present" },
-      ];
-        setRecentActivity(mockData);
-        setLastUpdated(new Date());
+      setRecentActivity([]);
     } finally {
       setIsLoading(false);
     }
@@ -260,35 +248,54 @@ export default function DashboardSwitch() {
             </div>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+              {recentActivity.map((activity) => {
+                const student = activity?.student || {};
+                const studentUser = student.user || {};
+                const studentName = activity?.studentName
+                  || student.name
+                  || [studentUser.first_name, studentUser.last_name].filter(Boolean).join(' ').trim()
+                  || "Unknown Student";
+                const initials = studentName
+                  .split(' ')
+                  .filter(Boolean)
+                  .map((n) => n[0]?.toUpperCase())
+                  .join('') || "?";
+                const rollNo = activity?.rollNo || activity?.roll_number || student.rollNo || student.roll_number || "N/A";
+                const roomNo = activity?.roomNo || student.roomNo || student.room_number || student.room || "--";
+                const status = activity?.status || "Unknown";
+                const timestampIso = activity?.timestamp || activity?.created_at;
+                const timestamp = timestampIso ? new Date(timestampIso) : null;
+
+                return (
+                <div key={activity.id ?? `${studentName}-${rollNo}`} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                       <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">
-                        {activity.studentName.split(' ').map(n => n[0]).join('')}
+                        {initials}
                       </span>
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100">{activity.studentName}</div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{studentName}</div>
                       <div className="text-sm text-gray-600 dark:text-gray-300">
-                        {activity.rollNo} • Room {activity.roomNo}
+                        {rollNo} • Room {roomNo}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      activity.status === 'Present' 
+                      status === 'Present' 
                         ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' 
                         : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
                     }`}>
-                      {activity.status}
+                      {status}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {formatTimeAgo(activity.timestamp)}
+                      {timestamp ? formatTimeAgo(timestamp) : 'Time Unknown'}
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

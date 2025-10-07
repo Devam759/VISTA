@@ -18,25 +18,24 @@ def enroll_face():
         current_user_id = get_jwt_identity()
         current_user = User.query.get(current_user_id)
         
-        # Only Wardens can enroll faces
-        if current_user.role == 'Student':
-            return jsonify({'error': 'Access denied'}), 403
-        
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        student_id = data.get('student_id')
+        data = request.get_json() or {}
         face_image = data.get('face_image')
-        
-        if not student_id or not face_image:
-            return jsonify({'error': 'Student ID and face image required'}), 400
-        
-        # Check if student exists
-        student = Student.query.get(student_id)
-        if not student:
-            return jsonify({'error': 'Student not found'}), 404
+
+        if not face_image:
+            return jsonify({'error': 'Face image required'}), 400
+
+        if current_user.role == 'Student':
+            student = Student.query.filter_by(user_id=current_user_id).first()
+            if not student:
+                return jsonify({'error': 'Student record not found'}), 404
+        else:
+            student_id = data.get('student_id')
+            if not student_id:
+                return jsonify({'error': 'Student ID required'}), 400
+
+            student = Student.query.get(student_id)
+            if not student:
+                return jsonify({'error': 'Student not found'}), 404
         
         # Process face enrollment
         enrollment_result = face_manager.enroll_face(face_image)
@@ -46,13 +45,16 @@ def enroll_face():
         
         # Create face enrollment record
         face_enrollment = FaceEnrollment(
-            student_id=student_id,
+            student_id=student.id,
             face_encoding_data=json.dumps(enrollment_result['encoding']),
             confidence_score=enrollment_result['quality_score'],
             face_quality_score=enrollment_result['quality_score'],
             enrollment_method='Manual',
             created_by=current_user_id,
-            notes='Face enrollment via API'
+            notes=data.get('notes') or (
+                'Face enrollment (self-service)' if current_user.role == 'Student'
+                else 'Face enrollment via API'
+            )
         )
         
         db.session.add(face_enrollment)

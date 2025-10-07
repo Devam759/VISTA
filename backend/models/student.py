@@ -23,7 +23,7 @@ class Student(db.Model):
     
     # Relationships
     hostel = db.relationship('Hostel', backref='students')
-    room = db.relationship('Room', backref='students')
+    room = db.relationship('Room', backref='room_students')
     attendance_records = db.relationship('Attendance', backref='student', cascade='all, delete-orphan')
     face_enrollments = db.relationship('FaceEnrollment', backref='student', cascade='all, delete-orphan')
     
@@ -40,10 +40,14 @@ class Student(db.Model):
     
     def to_dict(self):
         """Convert to dictionary for JSON serialization"""
+        user_name = f"{self.user.first_name} {self.user.last_name}" if self.user else "Unknown"
         return {
             'id': self.id,
+            'studentId': self.id,  # For frontend compatibility
             'user_id': self.user_id,
             'roll_number': self.roll_number,
+            'rollNo': self.roll_number,  # For frontend compatibility
+            'name': user_name,  # For frontend compatibility
             'hostel_id': self.hostel_id,
             'room_id': self.room_id,
             'course': self.course,
@@ -53,7 +57,9 @@ class Student(db.Model):
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'hostel_name': self.hostel.name if self.hostel else None,
+            'hostel': self.hostel.name if self.hostel else None,  # For frontend compatibility
             'room_number': self.room.room_number if self.room else None,
+            'roomNo': self.room.room_number if self.room else None,  # For frontend compatibility
             'user': self.user.to_dict() if self.user else None
         }
     
