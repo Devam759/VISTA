@@ -14,9 +14,9 @@ export default function ConditionalLayout({ children }) {
   if (isLoginPage) {
     // Login page layout - minimal with just logo
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gray-900 text-gray-200">
         {/* Minimal navbar for login page */}
-        <header className="w-full navbar-glass sticky top-0 z-30">
+        <header className="w-full bg-gray-900/80 backdrop-blur-lg sticky top-0 z-30 border-b border-gray-700/50">
           <div className="container-app py-4 flex items-center justify-center">
             <Link href="/" className="flex items-center group">
               <img src="/logo.webp" alt="VISTA" className="h-12 w-30 rounded-xl shadow-sm group-hover:shadow-md transition-all duration-200" />

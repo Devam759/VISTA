@@ -56,13 +56,8 @@ export default function Navbar() {
 						) : (
 							<Link href="/login" className="btn btn-primary">Login</Link>
 						)}
-						<ThemeToggle />
 					</nav>
 					
-					{/* Mobile theme toggle */}
-					<div className="md:hidden">
-						<ThemeToggle />
-					</div>
 				</div>
 			</header>
 			
@@ -142,5 +137,3 @@ export default function Navbar() {
 		</>
 	);
 }
-
-
