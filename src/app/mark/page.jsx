@@ -5,6 +5,7 @@ import Protected from "../../components/Protected";
 import { useState } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { markAttendance, verifyFace } from "../../lib/api";
+import locationService from "../../lib/location";
 
 export default function MarkAttendancePage() {
   const { token } = useAuth();
@@ -47,16 +48,32 @@ export default function MarkAttendancePage() {
   }
 
   async function handleMarkAttendance() {
-    if (!token || !verification) return;
+    if (!token || !verification || !captured) return;
     setMarking(true);
     setError("");
     setMessage("");
     try {
       const body = {
+        face_image: captured,
         verification_method: "Face",
         confidence_score: verification.confidence,
         notes: "Face verified via dashboard",
       };
+      
+      // Only request location for mobile devices
+      const isMobile = locationService.isMobileDevice();
+      if (isMobile) {
+        try {
+          const location = await locationService.getCurrentPosition();
+          body.latitude = location.latitude;
+          body.longitude = location.longitude;
+          body.accuracy = location.accuracy;
+        } catch (locError) {
+          // If location fails on mobile, still allow submission but log warning
+          console.warn("Location request failed:", locError);
+        }
+      }
+      
       const result = await markAttendance(token, body);
       setMessage(result?.message || "Attendance marked successfully.");
     } catch (err) {

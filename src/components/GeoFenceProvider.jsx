@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { getGeofencingBoundaries, verifyLocation } from "../lib/api";
 import locationService from "../lib/location";
@@ -22,8 +22,19 @@ export function GeoFenceProvider({ children }) {
   const [error, setError] = useState(null);
   const [boundaries, setBoundaries] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const hasCheckedLocation = useRef(false);
 
   const checkLocation = useCallback(async () => {
+    // Skip location check for desktop devices
+    const isMobile = locationService.isMobileDevice();
+    if (!isMobile) {
+      setStatus("verified");
+      setError(null);
+      setLocation(null);
+      setVerification(null);
+      return { success: true, location: null, verification: null, desktop: true };
+    }
+
     setStatus("checking");
     setError(null);
 
@@ -94,8 +105,23 @@ export function GeoFenceProvider({ children }) {
   }, [boundaries]);
 
   useEffect(() => {
-    checkLocation();
-  }, [checkLocation]);
+    // Only run once on mount
+    if (hasCheckedLocation.current) return;
+    hasCheckedLocation.current = true;
+    
+    // Only auto-check location on mobile devices
+    const isMobile = locationService.isMobileDevice();
+    if (!isMobile) {
+      // For desktop, set status to verified without location
+      setStatus("verified");
+      return;
+    }
+    
+    // For mobile, check location (use setTimeout to ensure checkLocation is ready)
+    setTimeout(() => {
+      checkLocation();
+    }, 0);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const value = useMemo(
     () => ({

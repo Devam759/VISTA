@@ -27,21 +27,8 @@ def login():
         if not email or not password:
             return jsonify({'error': 'Email and password required'}), 400
         
-        if latitude_raw is None or longitude_raw is None:
-            return jsonify({'error': 'Latitude and longitude are required for login'}), 400
-        
-        try:
-            latitude = float(latitude_raw)
-            longitude = float(longitude_raw)
-            accuracy = float(accuracy_raw) if accuracy_raw is not None else None
-        except (TypeError, ValueError):
-            return jsonify({'error': 'Invalid location data provided'}), 400
-        
         if not Validators.validate_email(email):
             return jsonify({'error': 'Invalid email format'}), 400
-        
-        if not Validators.validate_gps_coordinates(latitude, longitude):
-            return jsonify({'error': 'Invalid GPS coordinates'}), 400
         
         # Find user by email
         user = User.query.filter_by(email=email).first()
@@ -56,16 +43,29 @@ def login():
         if not user.verify_password(password):
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        # Verify location within campus boundary
-        geofence_manager = GeofencingManager()
-        location_verification = geofence_manager.verify_location(latitude, longitude, accuracy)
+        # Location verification (optional for desktop)
+        location_verification = None
+        if latitude_raw is not None and longitude_raw is not None:
+            try:
+                latitude = float(latitude_raw)
+                longitude = float(longitude_raw)
+                accuracy = float(accuracy_raw) if accuracy_raw is not None else None
+            except (TypeError, ValueError):
+                return jsonify({'error': 'Invalid location data provided'}), 400
+            
+            if not Validators.validate_gps_coordinates(latitude, longitude):
+                return jsonify({'error': 'Invalid GPS coordinates'}), 400
 
-        if not location_verification.get('gps_verified'):
-            return jsonify({
-                'error': 'Location verification failed',
-                'reason': location_verification.get('reason'),
-                'distance': location_verification.get('distance')
-            }), 403
+            # Verify location within campus boundary for mobile devices
+            geofence_manager = GeofencingManager()
+            location_verification = geofence_manager.verify_location(latitude, longitude, accuracy)
+
+            if not location_verification.get('gps_verified'):
+                return jsonify({
+                    'error': 'Location verification failed',
+                    'reason': location_verification.get('reason'),
+                    'distance': location_verification.get('distance')
+                }), 403
 
         # Update last login metadata
         user.last_login = datetime.utcnow()
@@ -74,11 +74,20 @@ def login():
         # Create JWT token
         token = create_access_token(identity=str(user.id))
 
-        return jsonify({
+        response_data = {
             'token': token,
             'user': user.to_dict(),
-            'location_verification': location_verification
-        })
+        }
+        
+        if location_verification:
+            response_data['location_verification'] = location_verification
+        else:
+            response_data['location_verification'] = {
+                'gps_verified': False,
+                'reason': 'Location not provided (desktop device)'
+            }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500

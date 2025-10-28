@@ -151,26 +151,36 @@ def mark_attendance():
         if existing_attendance:
             return jsonify({'error': 'Attendance already marked for today'}), 400
         
-        # Parse location data
-        try:
-            latitude = float(data['latitude'])
-            longitude = float(data['longitude'])
-            accuracy = float(data['accuracy']) if data.get('accuracy') is not None else None
-        except (TypeError, ValueError):
-            return jsonify({'error': 'Invalid location data provided'}), 400
+        # Parse location data (optional for desktop)
+        latitude = None
+        longitude = None
+        accuracy = None
+        location_verification = None
+        gps_verified = False
+        
+        if 'latitude' in data and 'longitude' in data:
+            try:
+                latitude = float(data['latitude'])
+                longitude = float(data['longitude'])
+                accuracy = float(data['accuracy']) if data.get('accuracy') is not None else None
+            except (TypeError, ValueError):
+                return jsonify({'error': 'Invalid location data provided'}), 400
 
-        if not Validators.validate_gps_coordinates(latitude, longitude):
-            return jsonify({'error': 'Invalid GPS coordinates'}), 400
+            if not Validators.validate_gps_coordinates(latitude, longitude):
+                return jsonify({'error': 'Invalid GPS coordinates'}), 400
 
-        geofence_manager = GeofencingManager()
-        location_verification = geofence_manager.verify_location(latitude, longitude, accuracy)
+            # Verify location only for mobile devices
+            geofence_manager = GeofencingManager()
+            location_verification = geofence_manager.verify_location(latitude, longitude, accuracy)
 
-        if not location_verification.get('gps_verified'):
-            return jsonify({
-                'error': 'Location verification failed',
-                'reason': location_verification.get('reason'),
-                'distance': location_verification.get('distance')
-            }), 403
+            if not location_verification.get('gps_verified'):
+                return jsonify({
+                    'error': 'Location verification failed',
+                    'reason': location_verification.get('reason'),
+                    'distance': location_verification.get('distance')
+                }), 403
+            
+            gps_verified = True
 
         # Verify face image against enrolled encodings
         face_enrollments = FaceEnrollment.query.filter_by(
@@ -219,6 +229,10 @@ def mark_attendance():
             status = 'Late'
         
         # Create attendance record
+        notes = data.get('notes', 'Face verified attendance')
+        if not gps_verified:
+            notes += ' (Desktop - No GPS verification)'
+        
         attendance = Attendance(
             student_id=student.id,
             attendance_date=today,
@@ -227,23 +241,32 @@ def mark_attendance():
             verification_method='Face',
             confidence_score=verification_result.get('confidence', 0.0),
             wifi_verified=data.get('wifi_verified', False),
-            gps_verified=True,
+            gps_verified=gps_verified,
             latitude=latitude,
             longitude=longitude,
             accuracy=accuracy,
-            notes=data.get('notes', 'Face verified attendance'),
+            notes=notes,
             marked_by=current_user_id
         )
         
         db.session.add(attendance)
         db.session.commit()
         
-        return jsonify({
+        response_data = {
             'message': 'Attendance marked successfully',
             'attendance': attendance.to_dict(),
             'verification': verification_result,
-            'location_verification': location_verification
-        })
+        }
+        
+        if location_verification:
+            response_data['location_verification'] = location_verification
+        else:
+            response_data['location_verification'] = {
+                'gps_verified': False,
+                'reason': 'Location not provided (desktop device)'
+            }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         db.session.rollback()

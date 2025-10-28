@@ -20,23 +20,22 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     
     # Database Configuration
-    DB_TYPE = os.getenv('DB_TYPE', 'sqlite')  # sqlite, mysql, postgresql
+    DB_TYPE = os.getenv('DB_TYPE', 'sqlite').lower()  # sqlite, mysql, postgresql
     DB_HOST = os.getenv('DB_HOST', 'localhost')
     DB_USER = os.getenv('DB_USER', '')
     DB_PASSWORD = os.getenv('DB_PASSWORD', '')
     DB_NAME = os.getenv('DB_NAME', 'vista_attendance')
     DB_PORT = int(os.getenv('DB_PORT', 3306))
     
-    # SQLite Configuration (default)
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///vista_attendance.db')
-    
-    # MySQL Configuration
+    # Database URI Configuration
+    # Default to SQLite, override only if explicitly set to mysql or postgresql
     if DB_TYPE == 'mysql':
         SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-    
-    # PostgreSQL Configuration
-    if DB_TYPE == 'postgresql':
+    elif DB_TYPE == 'postgresql':
         SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    else:
+        # SQLite Configuration (default)
+        SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///vista_attendance.db')
     
     # SQLAlchemy Configuration
     SQLALCHEMY_TRACK_MODIFICATIONS = False

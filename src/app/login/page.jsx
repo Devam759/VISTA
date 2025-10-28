@@ -16,6 +16,14 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [autoFilled, setAutoFilled] = useState(false);
+  
+  // Detect if mobile device  
+  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
+  
+  // Button should be disabled only if:
+  // 1. Loading, OR
+  // 2. On mobile AND (location not verified OR status is still checking)
+  const isButtonDisabled = loading || (isMobile && geoStatus !== "verified");
 
   useEffect(() => {
     if (existingRole) router.replace("/");
@@ -24,7 +32,9 @@ export default function LoginPage() {
   async function onSubmit(e) {
     e.preventDefault();
     setError("");
-    if (geoStatus !== "verified" || !location) {
+    
+    // For mobile, require location verification
+    if (isMobile && (geoStatus !== "verified" || !location)) {
       setError("Location verification required before logging in.");
       return;
     }
@@ -34,12 +44,13 @@ export default function LoginPage() {
       const { token, user, location_verification } = await loginWithEmailPassword(
         email,
         password,
-        location
+        location || null // Will be null for desktop, which is fine
       );
       setSession(token, user, location_verification || verification);
       router.replace("/");
     } catch (err) {
       setError(err.message || "Login failed");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -183,10 +194,11 @@ export default function LoginPage() {
         </div>
 
         <button 
-          disabled={loading || geoStatus !== "verified"}
+          disabled={isButtonDisabled}
+          type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
         >
-          {loading ? "Signing in..." : geoStatus !== "verified" ? "Verify location" : "Sign in"}
+          {loading ? "Signing in..." : isButtonDisabled && !loading && isMobile ? "Verify location" : "Sign in"}
         </button>
       </form>
     </div>

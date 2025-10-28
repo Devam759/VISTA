@@ -12,7 +12,7 @@ from .validators import Validators
 class FaceAttendanceValidator:
     """Validation helpers for face-based attendance submissions."""
 
-    REQUIRED_FIELDS: List[str] = ["face_image", "latitude", "longitude"]
+    REQUIRED_FIELDS: List[str] = ["face_image"]  # Location fields are optional for desktop
 
     @staticmethod
     def validate_submission(data: Optional[Dict[str, Any]]) -> Dict[str, Any]:
