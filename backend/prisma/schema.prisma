@@ -1,0 +1,98 @@
+// Prisma Schema for VISTA
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Hostel {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  students  Student[]
+  wardens   Warden[]
+  rooms     Room[]
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("hostels")
+}
+
+model Room {
+  id       Int     @id @default(autoincrement())
+  roomNo   String  @map("room_no") @db.VarChar(10)
+  hostelId Int     @map("hostel_id")
+  hostel   Hostel  @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@map("rooms")
+  @@index([hostelId])
+}
+
+model Student {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(100)
+  rollNo     String       @unique @map("roll_no") @db.VarChar(30)
+  roomNo     String       @map("room_no") @db.VarChar(10)
+  hostelId   Int          @map("hostel_id")
+  program    String       @db.VarChar(80)
+  mobile     String       @db.VarChar(15)
+  address    String       @db.Text
+  email      String       @unique @db.VarChar(120)
+  password   String       @db.VarChar(255)
+  faceIdUrl  String?      @map("face_id_url") @db.Text
+  hostel     Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  attendance Attendance[]
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  @@map("students")
+  @@index([hostelId])
+  @@index([email])
+}
+
+model Warden {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(120)
+  password  String   @db.VarChar(255)
+  mobile    String   @db.VarChar(15)
+  hostelId  Int      @map("hostel_id")
+  hostel    Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("wardens")
+  @@index([hostelId])
+  @@index([email])
+}
+
+model Attendance {
+  id           Int                @id @default(autoincrement())
+  studentId    Int                @map("student_id")
+  date         DateTime           @db.Date
+  time         DateTime           @db.Time(0)
+  status       AttendanceStatus
+  faceVerified Boolean            @default(false) @map("face_verified")
+  student      Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  @@unique([studentId, date])
+  @@map("attendance")
+  @@index([studentId])
+  @@index([date])
+}
+
+model CampusPolygon {
+  id         Int   @id @default(autoincrement())
+  lat        Float @db.Double
+  lng        Float @db.Double
+  pointOrder Int   @map("point_order")
+
+  @@map("campus_polygon")
+}
+
+enum AttendanceStatus {
+  Marked
+  Missed
+  Late
+}

@@ -1,26 +1,26 @@
 {
-  "name": "vista-project",
-  "version": "1.0.0",
-  "description": "VISTA Night Attendance System",
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "start": "next start",
-    "lint": "next lint"
-  },
+  "name": "vista-frontend",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "next": "^15.5.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.1.13",
-    "eslint": "^9.35.0",
-    "eslint-config-next": "^15.5.3",
-    "tailwindcss": "^4.1.13"
+    "@vitejs/plugin-react": "^4.1.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.0.0"
   }
 }
