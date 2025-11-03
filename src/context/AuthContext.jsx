@@ -1,56 +1,51 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { apiFetch } from '../utils/api.js'
 
 const AuthContext = createContext(null)
 
-const demoUsers = [
-  {
-    id: '2024btech014',
-    password: '123',
-    role: 'student',
-    roll: '2024btech014',
-    name: 'Sample Student',
-    hostel: 'Hostel A',
-    room: 'A-101',
-  },
-  {
-    id: 'karan',
-    password: '123',
-    role: 'warden',
-    name: 'Karan',
-  },
-]
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [token, setToken] = useState('')
 
   useEffect(() => {
-    const stored = localStorage.getItem('vista-user')
-    if (stored) setUser(JSON.parse(stored))
+    const stored = localStorage.getItem('vista-auth')
+    if (stored) {
+      try {
+        const obj = JSON.parse(stored)
+        setUser(obj.user || null)
+        setToken(obj.token || '')
+      } catch {}
+    }
   }, [])
 
-  const login = async (identifier, password) => {
-    const id = (identifier || '').trim().toLowerCase()
+  const login = async (email, password) => {
+    const em = (email || '').trim()
     const pass = (password || '').trim()
-    // Dummy logic: match against fixed users (ID case-insensitive)
-    if (!id || !pass) throw new Error('Enter credentials')
+    if (!em || !pass) throw new Error('Enter credentials')
 
-    const found = demoUsers.find(u => u.id.toLowerCase() === id)
-    if (!found || found.password !== pass) {
-      throw new Error('Invalid credentials')
+    let data
+    try {
+      data = await apiFetch('/auth/student-login', { method: 'POST', body: { email: em, password: pass } })
+    } catch (e1) {
+      data = await apiFetch('/auth/warden-login', { method: 'POST', body: { email: em, password: pass } })
     }
 
-    const { password: _p, ...safeUser } = found
-    localStorage.setItem('vista-user', JSON.stringify(safeUser))
-    setUser(safeUser)
-    return safeUser
+    const { token: tkn, role, user: u } = data || {}
+    if (!tkn || !u) throw new Error('Invalid response')
+    const auth = { token: tkn, role, user: { ...u, role } }
+    localStorage.setItem('vista-auth', JSON.stringify(auth))
+    setUser(auth.user)
+    setToken(tkn)
+    return auth.user
   }
 
   const logout = () => {
-    localStorage.removeItem('vista-user')
+    localStorage.removeItem('vista-auth')
     setUser(null)
+    setToken('')
   }
 
-  const value = useMemo(() => ({ user, login, logout }), [user])
+  const value = useMemo(() => ({ user, token, login, logout }), [user, token])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
@@ -60,3 +55,4 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
   return ctx
 }
+

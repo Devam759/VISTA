@@ -3,6 +3,8 @@ import Camera from '../../components/Camera.jsx'
 import { verifyInsideCampus } from '../../utils/geoCheck.js'
 import { verifyJKLUWifi } from '../../utils/wifiCheck.js'
 import { useToast } from '../../components/Toast.jsx'
+import { apiFetch } from '../../utils/api.js'
+import { useAuth } from '../../context/AuthContext.jsx'
 
 function withinWindow(date = new Date()) {
   const start = new Date(date)
@@ -14,11 +16,14 @@ function withinWindow(date = new Date()) {
 
 export default function MarkAttendance() {
   const { push } = useToast()
+  const { token } = useAuth()
   const [locOk, setLocOk] = useState(false)
   const [wifiOk, setWifiOk] = useState(false)
   const [img, setImg] = useState('')
   const [now, setNow] = useState(new Date())
   const [camOn, setCamOn] = useState(false)
+  const [coords, setCoords] = useState({ lat: null, lng: null })
+  const [submitting, setSubmitting] = useState(false)
 
   const time = useMemo(() => withinWindow(now), [now])
 
@@ -35,11 +40,38 @@ export default function MarkAttendance() {
     })()
   }, [])
 
-  const mark = (isLate = false) => {
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        },
+        () => {
+          setCoords({ lat: null, lng: null })
+        },
+        { enableHighAccuracy: true, maximumAge: 60000, timeout: 5000 }
+      )
+    }
+  }, [])
+
+  const mark = async (isLate = false) => {
     if (!locOk || !wifiOk) return push('Verification failed. Recheck location/Wi-Fi.', 'error')
     if (!img) return push('Please capture your face image', 'error')
     if (!time.allowed && !isLate) return push('Time window closed', 'error')
-    push(isLate ? 'Late attendance marked' : 'Attendance marked', 'success')
+    try {
+      setSubmitting(true)
+      const body = {
+        test_image: img,
+        latitude: coords.lat,
+        longitude: coords.lng,
+      }
+      const data = await apiFetch('/attendance/mark', { method: 'POST', body, token })
+      push(data?.message || (isLate ? 'Late attendance marked' : 'Attendance marked'), 'success')
+    } catch (err) {
+      push(err.message || 'Failed to mark attendance', 'error')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -77,8 +109,8 @@ export default function MarkAttendance() {
             </li>
           </ul>
           <div className="mt-6 space-y-2">
-            <button onClick={() => mark(false)} disabled={!time.allowed} className="w-full px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-60">Scan & Mark Attendance</button>
-            <button onClick={() => mark(true)} disabled={now <= time.end} className="w-full px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-60">Mark Late</button>
+            <button onClick={() => mark(false)} disabled={!time.allowed || submitting} className="w-full px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-60">{submitting ? 'Submitting...' : 'Scan & Mark Attendance'}</button>
+            <button onClick={() => mark(true)} disabled={now <= time.end || submitting} className="w-full px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-60">{submitting ? 'Submitting...' : 'Mark Late'}</button>
           </div>
         </div>
       </div>

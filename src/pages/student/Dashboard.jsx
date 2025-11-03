@@ -1,10 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { apiFetch } from '../../utils/api.js'
 
 export default function StudentDashboard() {
-  const { user, logout } = useAuth()
-  const todayStatus = 'Present'
+  const { user, token, logout } = useAuth()
+  const [todayStatus, setTodayStatus] = useState('Loading...')
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const data = await apiFetch('/attendance/today', { token })
+        const status = data?.status || 'NOT_MARKED'
+        if (active) setTodayStatus(status)
+      } catch (e) {
+        if (active) setTodayStatus('NOT_MARKED')
+      }
+    })()
+    return () => { active = false }
+  }, [token])
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -36,3 +51,4 @@ export default function StudentDashboard() {
     </div>
   )
 }
+
