@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
 import AppRoutes from './router.jsx'
 import { ToastProvider } from './components/Toast.jsx'
+import { Analytics } from "@vercel/analytics/react"
 
 export default function App() {
   return (
