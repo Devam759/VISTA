@@ -4,15 +4,23 @@ import CheckAccess from './pages/CheckAccess.jsx'
 import Login from './pages/Login.jsx'
 import StudentDashboard from './pages/student/Dashboard.jsx'
 import MarkAttendance from './pages/student/MarkAttendance.jsx'
+import EnrollFace from './pages/student/EnrollFace.jsx'
 import History from './pages/student/History.jsx'
 import WardenDashboard from './pages/warden/Dashboard.jsx'
 import Students from './pages/warden/Students.jsx'
+import AccessGate from './components/AccessGate.jsx'
 import { useAuth } from './context/AuthContext.jsx'
 
-function ProtectedRoute({ children, role }) {
+function ProtectedRoute({ children, role, requireCampusAccess = false }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
   if (role && user.role !== role) return <Navigate to="/login" replace />
+  
+  // Wrap student routes with AccessGate to enforce campus/WiFi requirements
+  if (requireCampusAccess && role === 'student') {
+    return <AccessGate>{children}</AccessGate>
+  }
+  
   return children
 }
 
@@ -25,7 +33,7 @@ export default function AppRoutes() {
       <Route
         path="/student/dashboard"
         element={
-          <ProtectedRoute role="student">
+          <ProtectedRoute role="student" requireCampusAccess={true}>
             <StudentDashboard />
           </ProtectedRoute>
         }
@@ -33,7 +41,7 @@ export default function AppRoutes() {
       <Route
         path="/student/mark"
         element={
-          <ProtectedRoute role="student">
+          <ProtectedRoute role="student" requireCampusAccess={true}>
             <MarkAttendance />
           </ProtectedRoute>
         }
@@ -41,8 +49,16 @@ export default function AppRoutes() {
       <Route
         path="/student/history"
         element={
-          <ProtectedRoute role="student">
+          <ProtectedRoute role="student" requireCampusAccess={true}>
             <History />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/enroll-face"
+        element={
+          <ProtectedRoute role="student">
+            <EnrollFace />
           </ProtectedRoute>
         }
       />

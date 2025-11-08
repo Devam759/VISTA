@@ -1,4 +1,4 @@
-export const API_BASE_URL = (import.meta?.env?.VITE_API_URL || 'https://vista-k1r1.onrender.com').replace(/\/$/, '')
+export const API_BASE_URL = (import.meta?.env?.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {
   const url = `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`

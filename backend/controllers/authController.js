@@ -3,6 +3,7 @@ import { authenticateStudent, authenticateWarden } from '../services/authService
 export const studentLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('📧 Student login attempt:', email);
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required' });
@@ -19,6 +20,7 @@ export const studentLogin = async (req, res) => {
 export const wardenLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('📧 Warden login attempt:', email);
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required' });

@@ -5,7 +5,8 @@ import { verifyCampusWiFi } from '../middleware/verifyWiFi.js';
 import {
   markAttendance,
   getTodayAttendance,
-  getAttendanceHistory
+  getAttendanceHistory,
+  enrollFace
 } from '../controllers/attendanceController.js';
 
 const router = express.Router();
@@ -13,6 +14,9 @@ const router = express.Router();
 // All routes require authentication as student
 router.use(authenticateToken);
 router.use(requireRole('student'));
+
+// Enroll face - no geo/wifi required for enrollment
+router.post('/enroll-face', enrollFace);
 
 // Mark attendance - requires geo + wifi + face verification
 router.post('/mark', verifyGeoFence, verifyCampusWiFi, markAttendance);

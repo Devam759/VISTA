@@ -3,9 +3,23 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { apiFetch } from '../../utils/api.js'
 
+function getDayName(date) {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  return days[date.getDay()]
+}
+
+function formatDate(date) {
+  return date.toISOString().split('T')[0]
+}
+
 export default function StudentDashboard() {
   const { user, token, logout } = useAuth()
   const [todayStatus, setTodayStatus] = useState('Loading...')
+  const [weekData, setWeekData] = useState([])
+  const [stats, setStats] = useState({ present: 0, late: 0, absent: 0, total: 0 })
+  const [streak, setStreak] = useState(0)
+  const [percentage, setPercentage] = useState(0)
+  const today = new Date()
 
   useEffect(() => {
     let active = true
@@ -21,30 +35,206 @@ export default function StudentDashboard() {
     return () => { active = false }
   }, [token])
 
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const data = await apiFetch('/attendance/history?limit=30', { token })
+        if (active && Array.isArray(data)) {
+          // Get last 7 days
+          const last7Days = []
+          for (let i = 6; i >= 0; i--) {
+            const d = new Date()
+            d.setDate(d.getDate() - i)
+            d.setHours(0, 0, 0, 0)
+            const dateStr = formatDate(d)
+            const record = data.find(r => formatDate(new Date(r.date)) === dateStr)
+            last7Days.push({
+              date: d,
+              dateStr,
+              day: getDayName(d),
+              status: record?.status || 'ABSENT',
+              isToday: formatDate(d) === formatDate(new Date())
+            })
+          }
+          setWeekData(last7Days)
+
+          // Calculate stats
+          const present = data.filter(r => r.status === 'Marked').length
+          const late = data.filter(r => r.status === 'Late').length
+          const absent = data.filter(r => r.status === 'Missed' || r.status === 'ABSENT').length
+          setStats({ present, late, absent, total: data.length })
+
+          // Calculate percentage
+          const pct = data.length > 0 ? Math.round(((present + late) / data.length) * 100) : 0
+          setPercentage(pct)
+
+          // Calculate streak (consecutive present days)
+          let currentStreak = 0
+          const sortedData = [...data].sort((a, b) => new Date(b.date) - new Date(a.date))
+          for (const record of sortedData) {
+            if (record.status === 'Marked' || record.status === 'Late') {
+              currentStreak++
+            } else {
+              break
+            }
+          }
+          setStreak(currentStreak)
+        }
+      } catch (e) {
+        console.error('Failed to load week data:', e)
+      }
+    })()
+    return () => { active = false }
+  }, [token])
+
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Student Dashboard</h1>
-        <button onClick={logout} className="text-sm text-red-600">Logout</button>
+        <div>
+          <h1 className="text-2xl font-semibold">Student Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">{getDayName(today)}, {today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        </div>
+        <button onClick={logout} className="text-sm text-red-600 hover:text-red-700">Logout</button>
       </div>
 
-      <div className="mt-6 grid md:grid-cols-2 gap-6">
+      {/* Today's Status Card */}
+      <div className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm opacity-90">Today's Attendance</p>
+            <p className="text-3xl font-bold mt-1">{todayStatus}</p>
+          </div>
+          <Link to="/student/mark" className="px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-50 font-medium shadow-md">
+            Mark Attendance
+          </Link>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-xl shadow p-4">
+          <p className="text-sm text-gray-500">Present</p>
+          <p className="text-2xl font-bold text-green-600">{stats.present}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-4">
+          <p className="text-sm text-gray-500">Late</p>
+          <p className="text-2xl font-bold text-yellow-600">{stats.late}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-4">
+          <p className="text-sm text-gray-500">Absent</p>
+          <p className="text-2xl font-bold text-red-600">{stats.absent}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-4">
+          <p className="text-sm text-gray-500">Attendance %</p>
+          <p className="text-2xl font-bold text-blue-600">{percentage}%</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-4">
+          <p className="text-sm text-gray-500">🔥 Streak</p>
+          <p className="text-2xl font-bold text-orange-600">{streak} days</p>
+        </div>
+      </div>
+
+      {/* Weekly Calendar */}
+      <div className="mt-6 bg-white rounded-xl shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Last 7 Days</h2>
+        <div className="grid grid-cols-7 gap-2">
+          {weekData.map((day, idx) => (
+            <div key={idx} className={`text-center p-3 rounded-lg border-2 ${
+              day.isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+            }`}>
+              <p className="text-xs text-gray-500 font-medium">{day.day.slice(0, 3)}</p>
+              <p className="text-sm font-semibold mt-1">{day.date.getDate()}</p>
+              <div className={`mt-2 w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-bold ${
+                day.status === 'Marked' ? 'bg-green-100 text-green-700' :
+                day.status === 'Late' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                {day.status === 'Marked' ? '✓' : day.status === 'Late' ? 'L' : '✗'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Profile & Quick Actions */}
+      <div className="mt-6 grid md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Profile</h2>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="text-gray-500">Name</div><div className="font-medium">{user?.name}</div>
-            <div className="text-gray-500">Roll</div><div className="font-medium">{user?.roll}</div>
-            <div className="text-gray-500">Hostel</div><div className="font-medium">{user?.hostel}</div>
-            <div className="text-gray-500">Room</div><div className="font-medium">{user?.room}</div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              {user?.name?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">{user?.name}</h2>
+              <p className="text-sm text-gray-500">{user?.roll}</p>
+            </div>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">📧 Email</span>
+              <span className="font-medium text-gray-900 text-xs">{user?.email}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">🎓 Program</span>
+              <span className="font-medium text-gray-900">{user?.program}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">🏠 Hostel</span>
+              <span className="font-medium text-gray-900">{user?.hostel}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">🚪 Room</span>
+              <span className="font-medium text-gray-900">{user?.room}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">🎭 Face Status</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                user?.faceIdUrl ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}>
+                {user?.faceIdUrl ? '✓ Enrolled' : '✗ Not Enrolled'}
+              </span>
+            </div>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Today</h2>
-          <p className="text-sm text-gray-500">Status</p>
-          <p className="text-2xl font-bold mt-1">{todayStatus}</p>
-          <div className="mt-6 flex gap-3">
-            <Link to="/student/mark" className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">Mark Attendance</Link>
-            <Link to="/student/history" className="px-4 py-2 border rounded hover:bg-gray-50">View History</Link>
+          <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+          <div className="space-y-3">
+            {!user?.faceIdUrl && (
+              <Link to="/student/enroll-face" className="block w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 text-center font-medium shadow-md">
+                🎭 Enroll Face (Required)
+              </Link>
+            )}
+            <Link to="/student/mark" className="block w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium">
+              📸 Mark Attendance
+            </Link>
+            <Link to="/student/history" className="block w-full px-4 py-3 border-2 border-gray-200 rounded-lg hover:bg-gray-50 text-center font-medium">
+              📊 View Full History
+            </Link>
+            {user?.faceIdUrl && (
+              <Link to="/student/enroll-face" className="block w-full px-4 py-3 border-2 border-purple-200 text-purple-600 rounded-lg hover:bg-purple-50 text-center font-medium">
+                🔄 Re-enroll Face
+              </Link>
+            )}
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-lg font-semibold mb-4">Attendance Window</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <span className="text-gray-700">✅ On Time</span>
+              <span className="font-semibold text-green-700">10:00 PM - 10:30 PM</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+              <span className="text-gray-700">⚠️ Late</span>
+              <span className="font-semibold text-yellow-700">10:30 PM - 11:00 PM</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+              <span className="text-gray-700">❌ Absent</span>
+              <span className="font-semibold text-red-700">After 11:00 PM</span>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
+              ℹ️ Requires: Campus location, College WiFi, and Face verification
+            </div>
           </div>
         </div>
       </div>

@@ -35,7 +35,10 @@ export const authenticateStudent = async (email, password) => {
       email: student.email,
       hostel: student.hostel.name,
       room: student.roomNo,
-      program: student.program
+      program: student.program,
+      faceIdUrl: student.faceIdUrl,
+      mobile: student.mobile,
+      address: student.address
     }
   };
 };
