@@ -60,7 +60,7 @@ CREATE TABLE `attendance` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `student_id` INTEGER NOT NULL,
     `date` DATE NOT NULL,
-    `time` TIME(0) NOT NULL,
+    `time` TIME NOT NULL,
     `status` ENUM('Marked', 'Missed', 'Late') NOT NULL,
     `face_verified` BOOLEAN NOT NULL DEFAULT false,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
