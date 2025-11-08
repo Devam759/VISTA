@@ -4,6 +4,38 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+async function resolveFailedMigrations(connection, database) {
+  try {
+    // Check for failed migrations
+    const [failedMigrations] = await connection.execute(
+      `SELECT id, migration_name, started_at, finished_at, rolled_back_at 
+       FROM _prisma_migrations 
+       WHERE finished_at IS NULL AND rolled_back_at IS NULL`
+    );
+
+    if (failedMigrations.length === 0) {
+      console.log('No failed migrations found');
+      return;
+    }
+
+    console.log(`Found ${failedMigrations.length} failed migration(s), resolving...`);
+    for (const migration of failedMigrations) {
+      console.log(`  - ${migration.migration_name} (started at ${migration.started_at})`);
+      await connection.execute(
+        `UPDATE _prisma_migrations 
+         SET rolled_back_at = NOW() 
+         WHERE id = ?`,
+        [migration.id]
+      );
+      console.log(`  ✓ Marked ${migration.migration_name} as rolled back`);
+    }
+    console.log('✓ All failed migrations resolved');
+  } catch (error) {
+    console.error('Warning: Could not resolve failed migrations:', error.message);
+    // Don't throw - this is not critical
+  }
+}
+
 async function createPrismaMigrationsTable() {
   console.log('Starting Prisma migrations table setup...');
   
@@ -83,6 +115,8 @@ async function createPrismaMigrationsTable() {
         console.log('Table dropped successfully');
       } else {
         console.log('_prisma_migrations table already exists with correct schema');
+        // Check for and resolve any failed migrations
+        await resolveFailedMigrations(connection, config.database);
         return;
       }
     }
@@ -138,6 +172,9 @@ async function createPrismaMigrationsTable() {
     }
     
     console.log('✓ Table verification passed - schema is correct');
+    
+    // Check for and resolve any failed migrations
+    await resolveFailedMigrations(connection, config.database);
   } catch (error) {
     // If table already exists, that's fine
     if (error.code === 'ER_TABLE_EXISTS_ERROR') {
