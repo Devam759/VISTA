@@ -53,19 +53,25 @@ async function createPrismaMigrationsTable() {
     console.log(`Table _prisma_migrations exists: ${tableExists}`);
 
     if (tableExists) {
-      // Check if the table has the wrong schema (DATETIME(3))
+      // Check if the table has the wrong schema (DATETIME(3) or invalid defaults)
       const [columns] = await connection.execute(`
         SELECT COLUMN_NAME, COLUMN_TYPE 
         FROM information_schema.COLUMNS 
         WHERE TABLE_SCHEMA = ? 
         AND TABLE_NAME = '_prisma_migrations'
-        AND COLUMN_TYPE LIKE '%DATETIME%'
+        AND (COLUMN_TYPE LIKE '%DATETIME%' OR COLUMN_NAME = 'started_at')
       `, [config.database]);
 
       let needsRecreation = false;
       for (const col of columns) {
         if (col.COLUMN_TYPE.includes('DATETIME(3)')) {
           console.log(`Found column ${col.COLUMN_NAME} with DATETIME(3), table needs to be recreated`);
+          needsRecreation = true;
+          break;
+        }
+        // Check if started_at is DATETIME instead of TIMESTAMP (which causes default value issues)
+        if (col.COLUMN_NAME === 'started_at' && col.COLUMN_TYPE.includes('DATETIME') && !col.COLUMN_TYPE.includes('TIMESTAMP')) {
+          console.log(`Found started_at column with DATETIME (should be TIMESTAMP), table needs to be recreated`);
           needsRecreation = true;
           break;
         }
@@ -82,6 +88,8 @@ async function createPrismaMigrationsTable() {
     }
 
     // Create the _prisma_migrations table with DATETIME (without precision)
+    // Note: Using TIMESTAMP for started_at because DATETIME doesn't support CURRENT_TIMESTAMP
+    // in older MySQL versions, but TIMESTAMP does
     console.log('Creating _prisma_migrations table with DATETIME (no precision)...');
     await connection.execute(`
       CREATE TABLE \`_prisma_migrations\` (
@@ -91,7 +99,7 @@ async function createPrismaMigrationsTable() {
         \`migration_name\` VARCHAR(255) NOT NULL,
         \`logs\` TEXT NULL,
         \`rolled_back_at\` DATETIME NULL,
-        \`started_at\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`started_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         \`applied_steps_count\` INTEGER UNSIGNED NOT NULL DEFAULT 0,
         PRIMARY KEY (\`id\`)
       ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
@@ -110,18 +118,22 @@ async function createPrismaMigrationsTable() {
       throw new Error('Table creation verification failed - table does not exist');
     }
     
-    // Verify the schema is correct (no DATETIME(3))
+    // Verify the schema is correct (no DATETIME(3), started_at should be TIMESTAMP)
     const [verifyColumns] = await connection.execute(`
       SELECT COLUMN_NAME, COLUMN_TYPE 
       FROM information_schema.COLUMNS 
       WHERE TABLE_SCHEMA = ? 
       AND TABLE_NAME = '_prisma_migrations'
-      AND COLUMN_TYPE LIKE '%DATETIME%'
+      AND (COLUMN_TYPE LIKE '%DATETIME%' OR COLUMN_NAME = 'started_at')
     `, [config.database]);
     
     for (const col of verifyColumns) {
       if (col.COLUMN_TYPE.includes('DATETIME(3)')) {
         throw new Error(`Table verification failed - column ${col.COLUMN_NAME} still has DATETIME(3)`);
+      }
+      // Verify started_at is TIMESTAMP, not DATETIME
+      if (col.COLUMN_NAME === 'started_at' && col.COLUMN_TYPE.includes('DATETIME') && !col.COLUMN_TYPE.includes('TIMESTAMP')) {
+        throw new Error(`Table verification failed - started_at should be TIMESTAMP, not DATETIME`);
       }
     }
     
