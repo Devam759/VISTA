@@ -1,4 +1,5 @@
-export const API_BASE_URL = (import.meta?.env?.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')
+// Using Render URL as default fallback instead of localhost
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://vista-ia7c.onrender.com').replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {
   const url = `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`
