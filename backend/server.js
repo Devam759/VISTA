@@ -43,6 +43,66 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' })); // For base64 images
 app.use(express.urlencoded({ extended: true }));
 
+// Debug route for geolocation testing (no auth required)
+app.post('/debug/geolocation', async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: 'latitude and longitude required' });
+    }
+
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    const prisma = (await import('./config/prisma.js')).default;
+    const { isPointInPolygon } = await import('./utils/pointInPolygon.js');
+
+    // Fetch campus polygon
+    const rows = await prisma.campusPolygon.findMany({
+      orderBy: { pointOrder: 'asc' }
+    });
+
+    if (rows.length < 3) {
+      return res.status(500).json({ error: 'Campus polygon not configured' });
+    }
+
+    const polygon = rows.map(r => ({ lat: r.lat, lng: r.lng }));
+    
+    // Ensure polygon is closed
+    if (polygon.length > 0) {
+      const first = polygon[0];
+      const last = polygon[polygon.length - 1];
+      if (first.lat !== last.lat || first.lng !== last.lng) {
+        polygon.push({ lat: first.lat, lng: first.lng });
+      }
+    }
+
+    const inside = isPointInPolygon(lat, lng, polygon);
+
+    const bounds = {
+      minLat: Math.min(...polygon.map(p => p.lat)),
+      maxLat: Math.max(...polygon.map(p => p.lat)),
+      minLng: Math.min(...polygon.map(p => p.lng)),
+      maxLng: Math.max(...polygon.map(p => p.lng))
+    };
+
+    return res.json({
+      userLocation: { lat, lng },
+      insidePolygon: inside,
+      polygonPoints: polygon.length,
+      polygonBounds: bounds,
+      polygonCoordinates: polygon,
+      message: inside 
+        ? '✅ You are INSIDE the campus boundary' 
+        : '❌ You are OUTSIDE the campus boundary'
+    });
+  } catch (error) {
+    console.error('Debug geolocation error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Routes
 app.use('/auth', authRoutes);
 app.use('/attendance', studentRoutes);
