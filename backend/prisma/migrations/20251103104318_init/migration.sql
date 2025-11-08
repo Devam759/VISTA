@@ -2,7 +2,7 @@
 CREATE TABLE `hostels` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -30,7 +30,7 @@ CREATE TABLE `students` (
     `email` VARCHAR(120) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `face_id_url` TEXT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE INDEX `students_roll_no_key`(`roll_no`),
     UNIQUE INDEX `students_email_key`(`email`),
@@ -47,7 +47,7 @@ CREATE TABLE `wardens` (
     `password` VARCHAR(255) NOT NULL,
     `mobile` VARCHAR(15) NOT NULL,
     `hostel_id` INTEGER NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE INDEX `wardens_email_key`(`email`),
     INDEX `wardens_hostel_id_idx`(`hostel_id`),
@@ -60,10 +60,10 @@ CREATE TABLE `attendance` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `student_id` INTEGER NOT NULL,
     `date` DATE NOT NULL,
-    `time` TIME(0) NOT NULL,
+    `time` TIME NOT NULL,
     `status` ENUM('Marked', 'Missed', 'Late') NOT NULL,
     `face_verified` BOOLEAN NOT NULL DEFAULT false,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     INDEX `attendance_student_id_idx`(`student_id`),
     INDEX `attendance_date_idx`(`date`),

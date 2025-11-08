@@ -70,7 +70,7 @@ model Attendance {
   id           Int                @id @default(autoincrement())
   studentId    Int                @map("student_id")
   date         DateTime           @db.Date
-  time         DateTime           @db.Time(0)
+  time         DateTime           @db.Time
   status       AttendanceStatus
   faceVerified Boolean            @default(false) @map("face_verified")
   student      Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
