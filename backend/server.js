@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/student.js';
 import wardenRoutes from './routes/warden.js';
+import seedRoutes from './routes/seed.js';
 import seedDatabase from './scripts/seedDatabase.js';
 
 dotenv.config();
@@ -46,6 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRoutes);
 app.use('/attendance', studentRoutes);
 app.use('/warden', wardenRoutes);
+app.use('/api', seedRoutes); // Seed endpoint at /api/seed
 
 // Health check
 app.get('/', (req, res) => {

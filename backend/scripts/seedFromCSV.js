@@ -9,33 +9,26 @@ const __dirname = path.dirname(__filename);
 
 const prisma = new PrismaClient();
 
-async function importCSV() {
-  console.log('🚀 Starting CSV import...\n');
+async function seedFromCSV() {
+  console.log('🌱 Starting comprehensive database seeding...\n');
 
   try {
-    // Read CSV file
-    const csvPath = path.join(__dirname, '../../publc/FINAL SHEET OF BH-2.csv');
-    const csvContent = fs.readFileSync(csvPath, 'utf-8');
-    const lines = csvContent.split('\n');
-
-    // Skip header rows (first 4 lines)
-    const dataLines = lines.slice(4).filter(line => line.trim());
-
-    // Create or get BH-2 hostel
+    // Step 1: Create or get BH-2 hostel
+    console.log('🏠 Creating/finding BH-2 hostel...');
     const hostel = await prisma.hostel.upsert({
-      where: { id: 3 },
+      where: { id: 1 },
       update: {},
       create: {
-        id: 3,
+        id: 1,
         name: 'BH-2'
       }
     });
+    console.log(`✅ Hostel: ${hostel.name} (ID: ${hostel.id})\n`);
 
-    console.log(`✅ Hostel created/found: ${hostel.name}\n`);
-
-    // Create warden account
+    // Step 2: Create warden account
     console.log('👮 Creating warden account...');
     const hashedPassword = await bcrypt.hash('123', 10);
+    
     const warden = await prisma.warden.upsert({
       where: { email: 'warden@jklu.edu.in' },
       update: {
@@ -52,23 +45,39 @@ async function importCSV() {
         hostelId: hostel.id
       }
     });
-    console.log(`✅ Warden created: ${warden.email} (password: 123)\n`);
+    console.log(`✅ Warden created: ${warden.email}\n`);
+
+    // Step 3: Read and parse CSV file
+    console.log('📖 Reading CSV file...');
+    const csvPath = path.join(__dirname, '../../publc/FINAL SHEET OF BH-2.csv');
+    
+    if (!fs.existsSync(csvPath)) {
+      throw new Error(`CSV file not found at: ${csvPath}`);
+    }
+
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
+    const lines = csvContent.split('\n');
+
+    // Skip header rows (first 4 lines)
+    const dataLines = lines.slice(4).filter(line => line.trim());
 
     // Track unique rooms
     const roomsSet = new Set();
     const students = [];
+
+    console.log(`📊 Parsing ${dataLines.length} lines from CSV...\n`);
 
     // Parse CSV data
     for (const line of dataLines) {
       const columns = parseCSVLine(line);
       
       // Skip empty rows or rows without student name
-      if (!columns[6] || columns[6].trim() === '' || columns[6] === 'Vacant' || columns[6] === 'DEMO ROOM') {
+      const studentName = columns[6]?.trim();
+      if (!studentName || studentName === '' || studentName === 'Vacant' || studentName === 'DEMO ROOM') {
         continue;
       }
 
       const roomNo = columns[3]?.trim();
-      const studentName = columns[6]?.trim();
       const regNo = columns[7]?.trim();
       const mobile = columns[8]?.trim();
       const address = columns[9]?.trim();
@@ -85,8 +94,9 @@ async function importCSV() {
       let program = 'B.Tech Computer Science';
       if (regNo) {
         if (regNo.includes('BBA')) program = 'BBA';
-        else if (regNo.includes('BDes')) program = 'B.Des';
-        else if (regNo.includes('MDes')) program = 'M.Des';
+        else if (regNo.includes('BDes') || regNo.includes('Bdes')) program = 'B.Des';
+        else if (regNo.includes('MDes') || regNo.includes('Mdes')) program = 'M.Des';
+        else if (regNo.includes('BTech') || regNo.includes('B.Tech')) program = 'B.Tech Computer Science';
       }
 
       // Generate email from name or reg number
@@ -101,7 +111,7 @@ async function importCSV() {
         mobile: mobile || '0000000000',
         address: address || 'Not provided',
         email: email,
-        password: await bcrypt.hash('123', 10), // Default password
+        password: hashedPassword, // Same password hash for all
         faceIdUrl: null
       });
     }
@@ -109,18 +119,21 @@ async function importCSV() {
     console.log(`📊 Found ${students.length} students to import`);
     console.log(`📊 Found ${roomsSet.size} unique rooms\n`);
 
-    // Create rooms
+    // Step 4: Create rooms
     console.log('🏠 Creating rooms...');
     let roomsCreated = 0;
     let roomsSkipped = 0;
+
     for (const roomNo of roomsSet) {
       try {
+        // Check if room already exists
         const existingRoom = await prisma.room.findFirst({
           where: {
             roomNo: roomNo,
             hostelId: hostel.id
           }
         });
+
         if (!existingRoom) {
           await prisma.room.create({
             data: {
@@ -133,15 +146,17 @@ async function importCSV() {
           roomsSkipped++;
         }
       } catch (error) {
+        // Room might already exist, skip
         roomsSkipped++;
       }
     }
     console.log(`✅ Rooms: ${roomsCreated} created, ${roomsSkipped} already existed\n`);
 
-    // Import students
+    // Step 5: Import students
     console.log('👥 Importing students...');
     let imported = 0;
     let skipped = 0;
+    let errors = [];
 
     for (const student of students) {
       try {
@@ -149,23 +164,42 @@ async function importCSV() {
           data: student
         });
         imported++;
-        if (imported % 10 === 0) {
-          console.log(`   Imported ${imported}/${students.length}...`);
+        if (imported % 20 === 0) {
+          console.log(`   Progress: ${imported}/${students.length}...`);
         }
       } catch (error) {
         // Student might already exist (duplicate email or roll number)
         skipped++;
+        if (error.code === 'P2002') {
+          // Unique constraint violation
+          errors.push(`Duplicate: ${student.email} or ${student.rollNo}`);
+        } else {
+          errors.push(`Error for ${student.name}: ${error.message}`);
+        }
       }
     }
 
     console.log(`\n✅ Import complete!`);
     console.log(`   ✓ Imported: ${imported} students`);
-    console.log(`   ⊘ Skipped: ${skipped} students (duplicates)`);
+    console.log(`   ⊘ Skipped: ${skipped} students (duplicates or errors)`);
+    if (errors.length > 0 && errors.length <= 10) {
+      console.log(`   ⚠️  Errors: ${errors.slice(0, 5).join(', ')}`);
+    }
     console.log(`\n📝 Default password for all users: 123`);
-    console.log(`📝 Warden login: warden@jklu.edu.in / 123`);
+    console.log(`📝 Warden email: warden@jklu.edu.in`);
+
+    return {
+      success: true,
+      hostel: hostel.name,
+      warden: warden.email,
+      studentsImported: imported,
+      studentsSkipped: skipped,
+      roomsCreated: roomsCreated,
+      roomsSkipped: roomsSkipped
+    };
 
   } catch (error) {
-    console.error('❌ Import failed:', error);
+    console.error('❌ Seeding failed:', error);
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -220,17 +254,19 @@ function generateEmail(name, regNo, rollNo) {
 }
 
 // Export for use in API endpoint
-export default importCSV;
+export default seedFromCSV;
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  importCSV()
-    .then(() => {
-      console.log('\n🎉 CSV import completed successfully!');
+  seedFromCSV()
+    .then((result) => {
+      console.log('\n🎉 Database seeding completed successfully!');
+      console.log(JSON.stringify(result, null, 2));
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n💥 CSV import failed:', error.message);
+      console.error('\n💥 Database seeding failed:', error.message);
       process.exit(1);
     });
 }
+
