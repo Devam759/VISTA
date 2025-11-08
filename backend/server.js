@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
   process.env.FRONTEND_URL // Your Vercel deployment URL
 ].filter(Boolean);
 
@@ -22,9 +24,16 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Allow any Vercel deployment (*.vercel.app)
+    if (origin && origin.includes('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // Allow configured origins
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.warn('⚠️ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
