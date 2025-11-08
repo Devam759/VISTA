@@ -6,7 +6,9 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Format: mysql://user:password@host:port/database
+  // For production: mysql://sql12806790:C9E5gce8nV@sql12.freesqldatabase.com:3306/sql12806790
+  // For local: mysql://root:111@localhost:3306/vista
 }
 
 model Hostel {
