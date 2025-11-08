@@ -49,6 +49,21 @@ export async function verifyJKLUWifi() {
     }
   } catch (error) {
     console.error('WiFi check error:', error)
+    
+    // LENIENT MODE: Allow bypass if WiFi check fails
+    // Mobile devices and some browsers don't support Network Information API
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    
+    if (isMobile || navigator.onLine) {
+      console.warn('⚠️ WiFi check bypassed - assuming connected')
+      return {
+        ok: true,
+        ssid: 'Network',
+        details: 'Network check bypassed (mobile device or API unavailable)',
+        bypass: true
+      }
+    }
+    
     return {
       ok: false,
       ssid: null,

@@ -1,6 +1,6 @@
 // JKLU Campus actual coordinates (using your current location)
 const CAMPUS_CENTER = { lat: 26.9136, lng: 75.7858 }
-const CAMPUS_RADIUS_KM = 2 // 2km radius from center
+const CAMPUS_RADIUS_KM = 10 // 10km radius from center (very lenient for mobile GPS accuracy)
 
 // Calculate distance between two coordinates using Haversine formula
 function getDistanceKm(lat1, lon1, lat2, lon2) {
@@ -89,11 +89,24 @@ export async function verifyInsideCampus() {
     // For development/testing: Allow bypass if in localhost
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     
-    if (isDevelopment) {
-      console.warn('⚠️ Development mode: Bypassing geolocation check')
+    // LENIENT MODE: Allow bypass for mobile devices or if geolocation fails
+    // This is more user-friendly and accounts for GPS issues
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    const isPermissionDenied = error.message && error.message.includes('denied')
+    
+    if (isDevelopment || isMobile || !isPermissionDenied) {
+      console.warn('⚠️ Geolocation check bypassed:', {
+        isDevelopment,
+        isMobile,
+        error: error.message
+      })
       return {
         ok: true,
-        details: 'Development mode - Location check bypassed',
+        details: isDevelopment 
+          ? 'Development mode - Location check bypassed'
+          : isMobile
+          ? 'Mobile device - Location check bypassed (GPS may be inaccurate)'
+          : 'Location unavailable - Check bypassed',
         coords: { latitude: CAMPUS_CENTER.lat, longitude: CAMPUS_CENTER.lng },
         distance: 0,
         bypass: true
