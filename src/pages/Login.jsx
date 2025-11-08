@@ -79,32 +79,45 @@ export default function Login() {
             </button>
           </div>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  geoStatus.ok ? 'bg-green-100' : 'bg-red-100'
-                }`}>
-                  <svg className={`w-5 h-5 ${geoStatus.ok ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+            <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    geoStatus.ok ? 'bg-green-100' : 'bg-red-100'
+                  }`}>
+                    <svg className={`w-5 h-5 ${geoStatus.ok ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Campus Location</p>
+                    <p className="text-xs text-gray-500">GPS verification</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Campus Location</p>
-                  <p className="text-xs text-gray-500">GPS verification</p>
-                </div>
+                {geoStatus.checking ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-gray-500">Checking</span>
+                  </div>
+                ) : (
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    geoStatus.ok ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {geoStatus.ok ? 'Verified' : 'Failed'}
+                  </span>
+                )}
               </div>
-              {geoStatus.checking ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-500">Checking</span>
+              {!geoStatus.checking && !geoStatus.ok && geoStatus.details && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-100 rounded-lg">
+                  <p className="text-xs text-red-700">{geoStatus.details}</p>
+                  <button
+                    onClick={checkAccessRequirements}
+                    className="mt-1 text-xs text-red-600 hover:text-red-700 font-medium underline"
+                  >
+                    Try Again
+                  </button>
                 </div>
-              ) : (
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  geoStatus.ok ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {geoStatus.ok ? 'Verified' : 'Failed'}
-                </span>
               )}
             </div>
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">

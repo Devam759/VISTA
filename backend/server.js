@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/student.js';
 import wardenRoutes from './routes/warden.js';
+import seedDatabase from './scripts/seedDatabase.js';
 
 dotenv.config();
 
@@ -11,8 +12,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL // Your Vercel deployment URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' })); // For base64 images
@@ -43,6 +58,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 VISTA Backend running on port ${PORT}`);
+  
+  // Auto-seed database on first run (only if AUTO_SEED=true)
+  if (process.env.AUTO_SEED === 'true') {
+    try {
+      await seedDatabase();
+    } catch (error) {
+      console.error('⚠️  Auto-seed failed, but server is running');
+    }
+  }
 });

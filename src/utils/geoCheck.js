@@ -17,17 +17,48 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
 
 export async function verifyInsideCampus() {
   try {
-    // Get current position from browser
+    // Check if geolocation is supported
+    if (!navigator.geolocation) {
+      throw new Error('Geolocation is not supported by your browser')
+    }
+
+    // Get current position from browser with better error handling
     const position = await new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation not supported'))
-        return
-      }
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
-      })
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Location request timed out. Please enable location permissions.'))
+      }, 15000) // 15 second timeout
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          clearTimeout(timeoutId)
+          resolve(pos)
+        },
+        (error) => {
+          clearTimeout(timeoutId)
+          let errorMessage = 'Failed to get location'
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
+              break
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Location information unavailable. Please check your device GPS.'
+              break
+            case error.TIMEOUT:
+              errorMessage = 'Location request timed out. Please try again.'
+              break
+            default:
+              errorMessage = error.message || 'Unknown location error'
+          }
+          
+          reject(new Error(errorMessage))
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 30000 // Accept cached position up to 30 seconds old
+        }
+      )
     })
 
     const { latitude, longitude } = position.coords
@@ -53,10 +84,25 @@ export async function verifyInsideCampus() {
       distance
     }
   } catch (error) {
-    console.error('Geolocation error:', error)
+    console.error('❌ Geolocation error:', error)
+    
+    // For development/testing: Allow bypass if in localhost
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    
+    if (isDevelopment) {
+      console.warn('⚠️ Development mode: Bypassing geolocation check')
+      return {
+        ok: true,
+        details: 'Development mode - Location check bypassed',
+        coords: { latitude: CAMPUS_CENTER.lat, longitude: CAMPUS_CENTER.lng },
+        distance: 0,
+        bypass: true
+      }
+    }
+    
     return {
       ok: false,
-      details: 'Failed to get location: ' + error.message,
+      details: error.message || 'Failed to get location',
       error: error.message
     }
   }
