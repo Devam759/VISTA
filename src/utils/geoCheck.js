@@ -1,19 +1,5 @@
-// JKLU Campus actual coordinates (using your current location)
-const CAMPUS_CENTER = { lat: 26.9136, lng: 75.7858 }
-const CAMPUS_RADIUS_KM = 10 // 10km radius from center (very lenient for mobile GPS accuracy)
-
-// Calculate distance between two coordinates using Haversine formula
-function getDistanceKm(lat1, lon1, lat2, lon2) {
-  const R = 6371 // Earth's radius in km
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLon = (lon2 - lon1) * Math.PI / 180
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-  return R * c
-}
+// Get API base URL from environment or use default
+const API_BASE = import.meta.env.VITE_API_URL || 'https://vista-ia7c.onrender.com'
 
 export async function verifyInsideCampus() {
   try {
@@ -26,7 +12,7 @@ export async function verifyInsideCampus() {
     const position = await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         reject(new Error('Location request timed out. Please enable location permissions.'))
-      }, 15000) // 15 second timeout
+      }, 20000) // 20 second timeout for better accuracy
 
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -54,34 +40,53 @@ export async function verifyInsideCampus() {
           reject(new Error(errorMessage))
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 30000 // Accept cached position up to 30 seconds old
+          enableHighAccuracy: true, // Use GPS for precise location
+          timeout: 15000,
+          maximumAge: 0 // Don't use cached position, get fresh one
         }
       )
     })
 
     const { latitude, longitude } = position.coords
     
-    // Calculate distance from campus center
-    const distance = getDistanceKm(latitude, longitude, CAMPUS_CENTER.lat, CAMPUS_CENTER.lng)
-    
-    // Check if within campus radius
-    const isInside = distance <= CAMPUS_RADIUS_KM
-    
-    // Log for debugging
-    console.log(`📍 Your Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`)
-    console.log(`📍 Campus Center: ${CAMPUS_CENTER.lat}, ${CAMPUS_CENTER.lng}`)
-    console.log(`📏 Distance: ${distance.toFixed(2)}km (Max allowed: ${CAMPUS_RADIUS_KM}km)`)
-    console.log(`✅ Inside campus: ${isInside}`)
-    
-    return {
-      ok: isInside,
-      details: isInside 
-        ? `Within campus bounds (${distance.toFixed(2)}km from center)`
-        : `Outside campus (${distance.toFixed(2)}km from center, max ${CAMPUS_RADIUS_KM}km allowed)`,
-      coords: { latitude, longitude },
-      distance
+    // Call backend API to check against actual polygon
+    try {
+      const response = await fetch(`${API_BASE}/debug/geolocation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude, longitude })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Backend check failed: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      
+      // Log for debugging
+      console.log(`📍 Your Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`)
+      console.log(`📍 Polygon Check: ${data.insidePolygon ? '✅ INSIDE' : '❌ OUTSIDE'}`)
+      console.log(`📍 Polygon Points: ${data.polygonPoints}`)
+      console.log(`📍 Polygon Bounds: Lat [${data.polygonBounds.minLat.toFixed(6)}, ${data.polygonBounds.maxLat.toFixed(6)}], Lng [${data.polygonBounds.minLng.toFixed(6)}, ${data.polygonBounds.maxLng.toFixed(6)}]`)
+      
+      return {
+        ok: data.insidePolygon,
+        details: data.message,
+        coords: { latitude, longitude },
+        polygonData: data
+      }
+    } catch (apiError) {
+      console.error('❌ Backend geolocation check failed:', apiError)
+      // Fallback: allow if backend check fails (for development)
+      console.warn('⚠️ Using fallback - allowing location check')
+      return {
+        ok: true,
+        details: 'Backend check unavailable, allowing for development',
+        coords: { latitude, longitude },
+        bypass: true
+      }
     }
   } catch (error) {
     console.error('❌ Geolocation error:', error)
@@ -90,11 +95,10 @@ export async function verifyInsideCampus() {
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     
     // LENIENT MODE: Allow bypass for mobile devices or if geolocation fails
-    // This is more user-friendly and accounts for GPS issues
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     const isPermissionDenied = error.message && error.message.includes('denied')
     
-    if (isDevelopment || isMobile || !isPermissionDenied) {
+    if (isDevelopment || (isMobile && !isPermissionDenied)) {
       console.warn('⚠️ Geolocation check bypassed:', {
         isDevelopment,
         isMobile,
@@ -107,8 +111,7 @@ export async function verifyInsideCampus() {
           : isMobile
           ? 'Mobile device - Location check bypassed (GPS may be inaccurate)'
           : 'Location unavailable - Check bypassed',
-        coords: { latitude: CAMPUS_CENTER.lat, longitude: CAMPUS_CENTER.lng },
-        distance: 0,
+        coords: { latitude: null, longitude: null },
         bypass: true
       }
     }
