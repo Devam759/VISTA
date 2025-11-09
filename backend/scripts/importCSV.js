@@ -164,6 +164,38 @@ async function importCSV() {
     console.log(`\n📝 Default password for all users: 123`);
     console.log(`📝 Warden login: warden@jklu.edu.in / 123`);
 
+    // Import campus polygon
+    console.log('\n📍 Importing campus polygon...');
+    const campusCoordinates = [
+      { lat: 26.835786216245545, lng: 75.65131165087223, pointOrder: 1 },
+      { lat: 26.837407397333223, lng: 75.65114535391331, pointOrder: 2 },
+      { lat: 26.836622388388918, lng: 75.64845744520426, pointOrder: 3 },
+      { lat: 26.836051578163385, lng: 75.64818117767572, pointOrder: 4 },
+      { lat: 26.835461618240164, lng: 75.65019752830267, pointOrder: 5 },
+      { lat: 26.834609880617364, lng: 75.65087344497442, pointOrder: 6 },
+      { lat: 26.834014228898674, lng: 75.651178881526, pointOrder: 7 },
+      { lat: 26.83333241176029, lng: 75.65138272941113, pointOrder: 8 },
+      { lat: 26.832626058039946, lng: 75.65278552472591, pointOrder: 9 },
+      { lat: 26.833887678682544, lng: 75.65269734710455, pointOrder: 10 },
+      { lat: 26.834122828616806, lng: 75.6522286310792, pointOrder: 11 },
+      { lat: 26.83494166115547, lng: 75.6524958461523, pointOrder: 12 }
+    ];
+
+    // Delete existing polygon
+    await prisma.campusPolygon.deleteMany({});
+    
+    // Insert new coordinates
+    for (const coord of campusCoordinates) {
+      await prisma.campusPolygon.create({
+        data: {
+          lat: coord.lat,
+          lng: coord.lng,
+          pointOrder: coord.pointOrder
+        }
+      });
+    }
+    console.log(`✅ Campus polygon imported: ${campusCoordinates.length} boundary points`);
+
   } catch (error) {
     console.error('❌ Import failed:', error);
     throw error;
