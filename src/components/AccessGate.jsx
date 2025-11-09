@@ -20,19 +20,23 @@ export default function AccessGate({ children }) {
       setChecking(true)
       setError('')
       
+      // Run checks in parallel for faster response
       const [geoResult, wifiResult] = await Promise.all([
-        verifyInsideCampus(),
-        verifyJKLUWifi()
+        verifyInsideCampus().catch(err => ({ ok: false, details: err.message })),
+        verifyJKLUWifi().catch(err => ({ ok: false, details: err.message }))
       ])
       
       setGeoOk(geoResult.ok)
       setWifiOk(wifiResult.ok)
       
       if (!geoResult.ok || !wifiResult.ok) {
-        setError('Access denied: You must be on campus and connected to college WiFi')
+        const reasons = []
+        if (!geoResult.ok) reasons.push(`Location: ${geoResult.details || 'Not verified'}`)
+        if (!wifiResult.ok) reasons.push(`WiFi: ${wifiResult.details || 'Not verified'}`)
+        setError(`Access denied: ${reasons.join(' | ')}`)
       }
     } catch (err) {
-      setError('Failed to verify access requirements')
+      setError(`Failed to verify access: ${err.message || 'Unknown error'}`)
       setGeoOk(false)
       setWifiOk(false)
     } finally {
