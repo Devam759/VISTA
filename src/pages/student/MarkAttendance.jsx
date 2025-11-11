@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import Camera from '../../components/Camera.jsx'
 import { verifyInsideCampus } from '../../utils/geoCheck.js'
-import { verifyJKLUWifi } from '../../utils/wifiCheck.js'
 import { useToast } from '../../components/Toast.jsx'
 import { apiFetch } from '../../utils/api.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -20,7 +19,6 @@ export default function MarkAttendance() {
   const { push } = useToast()
   const { token } = useAuth()
   const [locOk, setLocOk] = useState(false)
-  const [wifiOk, setWifiOk] = useState(false)
   const [img, setImg] = useState('')
   const [now, setNow] = useState(new Date())
   const [camOn, setCamOn] = useState(false)
@@ -36,9 +34,8 @@ export default function MarkAttendance() {
 
   useEffect(() => {
     ;(async () => {
-      const [g, w] = await Promise.all([verifyInsideCampus(), verifyJKLUWifi()])
+      const g = await verifyInsideCampus()
       setLocOk(!!g.ok)
-      setWifiOk(!!w.ok)
     })()
   }, [])
 
@@ -64,8 +61,8 @@ export default function MarkAttendance() {
   }, [img])
 
   const markAttendance = async () => {
-    if (!locOk || !wifiOk) {
-      push('Verification failed. Please ensure you are on campus and connected to college WiFi.', 'error')
+    if (!locOk) {
+      push('Verification failed. Please ensure you are on campus.', 'error')
       return
     }
     if (!time.allowed && !time.isLateWindow) {
@@ -180,29 +177,7 @@ export default function MarkAttendance() {
               </div>
             </div>
 
-            {/* WiFi Status */}
-            <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    wifiOk ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
-                    <svg className={`w-5 h-5 ${wifiOk ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">College WiFi</p>
-                    <p className="text-xs text-gray-500">Network check</p>
-                  </div>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  wifiOk ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {wifiOk ? 'Connected' : 'Not Connected'}
-                </span>
-              </div>
-            </div>
+            
 
             {/* Time Window Status */}
             <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">

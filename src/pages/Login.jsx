@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../components/Toast.jsx'
 import { verifyInsideCampus } from '../utils/geoCheck.js'
-import { verifyJKLUWifi } from '../utils/wifiCheck.js'
 
 export default function Login() {
   const { login } = useAuth()
@@ -12,7 +11,6 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [geoStatus, setGeoStatus] = useState({ checking: true, ok: false, details: '' })
-  const [wifiStatus, setWifiStatus] = useState({ checking: true, ok: false, details: '' })
   const [showTestCreds, setShowTestCreds] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -22,15 +20,10 @@ export default function Login() {
 
   async function checkAccessRequirements() {
     try {
-      const [geo, wifi] = await Promise.all([
-        verifyInsideCampus(),
-        verifyJKLUWifi()
-      ])
+      const geo = await verifyInsideCampus()
       setGeoStatus({ checking: false, ok: geo.ok, details: geo.details })
-      setWifiStatus({ checking: false, ok: wifi.ok, details: wifi.details })
     } catch (err) {
       setGeoStatus({ checking: false, ok: false, details: 'Check failed' })
-      setWifiStatus({ checking: false, ok: false, details: 'Check failed' })
     }
   }
 
@@ -50,17 +43,15 @@ export default function Login() {
     }
   }
 
+  const fill = (email, password) => setForm({ email, password })
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">VISTA</h1>
+          <img src="/logo.jpg" alt="Logo" className="mx-auto mb-4 h-16 w-auto object-contain" />
+          {/* <h1 className="text-3xl font-bold text-gray-900 mb-2">VISTA</h1> */}
           <p className="text-gray-600">Smart Attendance System</p>
         </div>
 
@@ -120,33 +111,6 @@ export default function Login() {
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  wifiStatus.ok ? 'bg-green-100' : 'bg-red-100'
-                }`}>
-                  <svg className={`w-5 h-5 ${wifiStatus.ok ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">College WiFi</p>
-                  <p className="text-xs text-gray-500">Network check</p>
-                </div>
-              </div>
-              {wifiStatus.checking ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-500">Checking</span>
-                </div>
-              ) : (
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  wifiStatus.ok ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {wifiStatus.ok ? 'Connected' : 'Not Connected'}
-                </span>
-              )}
-            </div>
           </div>
         </div>
 
@@ -175,13 +139,13 @@ export default function Login() {
               <div className="mt-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl text-sm space-y-3">
                 <div>
                   <p className="font-semibold text-indigo-900 mb-1">Student Account</p>
-                  <p className="text-indigo-700 font-mono text-xs">btech250231@jklu.edu.in</p>
-                  <p className="text-indigo-600 font-mono text-xs">Password: 123</p>
+                  <button type="button" onClick={() => fill('btech250231@jklu.edu.in', '123')} className="text-left text-indigo-700 font-mono text-xs hover:underline cursor-pointer">btech250231@jklu.edu.in</button>
+                  <button type="button" onClick={() => fill('btech250231@jklu.edu.in', '123')} className="block text-left text-indigo-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
                 </div>
                 <div className="border-t border-indigo-200 pt-3">
                   <p className="font-semibold text-purple-900 mb-1">Warden Account</p>
-                  <p className="text-purple-700 font-mono text-xs">warden@jklu.edu.in</p>
-                  <p className="text-purple-600 font-mono text-xs">Password: 123</p>
+                  <button type="button" onClick={() => fill('warden@jklu.edu.in', '123')} className="text-left text-purple-700 font-mono text-xs hover:underline cursor-pointer">warden@jklu.edu.in</button>
+                  <button type="button" onClick={() => fill('warden@jklu.edu.in', '123')} className="block text-left text-purple-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
                 </div>
               </div>
             )}
