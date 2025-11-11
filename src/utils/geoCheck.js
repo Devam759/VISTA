@@ -17,6 +17,18 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
 
 export async function verifyInsideCampus() {
   try {
+    // Desktop bypass: allow UI access on desktop devices
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    if (!isMobileUA) {
+      return {
+        ok: true,
+        details: 'Desktop device – location check bypassed',
+        coords: { latitude: CAMPUS_CENTER.lat, longitude: CAMPUS_CENTER.lng },
+        distance: 0,
+        bypass: true
+      }
+    }
+
     // Check if geolocation is supported
     if (!navigator.geolocation) {
       throw new Error('Geolocation is not supported by your browser')

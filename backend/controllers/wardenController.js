@@ -2,7 +2,8 @@ import {
   getHostelAttendance as getHostelAttendanceService,
   getAllAttendance as getAllAttendanceService,
   overrideAttendance as overrideAttendanceService,
-  getStudentsList as getStudentsListService
+  getStudentsList as getStudentsListService,
+  importStudentsMetaFromCsv as importStudentsMetaFromCsvService
 } from '../services/wardenService.js';
 
 export const getHostelAttendance = async (req, res) => {
@@ -58,5 +59,18 @@ export const getStudentsList = async (req, res) => {
   } catch (error) {
     console.error('Get students list error:', error);
     res.status(500).json({ error: error.message || 'Failed to fetch students' });
+  }
+};
+
+export const importStudentsMetaFromCsv = async (req, res) => {
+  try {
+    const { id: wardenId } = req.user;
+    const { csvUrl } = req.body || {};
+    if (!csvUrl) return res.status(400).json({ error: 'csvUrl is required' });
+    const result = await importStudentsMetaFromCsvService(wardenId, csvUrl);
+    res.json(result);
+  } catch (error) {
+    console.error('Import students meta CSV error:', error);
+    res.status(500).json({ error: error.message || 'Failed to import CSV' });
   }
 };

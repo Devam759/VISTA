@@ -27,9 +27,12 @@ model Room {
   roomNo   String  @map("room_no") @db.VarChar(10)
   hostelId Int     @map("hostel_id")
   hostel   Hostel  @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  isAC     Boolean @default(false) @map("is_ac")
+  students Student[]
 
   @@map("rooms")
   @@index([hostelId])
+  @@unique([hostelId, roomNo])
 }
 
 model Student {
@@ -37,6 +40,8 @@ model Student {
   name       String       @db.VarChar(100)
   rollNo     String       @unique @map("roll_no") @db.VarChar(30)
   roomNo     String       @map("room_no") @db.VarChar(10)
+  regNo      String?      @map("reg_no") @db.VarChar(40)
+  roomId     Int?         @map("room_id")
   hostelId   Int          @map("hostel_id")
   program    String       @db.VarChar(80)
   mobile     String       @db.VarChar(15)
@@ -45,6 +50,7 @@ model Student {
   password   String       @db.VarChar(255)
   faceIdUrl  String?      @map("face_id_url") @db.Text
   hostel     Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  room       Room?        @relation(fields: [roomId], references: [id])
   attendance Attendance[]
   createdAt  DateTime     @default(now()) @map("created_at")
 

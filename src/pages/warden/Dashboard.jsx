@@ -79,14 +79,14 @@ export default function WardenDashboard() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Warden Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">{user?.hostel} - {getDayName(today)}, {today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <h1 className="text-xl font-semibold text-gray-900">Warden Dashboard</h1>
+          <p className="text-xs text-gray-500 mt-1">{user?.hostel} • {getDayName(today)}, {today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
-        <button onClick={logout} className="text-sm text-red-600 hover:text-red-700">Logout</button>
+        <button onClick={logout} className="px-3 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Logout</button>
       </div>
 
       {/* Date Selector */}
-      <div className="mt-6 bg-white rounded-xl shadow p-4">
+      <div className="mt-6 bg-white rounded-2xl shadow ring-1 ring-gray-100 p-4">
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium text-gray-700">Select Date:</label>
           <input 
@@ -94,11 +94,11 @@ export default function WardenDashboard() {
             value={selectedDate} 
             onChange={(e) => setSelectedDate(e.target.value)}
             max={formatDate(new Date())}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
           />
           <button 
             onClick={() => setSelectedDate(formatDate(new Date()))}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+            className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 text-sm font-medium"
           >
             Today
           </button>
@@ -107,22 +107,22 @@ export default function WardenDashboard() {
 
       {/* Stats Cards */}
       <div className="mt-6 grid sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow p-5">
+        <div className="bg-white rounded-xl shadow p-5 ring-1 ring-gray-100">
           <p className="text-sm text-gray-500">Present</p>
           <p className="text-3xl font-bold text-green-600">{metrics.present}</p>
           <p className="text-xs text-gray-400 mt-1">{metrics.total > 0 ? Math.round((metrics.present / metrics.total) * 100) : 0}%</p>
         </div>
-        <div className="bg-white rounded-xl shadow p-5">
+        <div className="bg-white rounded-xl shadow p-5 ring-1 ring-gray-100">
           <p className="text-sm text-gray-500">Late</p>
           <p className="text-3xl font-bold text-yellow-600">{metrics.late}</p>
           <p className="text-xs text-gray-400 mt-1">{metrics.total > 0 ? Math.round((metrics.late / metrics.total) * 100) : 0}%</p>
         </div>
-        <div className="bg-white rounded-xl shadow p-5">
+        <div className="bg-white rounded-xl shadow p-5 ring-1 ring-gray-100">
           <p className="text-sm text-gray-500">Absent</p>
           <p className="text-3xl font-bold text-red-600">{metrics.absent}</p>
           <p className="text-xs text-gray-400 mt-1">{metrics.total > 0 ? Math.round((metrics.absent / metrics.total) * 100) : 0}%</p>
         </div>
-        <div className="bg-white rounded-xl shadow p-5">
+        <div className="bg-white rounded-xl shadow p-5 ring-1 ring-gray-100">
           <p className="text-sm text-gray-500">Total Students</p>
           <p className="text-3xl font-bold text-gray-700">{metrics.total}</p>
           <p className="text-xs text-gray-400 mt-1">{attendanceData?.hostel || ''}</p>
@@ -130,7 +130,7 @@ export default function WardenDashboard() {
       </div>
 
       {/* Filters and Search */}
-      <div className="mt-6 bg-white rounded-xl shadow p-4">
+      <div className="mt-6 bg-white rounded-2xl shadow ring-1 ring-gray-100 p-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px]">
             <input
@@ -138,14 +138,14 @@ export default function WardenDashboard() {
               placeholder="Search by name, roll no, or room..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
             />
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setFilterStatus('all')}
               className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                filterStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterStatus === 'all' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               All ({allStudents.length})
@@ -161,7 +161,7 @@ export default function WardenDashboard() {
             <button
               onClick={() => setFilterStatus('late')}
               className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                filterStatus === 'late' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterStatus === 'late' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               Late ({metrics.late})
@@ -179,7 +179,7 @@ export default function WardenDashboard() {
       </div>
 
       {/* Attendance Table */}
-      <div className="mt-6 bg-white rounded-xl shadow overflow-hidden">
+      <div className="mt-6 bg-white rounded-2xl shadow ring-1 ring-gray-100 overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <div>
             <h2 className="font-semibold text-lg">Attendance for {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h2>
@@ -188,11 +188,11 @@ export default function WardenDashboard() {
           <div className="flex gap-3">
             <button
               onClick={exportToCSV}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+              className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 text-sm font-medium flex items-center gap-2"
             >
               📥 Export CSV
             </button>
-            <Link to="/warden/students" className="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium">
+            <Link to="/warden/students" className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium">
               Manage Students →
             </Link>
           </div>
@@ -224,9 +224,9 @@ export default function WardenDashboard() {
                     <td className="px-6 py-4">
                       {student.status ? (
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          student.status === 'Marked' ? 'bg-green-100 text-green-700' :
-                          student.status === 'Late' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                          student.status === 'Marked' ? 'bg-emerald-100 text-emerald-700' :
+                          student.status === 'Late' ? 'bg-amber-100 text-amber-700' :
+                          'bg-rose-100 text-rose-700'
                         }`}>
                           {student.status}
                         </span>
