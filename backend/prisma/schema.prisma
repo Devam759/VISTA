@@ -27,7 +27,6 @@ model Room {
   roomNo   String  @map("room_no") @db.VarChar(10)
   hostelId Int     @map("hostel_id")
   hostel   Hostel  @relation(fields: [hostelId], references: [id], onDelete: Cascade)
-  isAC     Boolean @default(false) @map("is_ac")
   students Student[]
 
   @@map("rooms")

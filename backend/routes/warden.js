@@ -4,8 +4,7 @@ import {
   getHostelAttendance,
   getAllAttendance,
   overrideAttendance,
-  getStudentsList,
-  importStudentsMetaFromCsv
+  getStudentsList
 } from '../controllers/wardenController.js';
 
 const router = express.Router();
@@ -25,8 +24,5 @@ router.put('/attendance/override', overrideAttendance);
 
 // Get students list in warden's hostel
 router.get('/students', getStudentsList);
-
-// Import students meta (AC/NAC, Reg No.) from a CSV URL for this warden's hostel
-router.post('/import-students-meta', importStudentsMetaFromCsv);
 
 export default router;

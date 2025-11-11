@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { apiFetch } from '../../utils/api.js'
 
 export default function Students() {
   const { token } = useAuth()
+  const navigate = useNavigate()
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -86,13 +88,13 @@ export default function Students() {
   }
 
   function exportCurrentPageToCsv() {
-    const headers = ['Roll No', 'Registration No', 'Name', 'Room', 'Room Type', 'Status']
+    const headers = ['Roll No', 'Registration No', 'Name', 'Mobile', 'Room', 'Status']
     const rows = pageRows.map(r => [
       r.rollNo || '',
       r.regNo || '',
       r.name || '',
+      r.mobile || '',
       (r.room?.roomNo || r.roomNo || ''),
-      (r.room?.isAC ? 'AC' : 'Non AC'),
       r.status || ''
     ])
     const esc = (v) => {
@@ -111,37 +113,25 @@ export default function Students() {
     URL.revokeObjectURL(url)
   }
 
-  async function importFromCsvUrl() {
-    const csvUrl = window.prompt('Enter public CSV URL to import (AC/NAC, Reg No.):')
-    if (!csvUrl) return
-    try {
-      await apiFetch('/warden/import-students-meta', { method: 'POST', token, body: { csvUrl } })
-      alert('Import completed. Refreshing list...')
-      // reload
-      setLoading(true)
-      const data = await apiFetch('/warden/students', { token })
-      setStudents(Array.isArray(data) ? data : [])
-    } catch (e) {
-      alert(e.message || 'Import failed')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Import from CSV (AC/NAC) removed
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex items-start justify-between gap-4">
-        <div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            Back
+          </button>
           <h1 className="text-2xl font-semibold text-gray-900">Hostel Students</h1>
-          <div className="mt-1 flex items-center gap-2 flex-wrap">
-            <p className="text-sm text-gray-500">View and manage students in your hostel</p>
-            {hostelBadges.map(h => (
-              <span key={h} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 ring-1 ring-gray-200">
-                {h}
-              </span>
-            ))}
-          </div>
         </div>
+        
         <div className="mt-1 text-sm text-gray-600 whitespace-nowrap">{totalCount} students</div>
       </div>
 
@@ -187,31 +177,46 @@ export default function Students() {
           >
             Absent
           </button>
-          <div className="hidden sm:flex sm:ml-2 items-center gap-2">
-            <button onClick={exportCurrentPageToCsv} className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium">Export CSV</button>
-            <button onClick={importFromCsvUrl} className="px-3 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 text-sm font-medium">Import from CSV</button>
-            <button onClick={() => setCompact(c => !c)} className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium" title="Toggle density">
-              {compact ? 'Comfortable' : 'Compact'}
-            </button>
-          </div>
+          
         </div>
         </div>
 
         {/* Second row: Advanced filters */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <label className="text-sm text-gray-600">Hostel</label>
-            <select
-              value={hostelFilter}
-              onChange={(e) => setHostelFilter(e.target.value)}
-              className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
-            >
-              <option value="all">All</option>
-              <option value="bh-1">BH-1</option>
-              <option value="bh-2">BH-2</option>
-              <option value="gh-1">GH-1</option>
-              <option value="gh-2">GH-2</option>
-            </select>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setHostelFilter('all')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium ${hostelFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setHostelFilter('bh-1')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium ${hostelFilter === 'bh-1' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                BH-1
+              </button>
+              <button
+                onClick={() => setHostelFilter('bh-2')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium ${hostelFilter === 'bh-2' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                BH-2
+              </button>
+              <button
+                onClick={() => setHostelFilter('gh-1')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium ${hostelFilter === 'gh-1' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                GH-1
+              </button>
+              <button
+                onClick={() => setHostelFilter('gh-2')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium ${hostelFilter === 'gh-2' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                GH-2
+              </button>
+            </div>
           </div>
 
           <div className="sm:ml-auto">
@@ -222,10 +227,7 @@ export default function Students() {
             >
               Reset Filters
             </button>
-            <div className="sm:hidden mt-2 flex items-center gap-2">
-              <button onClick={exportCurrentPageToCsv} className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium">Export CSV</button>
-              <button onClick={importFromCsvUrl} className="flex-1 px-3 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 text-sm font-medium">Import CSV</button>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -241,7 +243,7 @@ export default function Students() {
             <col className="w-[12rem]" />
             <col className="w-[14rem]" />
             <col />
-            <col className="w-[10rem]" />
+            <col className="w-[12rem]" />
             <col className="w-[10rem]" />
             <col className="w-[10rem]" />
           </colgroup>
@@ -258,12 +260,12 @@ export default function Students() {
                   Name {sortBy === 'name' && <span className="text-gray-400">{sortDir === 'asc' ? '▲' : '▼'}</span>}
                 </button>
               </th>
+              <th className="px-4 py-3 font-semibold text-left">Mobile</th>
               <th className="px-4 py-3 font-semibold text-left">
                 <button onClick={() => toggleSort('room')} className="flex items-center gap-1">
                   Room {sortBy === 'room' && <span className="text-gray-400">{sortDir === 'asc' ? '▲' : '▼'}</span>}
                 </button>
               </th>
-              <th className="px-4 py-3 font-semibold text-left">Room Type</th>
               <th className="px-4 py-3 font-semibold text-left">Status</th>
             </tr>
           </thead>
@@ -313,12 +315,8 @@ export default function Students() {
                     <td className={`px-4 ${compact ? 'py-2' : 'py-3'} text-sm text-gray-700`}>
                       <span title={r.name} className="inline-block max-w-[18rem] truncate align-middle">{r.name}</span>
                     </td>
+                    <td className={`px-4 ${compact ? 'py-2' : 'py-3'} text-sm text-gray-700 font-mono`}>{r.mobile || '—'}</td>
                     <td className={`px-4 ${compact ? 'py-2' : 'py-3'} text-sm text-gray-700 font-mono`}>{r.room?.roomNo || r.roomNo || '—'}</td>
-                    <td className={`px-4 ${compact ? 'py-2' : 'py-3'}`}>
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ring-1 ring-inset ${isAC ? 'bg-blue-50 text-blue-700 ring-blue-200' : 'bg-gray-50 text-gray-700 ring-gray-200'}`}>
-                        {isAC ? 'AC' : 'Non AC'}
-                      </span>
-                    </td>
                     <td className={`px-4 ${compact ? 'py-2' : 'py-3'}`}>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 ring-inset ${badgeClass}`}>
                         <span className={`inline-block w-1.5 h-1.5 rounded-full ${dotClass}`}></span>

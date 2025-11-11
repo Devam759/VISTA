@@ -19,22 +19,40 @@ export default function WardenDashboard() {
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const today = new Date()
+  const [now, setNow] = useState(new Date())
+
+  // Live clock
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     let active = true
-    ;(async () => {
+    async function load(showLoading = false) {
       try {
-        setLoading(true)
+        if (showLoading) setLoading(true)
         const data = await apiFetch(`/warden/attendance/hostel?date=${selectedDate}`, { token })
         if (active) setAttendanceData(data)
       } catch (e) {
         console.error('Failed to load attendance:', e)
       } finally {
-        if (active) setLoading(false)
+        if (showLoading && active) setLoading(false)
       }
-    })()
-    return () => { active = false }
+    }
+
+    // initial load with loading state
+    load(true)
+
+    // live refresh every 10 seconds without toggling loading
+    const intervalId = setInterval(() => {
+      load(false)
+    }, 10000)
+
+    return () => {
+      active = false
+      clearInterval(intervalId)
+    }
   }, [selectedDate, token])
 
   const metrics = attendanceData?.metrics || { present: 0, late: 0, absent: 0, total: 0 }
@@ -56,14 +74,13 @@ export default function WardenDashboard() {
   })
 
   const exportToCSV = () => {
-    const headers = ['Roll No', 'Name', 'Room', 'Status', 'Time', 'Face Verified']
+    const headers = ['Roll No', 'Name', 'Room', 'Status', 'Time']
     const rows = allStudents.map(s => [
       s.rollNo,
       s.name,
       s.roomNo,
       s.status || 'Absent',
-      s.time ? new Date(s.time).toLocaleTimeString() : '-',
-      s.faceVerified ? 'Yes' : 'No'
+      s.time ? new Date(s.time).toLocaleTimeString() : '-'
     ])
     
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n')
@@ -80,7 +97,7 @@ export default function WardenDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Warden Dashboard</h1>
-          <p className="text-xs text-gray-500 mt-1">{user?.hostel} • {getDayName(today)}, {today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <p className="text-xs text-gray-500 mt-1">{user?.hostel} • {getDayName(now)}, {now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
         </div>
         <button onClick={logout} className="px-3 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Logout</button>
       </div>
@@ -135,7 +152,7 @@ export default function WardenDashboard() {
           <div className="flex-1 min-w-[200px]">
             <input
               type="text"
-              placeholder="Search by name, roll no, or room..."
+              placeholder="Search by Name, Roll No, or Room No."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
@@ -212,7 +229,7 @@ export default function WardenDashboard() {
                   <th className="px-6 py-3 text-left font-medium">Room</th>
                   <th className="px-6 py-3 text-left font-medium">Status</th>
                   <th className="px-6 py-3 text-left font-medium">Time</th>
-                  <th className="px-6 py-3 text-left font-medium">Face Verified</th>
+                  
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -236,15 +253,6 @@ export default function WardenDashboard() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {student.time ? new Date(student.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
-                    </td>
-                    <td className="px-6 py-4">
-                      {student.faceVerified ? (
-                        <span className="text-green-600 text-sm">✓ Yes</span>
-                      ) : student.status ? (
-                        <span className="text-red-600 text-sm">✗ No</span>
-                      ) : (
-                        <span className="text-gray-400 text-sm">-</span>
-                      )}
                     </td>
                   </tr>
                 ))}

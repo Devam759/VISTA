@@ -24,6 +24,7 @@ export default function MarkAttendance() {
   const [camOn, setCamOn] = useState(false)
   const [coords, setCoords] = useState({ lat: null, lng: null })
   const [submitting, setSubmitting] = useState(false)
+  const [desktopBlocked, setDesktopBlocked] = useState(false)
 
   const time = useMemo(() => withinWindow(now), [now])
 
@@ -34,6 +35,13 @@ export default function MarkAttendance() {
 
   useEffect(() => {
     ;(async () => {
+      const ua = (navigator.userAgent || '').toLowerCase()
+      const isMobile = /(android|iphone|ipad|ipod|mobile)/i.test(ua)
+      if (!isMobile) {
+        setDesktopBlocked(true)
+        setLocOk(false)
+        return
+      }
       const g = await verifyInsideCampus()
       setLocOk(!!g.ok)
     })()
@@ -61,6 +69,10 @@ export default function MarkAttendance() {
   }, [img])
 
   const markAttendance = async () => {
+    if (desktopBlocked) {
+      push('Attendance marking is restricted to mobile devices.', 'error')
+      return
+    }
     if (!locOk) {
       push('Verification failed. Please ensure you are on campus.', 'error')
       return
@@ -100,20 +112,12 @@ export default function MarkAttendance() {
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-lg text-gray-900">Face Verification</h2>
-            {!camOn && !img && (
+            {!camOn && !img && !desktopBlocked && (
               <button 
                 onClick={() => setCamOn(true)} 
                 className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md"
               >
                 Start Camera
-              </button>
-            )}
-            {camOn && (
-              <button 
-                onClick={() => setCamOn(false)} 
-                className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-all"
-              >
-                Stop Camera
               </button>
             )}
           </div>
