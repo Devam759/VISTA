@@ -72,10 +72,7 @@ export default function MarkAttendance() {
       push('Verification failed. Please ensure you are on campus and connected to college WiFi.', 'error')
       return
     }
-    if (!time.allowed && !time.isLateWindow) {
-      push('Attendance window closed. Available 10:00 PM - 11:00 PM', 'error')
-      return
-    }
+    // Time window check disabled for development
     try {
       setSubmitting(true)
       const body = {
@@ -86,7 +83,11 @@ export default function MarkAttendance() {
       }
       const data = await apiFetch('/attendance/mark', { method: 'POST', body, token })
       const status = time.allowed ? 'On Time' : 'Late'
-      push(data?.message || `Attendance marked successfully (${status})`, 'success')
+      
+      // Display detailed accuracy information
+      const accuracyMsg = data?.accuracy ? ` (${data.accuracy.status} - ${data.accuracy.percentage}% match)` : ''
+      push(`${data?.message || 'Attendance marked successfully'}${accuracyMsg}`, 'success')
+      
       // Disable camera after successful submission
       setCamOn(false)
     } catch (err) {

@@ -16,7 +16,8 @@
     "prisma:studio": "prisma studio",
     "prisma:setup-migrations": "node scripts/createPrismaMigrationsTable.js",
     "prisma:resolve-migrations": "node scripts/resolveFailedMigration.js",
-    "import:csv": "node scripts/importCSV.js"
+    "import:csv": "node scripts/importCSV.js",
+    "setup:face": "node scripts/setupFaceRecognition.js"
   },
   "keywords": [
     "attendance",

@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/student.js';
 import wardenRoutes from './routes/warden.js';
 import seedRoutes from './routes/seed.js';
+import faceRoutes from './routes/face.js';
 import seedDatabase from './scripts/seedDatabase.js';
 
 dotenv.config();
@@ -189,6 +190,7 @@ app.post('/debug/geolocation', async (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/attendance', studentRoutes);
 app.use('/warden', wardenRoutes);
+app.use('/face', faceRoutes); // Face recognition endpoints
 app.use('/api', seedRoutes); // Seed endpoint at /api/seed
 
 // Health check
