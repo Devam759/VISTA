@@ -11,7 +11,7 @@ const getApiBaseUrl = () => {
   }
   
   // Default to production
-  return 'https://vista-ia7c.onrender.com'
+  return 'https://vista-ia7c.onrender.com'  // Backend Render URL
 }
 
 // Make it a getter function to always evaluate at runtime
