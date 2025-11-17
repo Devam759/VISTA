@@ -53,6 +53,11 @@ export const verifyGeoFence = async (req, res, next) => {
     const lng = parseFloat(longitude);
     const accuracy = req.body.accuracy ? parseFloat(req.body.accuracy) : null;
 
+    // Validate coordinates
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ error: 'Invalid coordinates provided' });
+    }
+
     // Get campus polygon (cached for performance)
     const polygon = await getCampusPolygon();
 

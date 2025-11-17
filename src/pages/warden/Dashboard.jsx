@@ -23,7 +23,9 @@ export default function WardenDashboard() {
 
   useEffect(() => {
     let active = true
-    ;(async () => {
+    let interval
+    
+    const fetchAttendanceData = async () => {
       try {
         setLoading(true)
         const data = await apiFetch(`/warden/attendance/hostel?date=${selectedDate}`, { token })
@@ -33,8 +35,18 @@ export default function WardenDashboard() {
       } finally {
         if (active) setLoading(false)
       }
-    })()
-    return () => { active = false }
+    }
+    
+    // Fetch immediately
+    fetchAttendanceData()
+    
+    // Refresh every 5 seconds to show updated attendance
+    interval = setInterval(fetchAttendanceData, 5000)
+    
+    return () => { 
+      active = false
+      if (interval) clearInterval(interval)
+    }
   }, [selectedDate, token])
 
   const metrics = attendanceData?.metrics || { present: 0, late: 0, absent: 0, total: 0 }
@@ -192,6 +204,9 @@ export default function WardenDashboard() {
             >
               📥 Export CSV
             </button>
+            <Link to="/warden/face-data" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium">
+              👤 Face Data
+            </Link>
             <Link to="/warden/students" className="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium">
               Manage Students →
             </Link>

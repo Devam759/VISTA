@@ -12,6 +12,7 @@ export default function CheckAccess() {
   const [geoDetails, setGeoDetails] = useState('')
   const [wifiDetails, setWifiDetails] = useState('')
   const [error, setError] = useState('')
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
   const runChecks = async () => {
     setLoading(true)
@@ -48,8 +49,23 @@ export default function CheckAccess() {
     }
   }
 
+  const bypassChecks = () => {
+    setLocOk(true)
+    setWifiOk(true)
+    setGeoDetails('✅ Development Mode: Bypassed')
+    setWifiDetails('✅ Development Mode: Bypassed')
+    setError('')
+    setLoading(false)
+    setTimeout(() => navigate('/login', { replace: true }), 500)
+  }
+
   useEffect(() => {
-    runChecks()
+    // Auto-bypass geolocation checks in development
+    if (isDev) {
+      bypassChecks()
+    } else {
+      runChecks()
+    }
   }, [])
 
   return (
@@ -105,7 +121,7 @@ export default function CheckAccess() {
                 {error.includes('backend') || error.includes('server') ? (
                   <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
                     <strong>🔧 Backend Connection Issue:</strong>
-                    <p className="mt-1 text-xs">Make sure the backend server is running on http://localhost:5000</p>
+                    <p className="mt-1 text-xs">Make sure the backend server is running on http://localhost:4000</p>
                     <p className="text-xs">Run: <code className="bg-gray-100 px-1 rounded">cd backend && npm start</code></p>
                   </div>
                 ) : null}
@@ -113,12 +129,22 @@ export default function CheckAccess() {
             )}
             
             {!(locOk && wifiOk) && (
-              <button 
-                onClick={runChecks} 
-                className="w-full mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors font-medium"
-              >
-                🔄 Retry Verification
-              </button>
+              <div className="space-y-2">
+                <button 
+                  onClick={runChecks} 
+                  className="w-full mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors font-medium"
+                >
+                  🔄 Retry Verification
+                </button>
+                {isDev && (
+                  <button 
+                    onClick={bypassChecks} 
+                    className="w-full px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors font-medium text-sm"
+                  >
+                    ⚡ Dev Mode: Bypass Checks
+                  </button>
+                )}
+              </div>
             )}
             {(locOk && wifiOk) && (
               <button 

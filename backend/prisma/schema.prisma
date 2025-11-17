@@ -33,7 +33,8 @@ model Room {
 model Student {
   id         Int          @id @default(autoincrement())
   name       String       @db.VarChar(100)
-  rollNo     String       @unique @map("roll_no") @db.VarChar(30)
+  rollNo     String?      @map("roll_no") @db.VarChar(30)
+  regNo      String?      @map("reg_no") @db.VarChar(30)
   roomNo     String       @map("room_no") @db.VarChar(10)
   hostelId   Int          @map("hostel_id")
   program    String       @db.VarChar(80)
@@ -41,10 +42,11 @@ model Student {
   address    String       @db.Text
   email      String       @unique @db.VarChar(120)
   password   String       @db.VarChar(255)
-  faceIdUrl  String?      @map("face_id_url") @db.Text
-  hostel     Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
-  attendance Attendance[]
-  createdAt  DateTime     @default(now()) @map("created_at")
+  faceIdUrl      String?      @map("face_id_url") @db.Text
+  faceDescriptor String?      @map("face_descriptor") @db.Text
+  hostel         Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  attendance     Attendance[]
+  createdAt      DateTime     @default(now()) @map("created_at")
 
   @@map("students")
   @@index([hostelId])

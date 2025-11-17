@@ -3,12 +3,19 @@ import { verifyInsideCampus } from '../utils/geoCheck.js'
 import { verifyJKLUWifi } from '../utils/wifiCheck.js'
 
 export default function AccessGate({ children }) {
-  const [checking, setChecking] = useState(true)
-  const [geoOk, setGeoOk] = useState(false)
-  const [wifiOk, setWifiOk] = useState(false)
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const [checking, setChecking] = useState(!isDev)
+  const [geoOk, setGeoOk] = useState(isDev)
+  const [wifiOk, setWifiOk] = useState(isDev)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    // Skip checks in development mode
+    if (isDev) {
+      setChecking(false)
+      return
+    }
+    
     checkAccess()
     // Re-check every 5 minutes
     const interval = setInterval(checkAccess, 5 * 60 * 1000)

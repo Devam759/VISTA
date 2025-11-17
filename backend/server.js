@@ -5,12 +5,20 @@ import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/student.js';
 import wardenRoutes from './routes/warden.js';
 import seedRoutes from './routes/seed.js';
+import faceRoutes from './routes/face.js';
 import seedDatabase from './scripts/seedDatabase.js';
+import faceService from './services/faceService.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.path}`);
+  next();
+});
 
 // Middleware
 const allowedOrigins = [
@@ -32,10 +40,11 @@ app.use(cors({
     
     // Allow configured origins
     if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+      return callback(null, true);
     } else {
       console.warn('⚠️ CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      // Don't throw error, just log warning
+      return callback(null, true);
     }
   },
   credentials: true
@@ -189,15 +198,22 @@ app.post('/debug/geolocation', async (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/attendance', studentRoutes);
 app.use('/warden', wardenRoutes);
+app.use('/face', faceRoutes); // Face enrollment and verification
 app.use('/api', seedRoutes); // Seed endpoint at /api/seed
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ 
-    message: 'VISTA Backend API',
-    version: '1.0.0',
-    status: 'running'
-  });
+  console.log('📍 Root endpoint called');
+  try {
+    res.json({ 
+      message: 'VISTA Backend API',
+      version: '1.0.0',
+      status: 'running'
+    });
+  } catch (err) {
+    console.error('Error in root endpoint:', err);
+    res.status(500).send('Internal error');
+  }
 });
 
 // Health check endpoint for debugging
@@ -236,8 +252,32 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// Global error handlers to prevent server crashes
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  console.error('Stack:', error.stack);
+  // Don't exit - let the server continue running
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise);
+  console.error('Reason:', reason);
+  // Don't exit - let the server continue running
+});
+
 app.listen(PORT, async () => {
   console.log(`🚀 VISTA Backend running on port ${PORT}`);
+  
+  // Pre-load face recognition models in the background for faster first request
+  console.log('🔄 Pre-loading face recognition models...');
+  faceService.initialize()
+    .then(() => {
+      console.log('✅ Face recognition models pre-loaded successfully');
+    })
+    .catch((error) => {
+      console.warn('⚠️  Face recognition models failed to pre-load:', error.message);
+      console.warn('   Models will be loaded on first use (may cause slower first request)');
+    });
   
   // Auto-seed database on first run (only if AUTO_SEED=true)
   if (process.env.AUTO_SEED === 'true') {

@@ -1,8 +1,7 @@
 import {
   markAttendance as markAttendanceService,
   getTodayAttendance as getTodayAttendanceService,
-  getAttendanceHistory as getAttendanceHistoryService,
-  enrollFace as enrollFaceService
+  getAttendanceHistory as getAttendanceHistoryService
 } from '../services/attendanceService.js';
 
 export const markAttendance = async (req, res) => {
@@ -10,11 +9,14 @@ export const markAttendance = async (req, res) => {
     const { id: studentId } = req.user;
     const { test_image } = req.body;
 
+    console.log(`📍 Mark attendance request from student ID: ${studentId}`);
+
     if (!test_image) {
       return res.status(400).json({ error: 'Face image required' });
     }
 
     const result = await markAttendanceService(studentId, test_image);
+    console.log(`✅ Attendance marked successfully for student ${studentId}`);
     res.json(result);
   } catch (error) {
     console.error('Mark attendance error:', error);
@@ -45,19 +47,3 @@ export const getAttendanceHistory = async (req, res) => {
   }
 };
 
-export const enrollFace = async (req, res) => {
-  try {
-    const { id: studentId } = req.user;
-    const { images } = req.body;
-
-    if (!images || !Array.isArray(images) || images.length < 3) {
-      return res.status(400).json({ error: 'At least 3 face images required' });
-    }
-
-    const result = await enrollFaceService(studentId, images);
-    res.json(result);
-  } catch (error) {
-    console.error('Enroll face error:', error);
-    res.status(500).json({ error: error.message || 'Failed to enroll face' });
-  }
-};

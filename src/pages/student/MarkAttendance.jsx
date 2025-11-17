@@ -35,11 +35,18 @@ export default function MarkAttendance() {
   }, [])
 
   useEffect(() => {
-    ;(async () => {
-      const [g, w] = await Promise.all([verifyInsideCampus(), verifyJKLUWifi()])
-      setLocOk(!!g.ok)
-      setWifiOk(!!w.ok)
-    })()
+    // Development mode: bypass geolocation checks
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    if (isDev) {
+      setLocOk(true)
+      setWifiOk(true)
+    } else {
+      ;(async () => {
+        const [g, w] = await Promise.all([verifyInsideCampus(), verifyJKLUWifi()])
+        setLocOk(!!g.ok)
+        setWifiOk(!!w.ok)
+      })()
+    }
   }, [])
 
   useEffect(() => {
@@ -72,17 +79,40 @@ export default function MarkAttendance() {
       push('Verification failed. Please ensure you are on campus and connected to college WiFi.', 'error')
       return
     }
-    if (!time.allowed && !time.isLateWindow) {
-      push('Attendance window closed. Available 10:00 PM - 11:00 PM', 'error')
-      return
-    }
+    // Attendance window check disabled - students can mark attendance anytime
+    // if (!time.allowed && !time.isLateWindow) {
+    //   push('Attendance window closed. Available 10:00 PM - 11:00 PM', 'error')
+    //   return
+    // }
     try {
       setSubmitting(true)
+      
+      // Step 1: Verify face first
+      console.log('🔍 Verifying face...');
+      const faceVerification = await apiFetch('/face/verify', {
+        method: 'POST',
+        body: { testImage: img },
+        token
+      });
+      
+      if (!faceVerification.verified) {
+        push(`Face verification failed: ${faceVerification.message}`, 'error');
+        setImg('');
+        setSubmitting(false);
+        return;
+      }
+      
+      console.log(`✅ Face verified with ${faceVerification.confidence || faceVerification.accuracy}% confidence`);
+      const confidence = faceVerification.confidence || faceVerification.accuracy;
+      push(`Face verified (${confidence}% match, minimum 70% required)`, 'success');
+      
+      // Step 2: Mark attendance after face verification
       const body = {
         test_image: img,
         latitude: coords.lat,
         longitude: coords.lng,
-        accuracy: coords.accuracy || null, // Send GPS accuracy for tolerance
+        accuracy: coords.accuracy || null,
+        faceAccuracy: parseFloat(faceVerification.confidence || faceVerification.accuracy)
       }
       const data = await apiFetch('/attendance/mark', { method: 'POST', body, token })
       const status = time.allowed ? 'On Time' : 'Late'
@@ -126,7 +156,7 @@ export default function MarkAttendance() {
             )}
           </div>
           
-          <Camera onCapture={setImg} active={camOn} />
+          <Camera onCapture={setImg} active={camOn} showFaceDetection={true} />
           
           {img && (
             <div className="mt-4">

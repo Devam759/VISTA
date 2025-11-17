@@ -14,6 +14,8 @@ export const getHostelAttendance = async (wardenId, date) => {
   const targetDate = date ? new Date(date) : new Date();
   targetDate.setHours(0, 0, 0, 0);
 
+  console.log(`📊 Fetching attendance for warden hostel ${warden.hostel.name} (ID: ${warden.hostelId}) on ${targetDate.toISOString().split('T')[0]}`);
+
   // Get all students in this hostel with their attendance status
   const students = await prisma.student.findMany({
     where: { hostelId: warden.hostelId },
@@ -25,6 +27,15 @@ export const getHostelAttendance = async (wardenId, date) => {
       hostel: { select: { name: true } }
     },
     orderBy: [{ roomNo: 'asc' }, { rollNo: 'asc' }]
+  });
+
+  console.log(`📊 Found ${students.length} students in hostel`);
+  
+  // Log students with attendance
+  const attendedStudents = students.filter(s => s.attendance.length > 0);
+  console.log(`📊 Students with attendance records: ${attendedStudents.length}`);
+  attendedStudents.forEach(s => {
+    console.log(`   - ${s.rollNo} ${s.name}: ${s.attendance[0].status}`);
   });
 
   // Format response
@@ -46,6 +57,8 @@ export const getHostelAttendance = async (wardenId, date) => {
     absent: formattedStudents.filter(s => !s.status).length,
     total: formattedStudents.length
   };
+
+  console.log(`📊 Attendance metrics: Present=${metrics.present}, Late=${metrics.late}, Absent=${metrics.absent}`);
 
   return {
     date: targetDate.toISOString().split('T')[0],

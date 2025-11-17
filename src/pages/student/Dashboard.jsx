@@ -23,7 +23,9 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     let active = true
-    ;(async () => {
+    let interval
+    
+    const fetchTodayStatus = async () => {
       try {
         const data = await apiFetch('/attendance/today', { token })
         const status = data?.status || 'NOT_MARKED'
@@ -31,8 +33,18 @@ export default function StudentDashboard() {
       } catch (e) {
         if (active) setTodayStatus('NOT_MARKED')
       }
-    })()
-    return () => { active = false }
+    }
+    
+    // Fetch immediately
+    fetchTodayStatus()
+    
+    // Refresh every 5 seconds to show updated attendance
+    interval = setInterval(fetchTodayStatus, 5000)
+    
+    return () => { 
+      active = false
+      if (interval) clearInterval(interval)
+    }
   }, [token])
 
   useEffect(() => {
@@ -189,9 +201,9 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <span className="text-gray-600">🎭 Face Status</span>
               <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                user?.faceIdUrl ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                (user?.faceIdUrl || user?.faceDescriptor) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
               }`}>
-                {user?.faceIdUrl ? '✓ Enrolled' : '✗ Not Enrolled'}
+                {(user?.faceIdUrl || user?.faceDescriptor) ? '✓ Enrolled' : '✗ Not Enrolled'}
               </span>
             </div>
           </div>
@@ -199,7 +211,7 @@ export default function StudentDashboard() {
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            {!user?.faceIdUrl && (
+            {!(user?.faceIdUrl || user?.faceDescriptor) && (
               <Link to="/student/enroll-face" className="block w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 text-center font-medium shadow-md">
                 🎭 Enroll Face (Required)
               </Link>
@@ -210,7 +222,7 @@ export default function StudentDashboard() {
             <Link to="/student/history" className="block w-full px-4 py-3 border-2 border-gray-200 rounded-lg hover:bg-gray-50 text-center font-medium">
               📊 View Full History
             </Link>
-            {user?.faceIdUrl && (
+            {(user?.faceIdUrl || user?.faceDescriptor) && (
               <Link to="/student/enroll-face" className="block w-full px-4 py-3 border-2 border-purple-200 text-purple-600 rounded-lg hover:bg-purple-50 text-center font-medium">
                 🔄 Re-enroll Face
               </Link>

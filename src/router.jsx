@@ -8,6 +8,7 @@ import EnrollFace from './pages/student/EnrollFace.jsx'
 import History from './pages/student/History.jsx'
 import WardenDashboard from './pages/warden/Dashboard.jsx'
 import Students from './pages/warden/Students.jsx'
+import FaceData from './pages/warden/FaceData.jsx'
 import AccessGate from './components/AccessGate.jsx'
 import { useAuth } from './context/AuthContext.jsx'
 
@@ -76,6 +77,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute role="warden">
             <Students />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/warden/face-data"
+        element={
+          <ProtectedRoute role="warden">
+            <FaceData />
           </ProtectedRoute>
         }
       />

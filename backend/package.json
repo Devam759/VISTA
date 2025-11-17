@@ -16,7 +16,8 @@
     "prisma:studio": "prisma studio",
     "prisma:setup-migrations": "node scripts/createPrismaMigrationsTable.js",
     "prisma:resolve-migrations": "node scripts/resolveFailedMigration.js",
-    "import:csv": "node scripts/importCSV.js"
+    "import:csv": "node scripts/importCSV.js",
+    "download:models": "node scripts/downloadFaceModels.js"
   },
   "keywords": [
     "attendance",
@@ -27,11 +28,14 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.7.1",
+    "@tensorflow/tfjs": "^4.22.0",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
+    "canvas": "^3.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
+    "face-api.js": "^0.22.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.5"
   },

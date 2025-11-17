@@ -174,14 +174,20 @@ export default function Login() {
             {showTestCreds && (
               <div className="mt-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl text-sm space-y-3">
                 <div>
-                  <p className="font-semibold text-indigo-900 mb-1">Student Account</p>
-                  <p className="text-indigo-700 font-mono text-xs">btech250231@jklu.edu.in</p>
+                  <p className="font-semibold text-indigo-900 mb-1">Student Account (from CSV)</p>
+                  <p className="text-indigo-700 font-mono text-xs break-all">btech250231@jklu.edu.in</p>
                   <p className="text-indigo-600 font-mono text-xs">Password: 123</p>
+                  <p className="text-indigo-500 text-xs mt-1">Or any student email from the imported CSV</p>
                 </div>
                 <div className="border-t border-indigo-200 pt-3">
                   <p className="font-semibold text-purple-900 mb-1">Warden Account</p>
                   <p className="text-purple-700 font-mono text-xs">warden@jklu.edu.in</p>
                   <p className="text-purple-600 font-mono text-xs">Password: 123</p>
+                </div>
+                <div className="border-t border-indigo-200 pt-3 bg-yellow-50 rounded p-2">
+                  <p className="text-xs text-yellow-800">
+                    <strong>Note:</strong> All passwords are <code className="bg-yellow-100 px-1 rounded">123</code>
+                  </p>
                 </div>
               </div>
             )}

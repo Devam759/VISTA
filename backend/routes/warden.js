@@ -4,7 +4,8 @@ import {
   getHostelAttendance,
   getAllAttendance,
   overrideAttendance,
-  getStudentsList
+  getStudentsList,
+  getFaceData
 } from '../controllers/wardenController.js';
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.put('/attendance/override', overrideAttendance);
 
 // Get students list in warden's hostel
 router.get('/students', getStudentsList);
+
+// Get face enrollment data for all students
+router.get('/face-data', getFaceData);
 
 export default router;

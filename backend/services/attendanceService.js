@@ -1,5 +1,5 @@
-import axios from 'axios';
 import prisma from '../config/prisma.js';
+import faceService from './faceService.js';
 
 // Check if current time is within attendance window
 function checkTimeWindow() {
@@ -21,131 +21,129 @@ function checkTimeWindow() {
   }
 }
 
-// Enroll face for a student
-export const enrollFace = async (studentId, images) => {
-  // Get student
+/**
+ * Mark attendance for a student
+ * @param {number} studentId - Student ID
+ * @param {string} testImage - Base64 encoded face image
+ * @returns {Object} - Attendance result
+ */
+export const markAttendance = async (studentId, testImage) => {
+  // Time window check is disabled - students can mark anytime
+  // const timeCheck = checkTimeWindow();
+  // if (!timeCheck.allowed) {
+  //   throw new Error('Attendance window closed. Available 10:00 PM - 11:00 PM');
+  // }
+
+  // Get today's date
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Determine status based on current time (for record keeping)
+  const timeCheck = checkTimeWindow();
+  const status = timeCheck.status || 'Marked'; // Default to 'Marked' if outside window
+
+  // Get student info
   const student = await prisma.student.findUnique({
-    where: { id: studentId }
+    where: { id: studentId },
+    select: { 
+      faceDescriptor: true, 
+      rollNo: true, 
+      name: true,
+      hostelId: true
+    }
   });
 
   if (!student) {
     throw new Error('Student not found');
   }
 
-  // Store the first image as the primary face ID
-  // In production, you would:
-  // 1. Upload images to cloud storage (S3, Cloudinary, etc.)
-  // 2. Process with face recognition library
-  // 3. Store face embeddings/descriptors
-  // For now, we'll store the base64 image
-  const faceIdUrl = images[0]; // Store first image
-
-  // Update student with face data
-  await prisma.student.update({
-    where: { id: studentId },
-    data: { faceIdUrl }
-  });
-
-  console.log(`✅ Face enrolled for student ${student.rollNo}`);
-
-  return {
-    message: 'Face enrolled successfully',
-    success: true
-  };
-};
-
-export const markAttendance = async (studentId, testImage) => {
-  // Check time window
-  const timeCheck = checkTimeWindow();
-  if (!timeCheck.allowed) {
-    throw new Error('Attendance window closed');
-  }
-
-  // Check if already marked today
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const existing = await prisma.attendance.findFirst({
-    where: {
-      studentId,
-      date: today
-    }
-  });
-
-  if (existing) {
-    throw new Error('Attendance already marked for today');
-  }
-
-  // Retrieve stored face
-  const student = await prisma.student.findUnique({
-    where: { id: studentId },
-    select: { faceIdUrl: true, rollNo: true, name: true }
-  });
-
-  if (!student || !student.faceIdUrl) {
+  if (!student.faceDescriptor) {
     throw new Error('❌ Face not enrolled. Please enroll your face first from the dashboard.');
   }
 
   console.log(`🔍 Verifying face for student: ${student.rollNo} - ${student.name}`);
 
-  // Call face verification API
-  const faceApiUrl = process.env.FACE_API || 'http://localhost:8000/verify-face';
+  // Verify face using face-api.js (70% threshold)
   let faceVerified = false;
-  let similarity = 0;
+  let confidence = 0;
 
   try {
-    const response = await axios.post(faceApiUrl, {
-      stored_image: student.faceIdUrl,
-      test_image: testImage
-    }, {
-      timeout: 10000 // 10 second timeout
-    });
+    const verificationResult = await faceService.verifyFace(studentId, testImage);
+    faceVerified = verificationResult.isMatch && verificationResult.confidence >= 70;
+    confidence = verificationResult.confidence;
     
-    faceVerified = response.data?.verified || false;
-    similarity = response.data?.similarity || 0;
-    
-    console.log(`📊 Face match result: ${faceVerified ? '✅ MATCHED' : '❌ NOT MATCHED'} (Similarity: ${similarity}%)`);
-  } catch (err) {
-    console.error('❌ Face API error:', err.message);
-    // For development: allow if API is not available
-    console.log('⚠️ Face API unavailable, allowing for development');
-    faceVerified = true; // Remove this in production
+    console.log(`📊 Face match result: ${faceVerified ? '✅ MATCHED' : '❌ NOT MATCHED'} (Confidence: ${confidence}%)`);
+  } catch (error) {
+    console.error('❌ Face verification error:', error.message);
+    throw new Error(`Face verification failed: ${error.message}`);
   }
 
   if (!faceVerified) {
-    throw new Error('❌ Face verification failed. Your face does not match the enrolled image. Please try again.');
+    throw new Error(`❌ Face verification failed. Confidence: ${confidence.toFixed(2)}% (minimum 70% required). Please try again.`);
   }
 
-  console.log(`✅ Face verified successfully for ${student.rollNo}`);
+  console.log(`✅ Face verified successfully for ${student.rollNo} with ${confidence}% confidence`);
 
-  // Create attendance record
+  // Create or update attendance record (handle duplicates with upsert)
   const now = new Date();
-  const attendance = await prisma.attendance.create({
-    data: {
+  const attendance = await prisma.attendance.upsert({
+    where: {
+      studentId_date: {
+        studentId,
+        date: today
+      }
+    },
+    update: {
+      time: now,
+      status: timeCheck.status,
+      faceVerified: true
+    },
+    create: {
       studentId,
       date: today,
       time: now,
       status: timeCheck.status,
-      faceVerified
+      faceVerified: true
+    },
+    include: {
+      student: {
+        select: {
+          name: true,
+          rollNo: true
+        }
+      }
     }
   });
 
-  console.log(`✅ Attendance marked: ${student.rollNo} - ${student.name} - ${timeCheck.status}`);
+  const isUpdate = attendance.createdAt && (now.getTime() - new Date(attendance.createdAt).getTime()) < 1000;
+  const action = isUpdate ? 'updated' : 'marked';
+
+  console.log(`✅ Attendance ${action}: ${student.rollNo} - ${student.name} - ${timeCheck.status}`);
+  console.log(`   Attendance Record: ID=${attendance.id}, Date=${attendance.date}, Status=${attendance.status}, FaceVerified=${attendance.faceVerified}`);
 
   return {
-    message: `✅ Attendance marked successfully as ${timeCheck.status}!`,
+    message: `✅ Attendance ${action} successfully as ${timeCheck.status}!`,
     status: timeCheck.status,
     faceVerified: true,
+    confidence: parseFloat(confidence.toFixed(2)),
     student: {
       name: student.name,
       rollNo: student.rollNo
-    }
+    },
+    attendance
   };
 };
 
+/**
+ * Get today's attendance for a student
+ * @param {number} studentId - Student ID
+ * @returns {Object} - Today's attendance or NOT_MARKED
+ */
 export const getTodayAttendance = async (studentId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  console.log(`🔍 Checking attendance for student ${studentId} on ${today.toISOString().split('T')[0]}`);
 
   const attendance = await prisma.attendance.findFirst({
     where: {
@@ -155,12 +153,20 @@ export const getTodayAttendance = async (studentId) => {
   });
 
   if (!attendance) {
+    console.log(`   No attendance found - returning NOT_MARKED`);
     return { status: 'NOT_MARKED' };
   }
 
+  console.log(`   Attendance found: ${attendance.status}`);
   return attendance;
 };
 
+/**
+ * Get attendance history for a student
+ * @param {number} studentId - Student ID
+ * @param {number} limit - Number of records to return
+ * @returns {Array} - Attendance records
+ */
 export const getAttendanceHistory = async (studentId, limit = 30) => {
   const attendance = await prisma.attendance.findMany({
     where: { studentId },
