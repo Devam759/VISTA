@@ -151,6 +151,7 @@ async function importCSV() {
           update: {
             name: student.name,
             rollNo: student.rollNo,
+            regNo: student.regNo,
             roomNo: student.roomNo,
             program: student.program,
             mobile: student.mobile,
