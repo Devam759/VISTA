@@ -145,15 +145,26 @@ async function importCSV() {
 
     for (const student of students) {
       try {
-        await prisma.student.create({
-          data: student
+        // Use upsert to handle duplicates - update if exists, create if not
+        await prisma.student.upsert({
+          where: { email: student.email },
+          update: {
+            name: student.name,
+            rollNo: student.rollNo,
+            roomNo: student.roomNo,
+            program: student.program,
+            mobile: student.mobile,
+            address: student.address
+          },
+          create: student
         });
         imported++;
         if (imported % 10 === 0) {
           console.log(`   Imported ${imported}/${students.length}...`);
         }
       } catch (error) {
-        // Student might already exist (duplicate email or roll number)
+        // Log error for debugging
+        console.error(`   ⚠️ Error importing ${student.email}:`, error.message);
         skipped++;
       }
     }
