@@ -18,20 +18,41 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const login = async (email, password) => {
+  const login = async (email, password, coords) => {
     const em = (email || '').trim()
     const pass = (password || '').trim()
     if (!em || !pass) throw new Error('Enter credentials')
 
+    if (!coords || !coords.latitude || !coords.longitude) {
+      throw new Error('Location coordinates required')
+    }
+
+    const body = {
+      email: em,
+      password: pass,
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+    }
+
     let data
     try {
-      data = await apiFetch('/auth/student-login', { method: 'POST', body: { email: em, password: pass } })
+      data = await apiFetch('/auth/student-login', { method: 'POST', body })
     } catch (e1) {
-      data = await apiFetch('/auth/warden-login', { method: 'POST', body: { email: em, password: pass } })
+      // If student login fails, try warden login
+      try {
+        data = await apiFetch('/auth/warden-login', { method: 'POST', body })
+      } catch (e2) {
+        // Throw the most relevant error
+        // If the first error was a 401 (unauthorized), the second error is more specific
+        if (e1.status === 401 && e2.message) {
+          throw e2
+        }
+        throw e1 // Otherwise, throw the original student login error
+      }
     }
 
     const { token: tkn, role, user: u } = data || {}
-    if (!tkn || !u) throw new Error('Invalid response')
+    if (!tkn || !u) throw new Error('Invalid response from server')
     const auth = { token: tkn, role, user: { ...u, role } }
     localStorage.setItem('vista-auth', JSON.stringify(auth))
     setUser(auth.user)

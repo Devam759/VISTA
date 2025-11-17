@@ -94,7 +94,8 @@ async function importCSV() {
       
       students.push({
         name: studentName,
-        rollNo: rollNo || regNo || `TEMP-${Date.now()}-${Math.random()}`,
+        rollNo: rollNo || `TEMP-${Date.now()}-${Math.random()}`,
+        regNo: regNo || null,
         roomNo: roomNo,
         hostelId: hostel.id,
         program: program,
@@ -102,7 +103,8 @@ async function importCSV() {
         address: address || 'Not provided',
         email: email,
         password: await bcrypt.hash('123', 10), // Default password
-        faceIdUrl: null
+        faceIdUrl: null,
+        faceDescriptor: null
       });
     }
 
@@ -145,18 +147,28 @@ async function importCSV() {
 
     for (const student of students) {
       try {
+        // Prepare student data without undefined values
+        const studentData = {
+          name: student.name,
+          rollNo: student.rollNo,
+          regNo: student.regNo,
+          roomNo: student.roomNo,
+          program: student.program,
+          mobile: student.mobile,
+          address: student.address,
+          faceIdUrl: null,
+          faceDescriptor: null,
+          password: student.password,
+          hostelId: student.hostelId
+        };
+
+        // Remove undefined values
+        Object.keys(studentData).forEach(key => studentData[key] === undefined && delete studentData[key]);
+
         // Use upsert to handle duplicates - update if exists, create if not
         await prisma.student.upsert({
           where: { email: student.email },
-          update: {
-            name: student.name,
-            rollNo: student.rollNo,
-            regNo: student.regNo,
-            roomNo: student.roomNo,
-            program: student.program,
-            mobile: student.mobile,
-            address: student.address
-          },
+          update: studentData,
           create: student
         });
         imported++;

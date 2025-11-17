@@ -13,6 +13,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [geoStatus, setGeoStatus] = useState({ checking: true, ok: false, details: '' })
   const [wifiStatus, setWifiStatus] = useState({ checking: true, ok: false, details: '' })
+  const [locationCoords, setLocationCoords] = useState(null)
   const [showTestCreds, setShowTestCreds] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -28,6 +29,9 @@ export default function Login() {
       ])
       setGeoStatus({ checking: false, ok: geo.ok, details: geo.details })
       setWifiStatus({ checking: false, ok: wifi.ok, details: wifi.details })
+      if (geo.ok) {
+        setLocationCoords(geo.coords)
+      }
     } catch (err) {
       setGeoStatus({ checking: false, ok: false, details: 'Check failed' })
       setWifiStatus({ checking: false, ok: false, details: 'Check failed' })
@@ -38,9 +42,16 @@ export default function Login() {
 
   const onSubmit = async e => {
     e.preventDefault()
+
+    if (!geoStatus.ok || !locationCoords) {
+      push('Location not verified. Please ensure you are on campus and location services are enabled.', 'error')
+      checkAccessRequirements() // Re-trigger check
+      return
+    }
+
     try {
       setLoading(true)
-      const u = await login(form.email, form.password)
+      const u = await login(form.email, form.password, locationCoords)
       push('Login successful', 'success')
       navigate(u.role === 'warden' ? '/warden/dashboard' : '/student/dashboard', { replace: true })
     } catch (err) {
