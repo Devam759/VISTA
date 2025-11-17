@@ -43,6 +43,15 @@ async function getCampusPolygon() {
 
 export const verifyGeoFence = async (req, res, next) => {
   try {
+    const ua = (req.headers['user-agent'] || '').toLowerCase();
+    const isMobile = /(android|iphone|ipad|ipod|mobile)/i.test(ua);
+
+    // On desktop: bypass geofencing entirely
+    if (!isMobile) {
+      req.geoVerified = true;
+      return next();
+    }
+
     const { latitude, longitude } = req.body;
 
     if (!latitude || !longitude) {

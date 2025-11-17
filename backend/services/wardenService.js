@@ -178,6 +178,8 @@ export const getHostelAttendance = async (wardenId, date) => {
   }
 };
 
+// AC/NAC CSV import functionality and helpers removed
+
 export const getAllAttendance = async (date) => {
   const targetDate = date ? new Date(date) : new Date();
   targetDate.setHours(0, 0, 0, 0);
@@ -297,12 +299,14 @@ export const getStudentsList = async (wardenId, search) => {
     select: {
       id: true,
       rollNo: true,
+      regNo: true,
       name: true,
       roomNo: true,
       mobile: true,
       email: true,
       program: true,
-      hostel: { select: { name: true } }
+      hostel: { select: { name: true } },
+      room: { select: { roomNo: true } }
     },
     orderBy: [{ roomNo: 'asc' }, { rollNo: 'asc' }]
   });

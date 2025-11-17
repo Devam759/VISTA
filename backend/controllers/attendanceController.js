@@ -7,6 +7,12 @@ import {
 
 export const markAttendance = async (req, res) => {
   try {
+    const ua = (req.headers['user-agent'] || '').toLowerCase();
+    const isMobile = /(android|iphone|ipad|ipod|mobile)/i.test(ua);
+    if (!isMobile) {
+      return res.status(403).json({ error: 'Attendance marking is restricted to mobile devices on campus.' });
+    }
+
     const { id: studentId } = req.user;
     const { test_image } = req.body;
 

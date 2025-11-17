@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { verifyInsideCampus } from '../utils/geoCheck.js'
-import { verifyJKLUWifi } from '../utils/wifiCheck.js'
 
 export default function AccessGate({ children }) {
   const [checking, setChecking] = useState(true)
   const [geoOk, setGeoOk] = useState(false)
-  const [wifiOk, setWifiOk] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -19,26 +17,14 @@ export default function AccessGate({ children }) {
     try {
       setChecking(true)
       setError('')
-      
-      // Run checks in parallel for faster response
-      const [geoResult, wifiResult] = await Promise.all([
-        verifyInsideCampus().catch(err => ({ ok: false, details: err.message })),
-        verifyJKLUWifi().catch(err => ({ ok: false, details: err.message }))
-      ])
-      
+      const geoResult = await verifyInsideCampus()
       setGeoOk(geoResult.ok)
-      setWifiOk(wifiResult.ok)
-      
-      if (!geoResult.ok || !wifiResult.ok) {
-        const reasons = []
-        if (!geoResult.ok) reasons.push(`Location: ${geoResult.details || 'Not verified'}`)
-        if (!wifiResult.ok) reasons.push(`WiFi: ${wifiResult.details || 'Not verified'}`)
-        setError(`Access denied: ${reasons.join(' | ')}`)
+      if (!geoResult.ok) {
+        setError('Access denied: You must be on campus')
       }
     } catch (err) {
       setError(`Failed to verify access: ${err.message || 'Unknown error'}`)
       setGeoOk(false)
-      setWifiOk(false)
     } finally {
       setChecking(false)
     }
@@ -55,7 +41,7 @@ export default function AccessGate({ children }) {
     )
   }
 
-  if (!geoOk || !wifiOk) {
+  if (!geoOk) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
@@ -77,21 +63,12 @@ export default function AccessGate({ children }) {
                   {geoOk ? '✓ Verified' : '✗ Not Verified'}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">📶 College WiFi</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  wifiOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
-                  {wifiOk ? '✓ Connected' : '✗ Not Connected'}
-                </span>
-              </div>
             </div>
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-xs text-blue-800">
                 <strong>Requirements:</strong><br/>
                 • Be physically present on campus<br/>
-                • Connect to college WiFi network<br/>
                 • Enable location services
               </p>
             </div>

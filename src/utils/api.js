@@ -1,5 +1,9 @@
-// Using localhost for development, Render URL as production fallback
-export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')
+// First check for window.APP_CONFIG, then Vite env var, then use Render URL as fallback
+export const API_BASE_URL = (
+  (typeof window !== 'undefined' && window.APP_CONFIG?.API_URL) ||
+  import.meta.env.VITE_API_URL || 
+  'https://vista-ia7c.onrender.com'
+).replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {
   const url = `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`
