@@ -21,22 +21,45 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const em = (email || '').trim()
     const pass = (password || '').trim()
-    if (!em || !pass) throw new Error('Enter credentials')
+    if (!em || !pass) throw new Error('Please enter both email and password')
 
     let data
+    let error = null
+    
+    // Try student login first
     try {
-      data = await apiFetch('/auth/student-login', { method: 'POST', body: { email: em, password: pass } })
+      data = await apiFetch('/auth/student-login', { 
+        method: 'POST', 
+        body: { email: em, password: pass } 
+      })
     } catch (e1) {
-      data = await apiFetch('/auth/warden-login', { method: 'POST', body: { email: em, password: pass } })
+      error = e1
+      // If student login fails with 401, try warden login
+      if (e1.status === 401) {
+        try {
+          data = await apiFetch('/auth/warden-login', { 
+            method: 'POST', 
+            body: { email: em, password: pass } 
+          })
+          error = null
+        } catch (e2) {
+          error = e2
+        }
+      }
     }
 
-    const { token: tkn, role, user: u } = data || {}
-    if (!tkn || !u) throw new Error('Invalid response')
-    const auth = { token: tkn, role, user: { ...u, role } }
-    localStorage.setItem('vista-auth', JSON.stringify(auth))
-    setUser(auth.user)
-    setToken(tkn)
-    return auth.user
+    // If we have data, login was successful
+    if (data && data.token && data.user) {
+      const { token: tkn, role, user: u } = data
+      const auth = { token: tkn, role, user: { ...u, role } }
+      localStorage.setItem('vista-auth', JSON.stringify(auth))
+      setUser(auth.user)
+      setToken(tkn)
+      return auth.user
+    }
+    
+    // If we get here, all login attempts failed
+    throw error || new Error('Login failed. Please check your credentials.')
   }
 
   const logout = () => {

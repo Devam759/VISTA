@@ -22,7 +22,7 @@ export default function MarkAttendance() {
   const [img, setImg] = useState('')
   const [now, setNow] = useState(new Date())
   const [camOn, setCamOn] = useState(false)
-  const [coords, setCoords] = useState({ lat: null, lng: null })
+  const [coords, setCoords] = useState({ lat: null, lng: null, accuracy: null })
   const [submitting, setSubmitting] = useState(false)
   const [desktopBlocked, setDesktopBlocked] = useState(false)
 
@@ -51,10 +51,14 @@ export default function MarkAttendance() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+          setCoords({ 
+            lat: pos.coords.latitude, 
+            lng: pos.coords.longitude,
+            accuracy: pos.coords.accuracy || null
+          })
         },
         () => {
-          setCoords({ lat: null, lng: null })
+          setCoords({ lat: null, lng: null, accuracy: null })
         },
         { enableHighAccuracy: true, maximumAge: 60000, timeout: 5000 }
       )
@@ -77,20 +81,22 @@ export default function MarkAttendance() {
       push('Verification failed. Please ensure you are on campus.', 'error')
       return
     }
-    if (!time.allowed && !time.isLateWindow) {
-      push('Attendance window closed. Available 10:00 PM - 11:00 PM', 'error')
-      return
-    }
+    // Time window check disabled for development
     try {
       setSubmitting(true)
       const body = {
         test_image: img,
         latitude: coords.lat,
         longitude: coords.lng,
+        accuracy: coords.accuracy || null, // Send GPS accuracy for tolerance
       }
       const data = await apiFetch('/attendance/mark', { method: 'POST', body, token })
       const status = time.allowed ? 'On Time' : 'Late'
-      push(data?.message || `Attendance marked successfully (${status})`, 'success')
+      
+      // Display detailed accuracy information
+      const accuracyMsg = data?.accuracy ? ` (${data.accuracy.status} - ${data.accuracy.percentage}% match)` : ''
+      push(`${data?.message || 'Attendance marked successfully'}${accuracyMsg}`, 'success')
+      
       // Disable camera after successful submission
       setCamOn(false)
     } catch (err) {

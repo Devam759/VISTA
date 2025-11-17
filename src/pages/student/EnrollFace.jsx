@@ -49,7 +49,7 @@ export default function EnrollFace() {
 
     try {
       setSubmitting(true)
-      const response = await apiFetch('/student/enroll-face', {
+      const response = await apiFetch('/attendance/enroll-face', {
         method: 'POST',
         body: { images },
         token

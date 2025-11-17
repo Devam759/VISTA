@@ -11,9 +11,14 @@
     "import:students": "node --experimental-json-modules scripts/importStudentsFromCSV.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:db:push": "prisma db push --accept-data-loss",
     "prisma:seed": "node prisma/seed.js",
     "prisma:studio": "prisma studio",
-    "import:csv": "node scripts/importCSV.js"
+    "prisma:setup-migrations": "node scripts/createPrismaMigrationsTable.js",
+    "prisma:resolve-migrations": "node scripts/resolveFailedMigration.js",
+    "import:csv": "node scripts/importCSV.js",
+    "setup:face": "node scripts/setupFaceRecognition.js"
   },
   "keywords": [
     "attendance",

@@ -23,7 +23,7 @@ export default function AccessGate({ children }) {
         setError('Access denied: You must be on campus')
       }
     } catch (err) {
-      setError('Failed to verify access requirements')
+      setError(`Failed to verify access: ${err.message || 'Unknown error'}`)
       setGeoOk(false)
     } finally {
       setChecking(false)

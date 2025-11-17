@@ -48,7 +48,9 @@ model Student {
   email      String       @unique @db.VarChar(120)
   password   String       @db.VarChar(255)
   faceIdUrl  String?      @map("face_id_url") @db.Text
+  faceEnrolled Boolean    @default(false) @map("face_enrolled")
   hostel     Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  faceData   FaceData[]
   room       Room?        @relation(fields: [roomId], references: [id])
   attendance Attendance[]
   createdAt  DateTime     @default(now()) @map("created_at")
@@ -56,6 +58,18 @@ model Student {
   @@map("students")
   @@index([hostelId])
   @@index([email])
+}
+
+model FaceData {
+  id        Int       @id @default(autoincrement())
+  studentId Int       @map("student_id")
+  encoding  String    @db.LongText
+  imageUrl  String?   @map("image_url") @db.Text
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("face_data")
+  @@index([studentId])
 }
 
 model Warden {
@@ -77,7 +91,7 @@ model Attendance {
   id           Int                @id @default(autoincrement())
   studentId    Int                @map("student_id")
   date         DateTime           @db.Date
-  time         DateTime           @db.Time(0)
+  time         DateTime           @db.Time
   status       AttendanceStatus
   faceVerified Boolean            @default(false) @map("face_verified")
   student      Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)

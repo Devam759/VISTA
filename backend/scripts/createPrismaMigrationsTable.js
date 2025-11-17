@@ -1,0 +1,205 @@
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+async function resolveFailedMigrations(connection, database) {
+  try {
+    // Check for failed migrations
+    const [failedMigrations] = await connection.execute(
+      `SELECT id, migration_name, started_at, finished_at, rolled_back_at 
+       FROM _prisma_migrations 
+       WHERE finished_at IS NULL AND rolled_back_at IS NULL`
+    );
+
+    if (failedMigrations.length === 0) {
+      console.log('No failed migrations found');
+      return;
+    }
+
+    console.log(`Found ${failedMigrations.length} failed migration(s), resolving...`);
+    for (const migration of failedMigrations) {
+      console.log(`  - ${migration.migration_name} (started at ${migration.started_at})`);
+      await connection.execute(
+        `UPDATE _prisma_migrations 
+         SET rolled_back_at = NOW() 
+         WHERE id = ?`,
+        [migration.id]
+      );
+      console.log(`  ✓ Marked ${migration.migration_name} as rolled back`);
+    }
+    console.log('✓ All failed migrations resolved');
+  } catch (error) {
+    console.error('Warning: Could not resolve failed migrations:', error.message);
+    // Don't throw - this is not critical
+  }
+}
+
+async function createPrismaMigrationsTable() {
+  console.log('Starting Prisma migrations table setup...');
+  
+  const connectionString = process.env.DATABASE_URL;
+  
+  if (!connectionString) {
+    console.error('ERROR: DATABASE_URL environment variable is not set');
+    process.exit(1);
+  }
+
+  console.log('DATABASE_URL found, parsing connection string...');
+
+  // Parse the MySQL connection string
+  // Format: mysql://user:password@host:port/database
+  let config;
+  try {
+    // Handle both mysql:// and mysql2:// protocols
+    const urlString = connectionString.replace(/^mysql2?:\/\//, 'http://');
+    const url = new URL(urlString);
+    
+    config = {
+      host: url.hostname,
+      port: parseInt(url.port) || 3306,
+      user: decodeURIComponent(url.username),
+      password: decodeURIComponent(url.password || ''),
+      database: url.pathname.slice(1), // Remove leading slash
+    };
+    console.log(`Connecting to database: ${config.database} on ${config.host}:${config.port}`);
+  } catch (error) {
+    console.error('ERROR: Error parsing DATABASE_URL:', error.message);
+    process.exit(1);
+  }
+
+  let connection;
+  try {
+    connection = await mysql.createConnection(config);
+    console.log('Connected to database successfully');
+    
+    // Check if the table already exists
+    const [tables] = await connection.execute(
+      `SELECT COUNT(*) as count FROM information_schema.tables 
+       WHERE table_schema = ? AND table_name = '_prisma_migrations'`,
+      [config.database]
+    );
+
+    const tableExists = tables[0].count > 0;
+    console.log(`Table _prisma_migrations exists: ${tableExists}`);
+
+    if (tableExists) {
+      // Check if the table has the wrong schema (DATETIME(3) or invalid defaults)
+      const [columns] = await connection.execute(`
+        SELECT COLUMN_NAME, COLUMN_TYPE 
+        FROM information_schema.COLUMNS 
+        WHERE TABLE_SCHEMA = ? 
+        AND TABLE_NAME = '_prisma_migrations'
+        AND (COLUMN_TYPE LIKE '%DATETIME%' OR COLUMN_NAME = 'started_at')
+      `, [config.database]);
+
+      let needsRecreation = false;
+      for (const col of columns) {
+        if (col.COLUMN_TYPE.includes('DATETIME(3)')) {
+          console.log(`Found column ${col.COLUMN_NAME} with DATETIME(3), table needs to be recreated`);
+          needsRecreation = true;
+          break;
+        }
+        // Check if started_at is DATETIME instead of TIMESTAMP (which causes default value issues)
+        if (col.COLUMN_NAME === 'started_at' && col.COLUMN_TYPE.includes('DATETIME') && !col.COLUMN_TYPE.includes('TIMESTAMP')) {
+          console.log(`Found started_at column with DATETIME (should be TIMESTAMP), table needs to be recreated`);
+          needsRecreation = true;
+          break;
+        }
+      }
+
+      if (needsRecreation) {
+        console.log('Dropping existing _prisma_migrations table to recreate with correct schema...');
+        await connection.execute('DROP TABLE IF EXISTS `_prisma_migrations`');
+        console.log('Table dropped successfully');
+      } else {
+        console.log('_prisma_migrations table already exists with correct schema');
+        // Check for and resolve any failed migrations
+        await resolveFailedMigrations(connection, config.database);
+        return;
+      }
+    }
+
+    // Create the _prisma_migrations table with DATETIME (without precision)
+    // Note: Using TIMESTAMP for started_at because DATETIME doesn't support CURRENT_TIMESTAMP
+    // in older MySQL versions, but TIMESTAMP does
+    console.log('Creating _prisma_migrations table with DATETIME (no precision)...');
+    await connection.execute(`
+      CREATE TABLE \`_prisma_migrations\` (
+        \`id\` VARCHAR(36) NOT NULL,
+        \`checksum\` VARCHAR(64) NOT NULL,
+        \`finished_at\` DATETIME NULL,
+        \`migration_name\` VARCHAR(255) NOT NULL,
+        \`logs\` TEXT NULL,
+        \`rolled_back_at\` DATETIME NULL,
+        \`started_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`applied_steps_count\` INTEGER UNSIGNED NOT NULL DEFAULT 0,
+        PRIMARY KEY (\`id\`)
+      ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+    `);
+
+    console.log('✓ Successfully created _prisma_migrations table');
+    
+    // Verify the table was created correctly
+    const [verifyTables] = await connection.execute(
+      `SELECT COUNT(*) as count FROM information_schema.tables 
+       WHERE table_schema = ? AND table_name = '_prisma_migrations'`,
+      [config.database]
+    );
+    
+    if (verifyTables[0].count === 0) {
+      throw new Error('Table creation verification failed - table does not exist');
+    }
+    
+    // Verify the schema is correct (no DATETIME(3), started_at should be TIMESTAMP)
+    const [verifyColumns] = await connection.execute(`
+      SELECT COLUMN_NAME, COLUMN_TYPE 
+      FROM information_schema.COLUMNS 
+      WHERE TABLE_SCHEMA = ? 
+      AND TABLE_NAME = '_prisma_migrations'
+      AND (COLUMN_TYPE LIKE '%DATETIME%' OR COLUMN_NAME = 'started_at')
+    `, [config.database]);
+    
+    for (const col of verifyColumns) {
+      if (col.COLUMN_TYPE.includes('DATETIME(3)')) {
+        throw new Error(`Table verification failed - column ${col.COLUMN_NAME} still has DATETIME(3)`);
+      }
+      // Verify started_at is TIMESTAMP, not DATETIME
+      if (col.COLUMN_NAME === 'started_at' && col.COLUMN_TYPE.includes('DATETIME') && !col.COLUMN_TYPE.includes('TIMESTAMP')) {
+        throw new Error(`Table verification failed - started_at should be TIMESTAMP, not DATETIME`);
+      }
+    }
+    
+    console.log('✓ Table verification passed - schema is correct');
+    
+    // Check for and resolve any failed migrations
+    await resolveFailedMigrations(connection, config.database);
+  } catch (error) {
+    // If table already exists, that's fine
+    if (error.code === 'ER_TABLE_EXISTS_ERROR') {
+      console.log('_prisma_migrations table already exists');
+    } else {
+      console.error('ERROR: Error creating _prisma_migrations table:', error.message);
+      console.error('Error code:', error.code);
+      console.error('Full error:', error);
+      throw error;
+    }
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log('Database connection closed');
+    }
+  }
+}
+
+createPrismaMigrationsTable()
+  .then(() => {
+    console.log('Migration table setup complete');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('Failed to create migration table:', error);
+    process.exit(1);
+  });
+
