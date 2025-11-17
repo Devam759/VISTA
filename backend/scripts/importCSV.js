@@ -14,7 +14,7 @@ async function importCSV() {
 
   try {
     // Read CSV file
-    const csvPath = path.join(__dirname, '../../publc/FINAL SHEET OF BH-2.csv');
+    const csvPath = path.join(__dirname, '../../public/FINAL SHEET OF BH-2.csv');
     const csvContent = fs.readFileSync(csvPath, 'utf-8');
     const lines = csvContent.split('\n');
 
