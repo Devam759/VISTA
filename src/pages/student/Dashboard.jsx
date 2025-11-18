@@ -142,7 +142,7 @@ export default function StudentDashboard() {
           <p className="text-2xl font-bold text-blue-600">{percentage}%</p>
         </div>
         <div className="bg-white rounded-xl shadow p-4">
-          <p className="text-sm text-gray-500">🔥 Streak</p>
+          <p className="text-sm text-gray-500">Streak</p>
           <p className="text-2xl font-bold text-orange-600">{streak} days</p>
         </div>
       </div>
@@ -183,23 +183,23 @@ export default function StudentDashboard() {
           </div>
           <div className="space-y-3 text-sm">
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">📧 Email</span>
+              <span className="text-gray-600">Email</span>
               <span className="font-medium text-gray-900 text-xs">{user?.email}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">🎓 Program</span>
+              <span className="text-gray-600">Program</span>
               <span className="font-medium text-gray-900">{user?.program}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">🏠 Hostel</span>
+              <span className="text-gray-600">Hostel</span>
               <span className="font-medium text-gray-900">{user?.hostel}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">🚪 Room</span>
+              <span className="text-gray-600">Room</span>
               <span className="font-medium text-gray-900">{user?.room}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">🎭 Face Status</span>
+              <span className="text-gray-600">Face Status</span>
               <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                 (user?.faceIdUrl || user?.faceDescriptor) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
               }`}>
@@ -213,18 +213,18 @@ export default function StudentDashboard() {
           <div className="space-y-3">
             {!(user?.faceIdUrl || user?.faceDescriptor) && (
               <Link to="/student/enroll-face" className="block w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 text-center font-medium shadow-md">
-                🎭 Enroll Face (Required)
+                Enroll Face (Required)
               </Link>
             )}
             <Link to="/student/mark" className="block w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium">
-              📸 Mark Attendance
+              Mark Attendance
             </Link>
             <Link to="/student/history" className="block w-full px-4 py-3 border-2 border-gray-200 rounded-lg hover:bg-gray-50 text-center font-medium">
-              📊 View Full History
+              View Full History
             </Link>
             {(user?.faceIdUrl || user?.faceDescriptor) && (
               <Link to="/student/enroll-face" className="block w-full px-4 py-3 border-2 border-purple-200 text-purple-600 rounded-lg hover:bg-purple-50 text-center font-medium">
-                🔄 Re-enroll Face
+                Re-enroll Face
               </Link>
             )}
           </div>
@@ -245,7 +245,7 @@ export default function StudentDashboard() {
               <span className="font-semibold text-red-700">After 11:00 PM</span>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
-              ℹ️ Requires: Campus location, College WiFi, and Face verification
+              Requires: Campus location, College WiFi, and Face verification
             </div>
           </div>
         </div>
