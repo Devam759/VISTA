@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
         const obj = JSON.parse(stored)
         setUser(obj.user || null)
         setToken(obj.token || '')
-      } catch {}
+      } catch { }
     }
   }, [])
 
@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
     const pass = (password || '').trim()
     if (!em || !pass) throw new Error('Please enter both email and password')
 
-    if (!coords || !coords.latitude || !coords.longitude) {
+    if (!coords || coords.latitude === undefined || coords.longitude === undefined) {
       throw new Error('Location coordinates required')
     }
 
@@ -36,21 +36,21 @@ export function AuthProvider({ children }) {
 
     let data
     let error = null
-    
+
     // Try student login first
     try {
-      data = await apiFetch('/auth/student-login', { 
-        method: 'POST', 
-        body: { email: em, password: pass } 
+      data = await apiFetch('/auth/student-login', {
+        method: 'POST',
+        body
       })
     } catch (e1) {
       error = e1
       // If student login fails with 401, try warden login
       if (e1.status === 401) {
         try {
-          data = await apiFetch('/auth/warden-login', { 
-            method: 'POST', 
-            body: { email: em, password: pass } 
+          data = await apiFetch('/auth/warden-login', {
+            method: 'POST',
+            body
           })
           error = null
         } catch (e2) {
@@ -68,7 +68,7 @@ export function AuthProvider({ children }) {
       setToken(tkn)
       return auth.user
     }
-    
+
     // If we get here, all login attempts failed
     throw error || new Error('Login failed. Please check your credentials.')
   }

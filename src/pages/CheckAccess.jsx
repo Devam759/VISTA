@@ -9,6 +9,8 @@ export default function CheckAccess() {
   const [locOk, setLocOk] = useState(false)
   const [geoDetails, setGeoDetails] = useState('')
 
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
   const runChecks = async () => {
     setLoading(true)
     const geo = await verifyInsideCampus()
@@ -22,10 +24,7 @@ export default function CheckAccess() {
 
   const bypassChecks = () => {
     setLocOk(true)
-    setWifiOk(true)
     setGeoDetails('✅ Development Mode: Bypassed')
-    setWifiDetails('✅ Development Mode: Bypassed')
-    setError('')
     setLoading(false)
     setTimeout(() => navigate('/login', { replace: true }), 500)
   }

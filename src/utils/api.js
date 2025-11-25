@@ -1,12 +1,12 @@
 // First check for window.APP_CONFIG, then Vite env var, then use Render URL as fallback
 export const API_BASE_URL = (
   (typeof window !== 'undefined' && window.APP_CONFIG?.API_URL) ||
-  import.meta.env.VITE_API_URL || 
-  'https://vista-ia7c.onrender.com'
+  import.meta.env.VITE_API_URL ||
+  ((typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 'http://127.0.0.1:5000' : 'https://vista-ia7c.onrender.com')
 ).replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {
-  const baseUrl = getApiBaseUrl_Dynamic()
+  const baseUrl = API_BASE_URL
   const url = `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
   const isJSONBody = body && typeof body === 'object' && !(body instanceof FormData)
   const res = await fetch(url, {

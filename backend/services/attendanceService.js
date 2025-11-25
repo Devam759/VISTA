@@ -2,10 +2,11 @@ import prisma from '../config/prisma.js';
 import { getToday, getDateRange, formatDate, toISODateString } from '../utils/dateUtils.js';
 
 // Configuration
-const FACE_API_URL = process.env.FACE_API || 'http://localhost:8000/verify-face';
+import faceService from './faceService.js';
+
+// Configuration
 const FACE_MATCH_THRESHOLD = parseFloat(process.env.FACE_MATCH_THRESHOLD || '0.6'); // 60% similarity
 const MIN_FACE_SAMPLES = 3;
-const API_TIMEOUT = 10000; // 10 seconds
 
 // Check if current time is within attendance window
 function checkTimeWindow() {
@@ -35,23 +36,31 @@ export const enrollFace = async (studentId, images) => {
       where: { studentId }
     });
 
-    // Store multiple face encodings
+    // Store multiple face encodings using faceService
+    // We process each image to extract the descriptor and store it
     const faceDataRecords = [];
     for (let i = 0; i < images.length; i++) {
-      const faceData = await prisma.faceData.create({
-        data: {
-          studentId,
-          encoding: images[i], // Store base64 or encoding
-          imageUrl: images[i] // Store image URL for reference
-        }
-      });
-      faceDataRecords.push(faceData);
+      // We use faceService to get the descriptor, but we need to manually store it 
+      // because faceService.enrollFace does a full update including student record.
+      // Here we want to store multiple samples.
+
+      // However, faceService.enrollFace is designed for single image enrollment.
+      // Let's use faceService.getFaceDescriptor directly if possible, but it's not exported.
+      // Actually, faceService.enrollFace stores to FaceData now.
+      // So we can just call faceService.enrollFace for each image.
+      // But faceService.enrollFace clears old data? No, I modified it to APPEND.
+      // Wait, I modified it to:
+      // await prisma.faceData.create(...)
+      // It does NOT delete old data.
+
+      // So we can just call enrollFace for each image.
+      await faceService.enrollFace(studentId, images[i]);
     }
 
-    // Update student to mark face as enrolled
+    // Update student to mark face as enrolled (handled by faceService, but good to ensure)
     await prisma.student.update({
       where: { id: studentId },
-      data: { 
+      data: {
         faceIdUrl: images[0], // Store primary image
         faceEnrolled: true
       }
@@ -62,7 +71,7 @@ export const enrollFace = async (studentId, images) => {
     return {
       message: `Face enrolled successfully with ${images.length} samples`,
       success: true,
-      samplesStored: faceDataRecords.length
+      samplesStored: images.length
     };
   } catch (error) {
     console.error('Face enrollment error:', error);
@@ -73,54 +82,14 @@ export const enrollFace = async (studentId, images) => {
 // Verify face against all stored encodings with accuracy threshold
 async function verifyFaceWithMultipleSamples(studentId, testImage, student) {
   try {
-    // Get all stored face encodings for this student
-    const faceDataRecords = await prisma.faceData.findMany({
-      where: { studentId },
-      select: { encoding: true, id: true }
-    });
+    // Use faceService to verify
+    const result = await faceService.verifyFace(studentId, testImage);
 
-    if (!faceDataRecords || faceDataRecords.length === 0) {
-      throw new Error('No face data found for student');
-    }
-
-    console.log(`🔍 Comparing against ${faceDataRecords.length} stored face samples`);
-
-    let bestMatch = {
-      verified: false,
-      similarity: 0,
-      matchedSampleId: null
+    return {
+      verified: result.isMatch,
+      similarity: result.confidence,
+      matchedSampleId: null // faceService doesn't return this yet, but that's fine
     };
-
-    // Compare against each stored encoding
-    for (const faceData of faceDataRecords) {
-      try {
-        const response = await axios.post(FACE_API_URL, {
-          stored_image: faceData.encoding,
-          test_image: testImage
-        }, {
-          timeout: API_TIMEOUT
-        });
-
-        const similarity = response.data?.similarity || 0;
-        const verified = response.data?.verified || false;
-
-        console.log(`  Sample ${faceData.id}: Similarity ${similarity}%`);
-
-        // Update best match if this one is better
-        if (similarity > bestMatch.similarity) {
-          bestMatch = {
-            verified: verified || (similarity >= FACE_MATCH_THRESHOLD * 100),
-            similarity,
-            matchedSampleId: faceData.id
-          };
-        }
-      } catch (err) {
-        console.error(`  Error comparing with sample ${faceData.id}:`, err.message);
-        continue;
-      }
-    }
-
-    return bestMatch;
   } catch (error) {
     console.error('Face verification error:', error);
     throw error;
@@ -131,10 +100,10 @@ export const markAttendance = async (studentId, testImage) => {
   // First, get the student to ensure they exist and are enrolled
   const student = await prisma.student.findUnique({
     where: { id: studentId },
-    select: { 
+    select: {
       id: true,
-      faceIdUrl: true, 
-      rollNo: true, 
+      faceIdUrl: true,
+      rollNo: true,
       name: true,
       faceEnrolled: true
     }
@@ -158,9 +127,9 @@ export const markAttendance = async (studentId, testImage) => {
   const currentTime = new Date();
   const today = getToday();
   const { start: startOfDay, end: startOfNextDay } = getDateRange();
-  
+
   console.log(`🕒 Checking for existing attendance between ${formatDate(startOfDay)} and ${formatDate(startOfNextDay)}`);
-  
+
   // Check if attendance already exists for today
   const existing = await prisma.attendance.findFirst({
     where: {
@@ -179,7 +148,7 @@ export const markAttendance = async (studentId, testImage) => {
       date: existing.date,
       status: existing.status
     });
-    
+
     const updatedAttendance = await prisma.attendance.update({
       where: { id: existing.id },
       data: {
@@ -188,9 +157,9 @@ export const markAttendance = async (studentId, testImage) => {
         faceVerified: true
       }
     });
-    
+
     console.log(`🔄 Updated existing attendance for ${student.rollNo} at ${currentTime.toISOString()}`);
-    
+
     return {
       message: `✅ Attendance updated successfully as ${timeCheck.status}!`,
       status: timeCheck.status,
@@ -208,7 +177,7 @@ export const markAttendance = async (studentId, testImage) => {
   try {
     // Verify against multiple stored samples
     const verificationResult = await verifyFaceWithMultipleSamples(studentId, testImage, student);
-    
+
     faceVerified = verificationResult.verified;
     similarity = verificationResult.similarity;
     matchedSampleId = verificationResult.matchedSampleId;
@@ -216,7 +185,7 @@ export const markAttendance = async (studentId, testImage) => {
     console.log(`📊 Face match result: ${faceVerified ? '✅ MATCHED' : '❌ NOT MATCHED'} (Best Similarity: ${similarity}%)`);
   } catch (err) {
     console.error('❌ Face API error:', err.message);
-    
+
     // For development: allow if API is not available
     if (process.env.NODE_ENV !== 'production') {
       console.log('⚠️ Face API unavailable, allowing for development');
@@ -235,7 +204,7 @@ export const markAttendance = async (studentId, testImage) => {
   // Create new attendance record with consistent date handling
   const attendanceDate = new Date();
   attendanceDate.setHours(0, 0, 0, 0); // Set to start of day in local timezone
-  
+
   const attendanceData = {
     studentId,
     date: attendanceDate,  // Use consistent date format
@@ -243,7 +212,7 @@ export const markAttendance = async (studentId, testImage) => {
     status: timeCheck.status,
     faceVerified: true
   };
-  
+
   console.log('📝 Creating new attendance record:', {
     studentId,
     date: formatDate(attendanceDate),
@@ -251,7 +220,7 @@ export const markAttendance = async (studentId, testImage) => {
     time: currentTime.toISOString(),
     status: timeCheck.status
   });
-  
+
   // Use raw query to ensure consistent date handling
   const attendance = await prisma.$executeRaw`
     INSERT INTO Attendance (studentId, date, time, status, faceVerified)
@@ -267,7 +236,7 @@ export const markAttendance = async (studentId, testImage) => {
       status = VALUES(status),
       faceVerified = VALUES(faceVerified)
   `;
-  
+
   console.log(`✅ Created new attendance record:`, {
     id: attendance.id,
     studentId: attendance.studentId,

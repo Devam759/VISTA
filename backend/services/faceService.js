@@ -8,9 +8,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize face-api.js with canvas for Node.js
-faceapi.env.monkeyPatch({ 
-  Canvas: canvas.Canvas, 
-  Image: canvas.Image, 
+faceapi.env.monkeyPatch({
+  Canvas: canvas.Canvas,
+  Image: canvas.Image,
   ImageData: canvas.ImageData
 });
 
@@ -31,20 +31,20 @@ class FaceService {
 
     try {
       console.log(`🔄 Loading face-api.js models from: ${MODEL_PATH}`);
-      
+
       // Load face detection and recognition models
       console.log('📦 Loading SSD MobileNet v1 model...');
       await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_PATH);
       console.log('✅ SSD MobileNet v1 loaded');
-      
+
       console.log('📦 Loading Face Landmark 68 model...');
       await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_PATH);
       console.log('✅ Face Landmark 68 loaded');
-      
+
       console.log('📦 Loading Face Recognition model...');
       await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_PATH);
       console.log('✅ Face Recognition model loaded');
-      
+
       this.initialized = true;
       console.log('✅ All face recognition models loaded successfully');
     } catch (error) {
@@ -67,7 +67,7 @@ class FaceService {
 
       // Remove data URL prefix if present
       const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '');
-      
+
       // Validate base64 format
       if (!/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
         throw new Error('Invalid base64 format');
@@ -85,29 +85,29 @@ class FaceService {
       }
 
       const img = new canvas.Image();
-      
+
       // In Node.js canvas, image loading is often synchronous
       // Set up event handlers first, then set src
       const loadedImg = await new Promise((resolve, reject) => {
         let resolved = false;
-        
+
         img.onload = () => {
           if (!resolved) {
             resolved = true;
             resolve(img);
           }
         };
-        
+
         img.onerror = (err) => {
           if (!resolved) {
             resolved = true;
             reject(new Error('Failed to load image: ' + (err.message || 'Unknown error')));
           }
         };
-        
+
         // Set src - this may trigger onload synchronously in Node.js
         img.src = buffer;
-        
+
         // Check if image is already loaded (synchronous loading in Node.js)
         if (img.width > 0 && img.height > 0) {
           if (!resolved) {
@@ -124,21 +124,21 @@ class FaceService {
           }, 5000);
         }
       });
-      
+
       // Validate image dimensions
       if (!loadedImg.width || !loadedImg.height || loadedImg.width === 0 || loadedImg.height === 0) {
         throw new Error('Invalid image dimensions');
       }
-      
+
       // Resize if needed
       const MAX_SIZE = 800;
       let width = loadedImg.width;
       let height = loadedImg.height;
-      
+
       if (width <= MAX_SIZE && height <= MAX_SIZE) {
         return loadedImg;
       }
-      
+
       // Calculate new dimensions
       if (width > height) {
         height = Math.round((height * MAX_SIZE) / width);
@@ -147,37 +147,37 @@ class FaceService {
         width = Math.round((width * MAX_SIZE) / height);
         height = MAX_SIZE;
       }
-      
+
       // Create resized canvas
       const resizedCanvas = canvas.createCanvas(width, height);
       const ctx = resizedCanvas.getContext('2d');
       ctx.drawImage(loadedImg, 0, 0, width, height);
-      
+
       // Convert canvas to buffer and create new image
       const resizedBuffer = resizedCanvas.toBuffer('image/png');
       const resizedImg = new canvas.Image();
-      
+
       // In Node.js canvas, image loading is often synchronous
       return new Promise((resolve, reject) => {
         let resolved = false;
-        
+
         resizedImg.onload = () => {
           if (!resolved) {
             resolved = true;
             resolve(resizedImg);
           }
         };
-        
+
         resizedImg.onerror = (err) => {
           if (!resolved) {
             resolved = true;
             reject(new Error('Failed to create resized image: ' + (err.message || 'Unknown error')));
           }
         };
-        
+
         // Set src - this may trigger onload synchronously
         resizedImg.src = resizedBuffer;
-        
+
         // Check if image is already loaded (synchronous loading in Node.js)
         if (resizedImg.width > 0 && resizedImg.height > 0) {
           if (!resolved) {
@@ -215,11 +215,11 @@ class FaceService {
       console.log('🔄 Loading and processing image...');
       const img = await this.loadImageFromBase64(imageBase64);
       console.log(`✅ Image loaded: ${img.width}x${img.height}`);
-      
+
       // Try very lenient face detection first (very low confidence threshold)
       console.log('🔍 Detecting face (lenient mode)...');
       let detections = await faceapi
-        .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({ 
+        .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({
           minConfidence: 0.1, // Very low threshold - accept almost any detection
           maxResults: 1
         }))
@@ -230,7 +230,7 @@ class FaceService {
       if (detections.length === 0) {
         console.log('⚠️ No face detected with 0.1 threshold, trying 0.05...');
         detections = await faceapi
-          .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({ 
+          .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({
             minConfidence: 0.05, // Extremely low threshold
             maxResults: 1
           }))
@@ -242,7 +242,7 @@ class FaceService {
       if (detections.length === 0) {
         console.log('⚠️ No face detected with landmarks, trying without landmarks...');
         detections = await faceapi
-          .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({ 
+          .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({
             minConfidence: 0.01, // Extremely low threshold
             maxResults: 1
           }))
@@ -331,39 +331,43 @@ class FaceService {
       }
 
       console.log(`📸 Starting face enrollment for student ${studentId}...`);
-      
+
       // Extract face descriptor with timeout protection and fallback
-      // allowFallback=true means we'll store image even if face detection fails
       let descriptor;
       try {
         const descriptorPromise = this.getFaceDescriptor(imageBase64, true); // true = allow fallback
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Face detection timeout')), 30000)
         );
         descriptor = await Promise.race([descriptorPromise, timeoutPromise]);
       } catch (error) {
-        // Even if timeout, create fallback descriptor to allow enrollment
         console.warn('⚠️ Face detection failed or timed out, using fallback descriptor');
         descriptor = new Float32Array(128);
         for (let i = 0; i < 128; i++) {
           descriptor[i] = (Math.random() - 0.5) * 0.1;
         }
       }
-      
+
       // Convert Float32Array to JSON string for storage
       const descriptorArray = Array.from(descriptor);
-      
-      // Store face data:
-      // 1. faceDescriptor: 128D face descriptor array (JSON string) - used for face recognition
-      // 2. faceIdUrl: Full base64 image - stored for reference/display purposes
-      // Note: faceEnrolled status is determined by checking if faceDescriptor exists
-      
-      // Update student record with face descriptor and image
+      const descriptorJson = JSON.stringify(descriptorArray);
+
+      // Store face data in FaceData table
+      // We'll keep the latest 3 samples for better accuracy, but for now just add this one
+      await prisma.faceData.create({
+        data: {
+          studentId,
+          encoding: descriptorJson, // Store descriptor
+          imageUrl: imageBase64 // Store image for reference
+        }
+      });
+
+      // Update student to mark face as enrolled
       await prisma.student.update({
         where: { id: studentId },
         data: {
-          faceDescriptor: JSON.stringify(descriptorArray), // Main face recognition data
-          faceIdUrl: imageBase64 // Full base64 image for reference
+          faceIdUrl: imageBase64, // Update primary image
+          faceEnrolled: true
         }
       });
 
@@ -384,40 +388,64 @@ class FaceService {
    */
   async verifyFace(studentId, imageBase64) {
     try {
-      // Get student's enrolled face descriptor
+      // Get student's enrolled face data
       const student = await prisma.student.findUnique({
         where: { id: studentId },
-        select: { faceDescriptor: true, name: true, rollNo: true }
+        select: {
+          name: true,
+          rollNo: true,
+          faceEnrolled: true,
+          faceData: {
+            select: { encoding: true, id: true }
+          }
+        }
       });
 
-      if (!student || !student.faceDescriptor) {
+      if (!student) {
+        throw new Error('Student not found');
+      }
+
+      if (!student.faceEnrolled || student.faceData.length === 0) {
         throw new Error('No face enrolled for this student');
       }
 
-      // Parse stored descriptor
-      const storedDescriptorArray = JSON.parse(student.faceDescriptor);
-      const storedDescriptor = new Float32Array(storedDescriptorArray);
-      
       // Extract descriptor from test image
       const testDescriptor = await this.getFaceDescriptor(imageBase64);
-      
-      // Calculate distance and similarity
-      const distance = this.calculateDistance(storedDescriptor, testDescriptor);
-      const similarity = this.calculateSimilarity(distance);
-      
-      // 70% threshold for matching
-      const isMatch = similarity >= 70;
-      
+
+      // Compare against all stored samples and find best match
+      let bestMatch = {
+        distance: 2.0, // Start with high distance (no match)
+        similarity: 0,
+        match: false
+      };
+
+      for (const sample of student.faceData) {
+        try {
+          const storedDescriptorArray = JSON.parse(sample.encoding);
+          const storedDescriptor = new Float32Array(storedDescriptorArray);
+
+          const distance = this.calculateDistance(storedDescriptor, testDescriptor);
+          const similarity = this.calculateSimilarity(distance);
+          const match = similarity >= 70; // 70% threshold
+
+          if (distance < bestMatch.distance) {
+            bestMatch = { distance, similarity, match };
+          }
+        } catch (e) {
+          console.warn(`⚠️ Failed to parse face encoding for sample ${sample.id}`, e);
+        }
+      }
+
       console.log(`🔍 Face verification for ${student.name} (${student.rollNo}):`, {
-        similarity: `${similarity}%`,
-        distance: distance.toFixed(4),
-        match: isMatch ? '✅' : '❌'
+        similarity: `${bestMatch.similarity}%`,
+        distance: bestMatch.distance.toFixed(4),
+        match: bestMatch.match ? '✅' : '❌'
       });
 
       return {
-        isMatch,
-        confidence: similarity,
-        distance: parseFloat(distance.toFixed(4))
+        isMatch: bestMatch.match,
+        confidence: bestMatch.similarity,
+        distance: parseFloat(bestMatch.distance.toFixed(4))
       };
     } catch (error) {
       console.error('Error verifying face:', error);

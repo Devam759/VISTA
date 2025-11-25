@@ -40,7 +40,6 @@ model Student {
   rollNo     String?      @map("roll_no") @db.VarChar(30)
   regNo      String?      @map("reg_no") @db.VarChar(30)
   roomNo     String       @map("room_no") @db.VarChar(10)
-  regNo      String?      @map("reg_no") @db.VarChar(40)
   roomId     Int?         @map("room_id")
   hostelId   Int          @map("hostel_id")
   program    String       @db.VarChar(80)

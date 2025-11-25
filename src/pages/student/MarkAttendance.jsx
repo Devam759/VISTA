@@ -34,7 +34,7 @@ export default function MarkAttendance() {
   }, [])
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const ua = (navigator.userAgent || '').toLowerCase()
       const isMobile = /(android|iphone|ipad|ipod|mobile)/i.test(ua)
       if (!isMobile) {
@@ -51,8 +51,8 @@ export default function MarkAttendance() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setCoords({ 
-            lat: pos.coords.latitude, 
+          setCoords({
+            lat: pos.coords.latitude,
             lng: pos.coords.longitude,
             accuracy: pos.coords.accuracy || null
           })
@@ -84,26 +84,27 @@ export default function MarkAttendance() {
     // Time window check disabled for development
     try {
       setSubmitting(true)
-      
+
+      // Step 1: Verify face first
       // Step 1: Verify face first
       console.log('🔍 Verifying face...');
-      const faceVerification = await apiFetch('/face/verify', {
+      const faceVerification = await apiFetch('/attendance/verify-face', {
         method: 'POST',
-        body: { testImage: img },
+        body: { imageBase64: img }, // Changed key to imageBase64 to match faceService
         token
       });
-      
+
       if (!faceVerification.verified) {
         push(`Face verification failed: ${faceVerification.message}`, 'error');
         setImg('');
         setSubmitting(false);
         return;
       }
-      
+
       console.log(`✅ Face verified with ${faceVerification.confidence || faceVerification.accuracy}% confidence`);
       const confidence = faceVerification.confidence || faceVerification.accuracy;
       push(`Face verified (${confidence}% match, minimum 70% required)`, 'success');
-      
+
       // Step 2: Mark attendance after face verification
       const body = {
         test_image: img,
@@ -114,11 +115,11 @@ export default function MarkAttendance() {
       }
       const data = await apiFetch('/attendance/mark', { method: 'POST', body, token })
       const status = time.allowed ? 'On Time' : 'Late'
-      
+
       // Display detailed accuracy information
       const accuracyMsg = data?.accuracy ? ` (${data.accuracy.status} - ${data.accuracy.percentage}% match)` : ''
       push(`${data?.message || 'Attendance marked successfully'}${accuracyMsg}`, 'success')
-      
+
       // Disable camera after successful submission
       setCamOn(false)
     } catch (err) {
@@ -135,23 +136,23 @@ export default function MarkAttendance() {
         <h1 className="text-3xl font-bold text-gray-900">Mark Attendance</h1>
         <p className="text-gray-600 mt-2">Capture your face to mark attendance automatically</p>
       </div>
-      
+
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-lg text-gray-900">Face Verification</h2>
             {!camOn && !img && !desktopBlocked && (
-              <button 
-                onClick={() => setCamOn(true)} 
+              <button
+                onClick={() => setCamOn(true)}
                 className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md"
               >
                 Start Camera
               </button>
             )}
           </div>
-          
+
           <Camera onCapture={setImg} active={camOn} showFaceDetection={true} />
-          
+
           {img && (
             <div className="mt-4">
               <div className="flex items-center justify-between mb-2">
@@ -170,7 +171,7 @@ export default function MarkAttendance() {
               <p className="text-xs text-gray-500 mt-2 text-center">Attendance will be marked automatically</p>
             </div>
           )}
-          
+
           {!camOn && !img && (
             <div className="mt-4 p-8 bg-gray-50 rounded-xl text-center">
               <svg className="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,15 +184,14 @@ export default function MarkAttendance() {
         </div>
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <h2 className="font-semibold text-lg text-gray-900 mb-4">System Status</h2>
-          
+
           <div className="space-y-4">
             {/* Location Status */}
             <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    locOk ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${locOk ? 'bg-green-100' : 'bg-red-100'
+                    }`}>
                     <svg className={`w-5 h-5 ${locOk ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
@@ -201,26 +201,23 @@ export default function MarkAttendance() {
                     <p className="text-xs text-gray-500">GPS verification</p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  locOk ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${locOk ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
                   {locOk ? 'Verified' : 'Failed'}
                 </span>
               </div>
             </div>
 
-            
+
 
             {/* Time Window Status */}
             <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    time.allowed ? 'bg-green-100' : time.isLateWindow ? 'bg-yellow-100' : 'bg-red-100'
-                  }`}>
-                    <svg className={`w-5 h-5 ${
-                      time.allowed ? 'text-green-600' : time.isLateWindow ? 'text-yellow-600' : 'text-red-600'
-                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${time.allowed ? 'bg-green-100' : time.isLateWindow ? 'bg-yellow-100' : 'bg-red-100'
+                    }`}>
+                    <svg className={`w-5 h-5 ${time.allowed ? 'text-green-600' : time.isLateWindow ? 'text-yellow-600' : 'text-red-600'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -231,9 +228,8 @@ export default function MarkAttendance() {
                     </p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  time.allowed ? 'bg-green-500 text-white' : time.isLateWindow ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'
-                }`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${time.allowed ? 'bg-green-500 text-white' : time.isLateWindow ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
                   {time.allowed ? 'On Time' : time.isLateWindow ? 'Late' : 'Closed'}
                 </span>
               </div>

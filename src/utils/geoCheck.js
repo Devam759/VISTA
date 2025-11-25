@@ -3,12 +3,12 @@
 const getApiBase = () => {
   const envUrl = import.meta.env.VITE_API_URL
   if (envUrl) return envUrl
-  
+
   // Auto-detect if running on localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:4000'
+    return 'http://127.0.0.1:5000'
   }
-  
+
   return 'https://vista-ia7c.onrender.com'
 }
 
@@ -63,10 +63,10 @@ export async function verifyInsideCampus() {
 
       const onError = (error) => {
         if (resolved) return
-        
+
         let errorMessage = 'Failed to get location'
-        
-        switch(error.code) {
+
+        switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = 'Location permission denied. Please enable location access in your browser settings and reload the page.'
             break
@@ -98,7 +98,7 @@ export async function verifyInsideCampus() {
           default:
             errorMessage = error.message || 'Unknown location error'
         }
-        
+
         cleanup()
         reject(new Error(errorMessage))
       }
@@ -125,10 +125,10 @@ export async function verifyInsideCampus() {
     })
 
     const { latitude, longitude, accuracy } = position.coords
-    
+
     // Log GPS accuracy for debugging
     console.log(`📍 GPS Accuracy: ${accuracy ? `${Math.round(accuracy)}m` : 'Unknown'}`)
-    
+
     // Call backend API to check against actual polygon with accuracy tolerance
     try {
       const response = await fetch(`${API_BASE}/debug/geolocation`, {
@@ -136,8 +136,8 @@ export async function verifyInsideCampus() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          latitude, 
+        body: JSON.stringify({
+          latitude,
           longitude,
           accuracy: accuracy || null // Send accuracy for tolerance calculation
         })
@@ -153,7 +153,7 @@ export async function verifyInsideCampus() {
       }
 
       const data = await response.json()
-      
+
       // Log for debugging
       console.log(`📍 Your Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`)
       console.log(`📍 GPS Accuracy: ${accuracy ? `${Math.round(accuracy)}m` : 'Unknown'}`)
@@ -162,7 +162,7 @@ export async function verifyInsideCampus() {
       if (data.polygonBounds) {
         console.log(`📍 Polygon Bounds: Lat [${data.polygonBounds.minLat.toFixed(6)}, ${data.polygonBounds.maxLat.toFixed(6)}], Lng [${data.polygonBounds.minLng.toFixed(6)}, ${data.polygonBounds.maxLng.toFixed(6)}]`)
       }
-      
+
       // Backend already handles GPS tolerance, so use its result directly
       return {
         ok: data.insidePolygon,
@@ -174,15 +174,15 @@ export async function verifyInsideCampus() {
       }
     } catch (apiError) {
       console.error('❌ Backend geolocation check failed:', apiError)
-      
+
       // Handle different types of connection errors
       const errorMessage = apiError.message || '';
-      const isConnectionError = errorMessage.includes('Failed to fetch') || 
-                               errorMessage.includes('ERR_CONNECTION_RESET') ||
-                               errorMessage.includes('ERR_CONNECTION_REFUSED') ||
-                               errorMessage.includes('network') ||
-                               apiError.name === 'TypeError';
-      
+      const isConnectionError = errorMessage.includes('Failed to fetch') ||
+        errorMessage.includes('ERR_CONNECTION_RESET') ||
+        errorMessage.includes('ERR_CONNECTION_REFUSED') ||
+        errorMessage.includes('network') ||
+        apiError.name === 'TypeError';
+
       if (isConnectionError || errorMessage.includes('404') || errorMessage.includes('not found')) {
         // Development mode: Allow bypass with sample location for testing
         if (DEV_MODE) {
@@ -196,7 +196,7 @@ export async function verifyInsideCampus() {
             isDevelopment: true
           }
         }
-        
+
         return {
           ok: false,
           details: `Cannot connect to backend server at ${API_BASE}. Please ensure the backend is running.`,
@@ -205,7 +205,7 @@ export async function verifyInsideCampus() {
           connectionError: true
         }
       }
-      
+
       // NO FALLBACK - Geofencing is required
       return {
         ok: false,
@@ -216,16 +216,16 @@ export async function verifyInsideCampus() {
     }
   } catch (error) {
     console.error('❌ Geolocation error:', error)
-    
+
     // NO BYPASS - Geofencing is mandatory
     // Only allow localhost for development if explicitly needed
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    
+
     // For development only, provide helpful error message
     if (isDevelopment) {
       console.warn('⚠️ Geolocation failed in development:', error.message)
     }
-    
+
     return {
       ok: false,
       details: error.message || 'Failed to get location. Please enable location services and ensure GPS is working.',

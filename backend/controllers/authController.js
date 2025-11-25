@@ -9,7 +9,7 @@ export const studentLogin = async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' });
     }
 
-    if (!latitude || !longitude) {
+    if (latitude === undefined || longitude === undefined) {
       return res.status(400).json({ error: 'Location coordinates required for login' });
     }
 
@@ -30,7 +30,7 @@ export const wardenLogin = async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' });
     }
 
-    if (!latitude || !longitude) {
+    if (latitude === undefined || longitude === undefined) {
       return res.status(400).json({ error: 'Location coordinates required for login' });
     }
 

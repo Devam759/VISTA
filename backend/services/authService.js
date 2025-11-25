@@ -23,7 +23,7 @@ async function getCampusPolygon() {
   }
 
   const polygon = rows.map(r => ({ lat: r.lat, lng: r.lng }));
-  
+
   if (polygon.length > 0) {
     const first = polygon[0];
     const last = polygon[polygon.length - 1];
@@ -41,7 +41,7 @@ async function getCampusPolygon() {
  * Verify geofence during login
  */
 async function verifyGeofenceLogin(latitude, longitude, accuracy) {
-  if (!latitude || !longitude) {
+  if (latitude === undefined || longitude === undefined) {
     throw new Error('Location coordinates required for login');
   }
 
@@ -63,11 +63,11 @@ async function verifyGeofenceLogin(latitude, longitude, accuracy) {
       minLng: Math.min(...polygon.map(p => p.lng)),
       maxLng: Math.max(...polygon.map(p => p.lng))
     };
-    
+
     console.log(`❌ Geofence verification failed for login`);
     console.log(`   User Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
     console.log(`   Distance to boundary: ${Math.round(result.distanceToBoundary || 0)}m`);
-    
+
     throw new Error(`Location verification failed: You are ${Math.round(result.distanceToBoundary || 0)}m outside campus boundary. You must be on campus to login.`);
   }
 
@@ -77,11 +77,11 @@ async function verifyGeofenceLogin(latitude, longitude, accuracy) {
 export const authenticateStudent = async (email, password, latitude, longitude, accuracy) => {
   const emailLower = email.trim().toLowerCase();
   console.log(`🔍 Authenticating student: ${emailLower}`);
-  
+
   // GEOFENCE CHECK - REQUIRED FOR LOGIN
   console.log(`📍 Verifying geofence for login...`);
   await verifyGeofenceLogin(latitude, longitude, accuracy);
-  
+
   const student = await prisma.student.findUnique({
     where: { email: emailLower },
     include: { hostel: true }
@@ -95,7 +95,7 @@ export const authenticateStudent = async (email, password, latitude, longitude, 
   console.log(`✅ Student found: ${student.name}`);
   const validPassword = await bcrypt.compare(password, student.password);
   console.log(`🔐 Password valid: ${validPassword}`);
-  
+
   if (!validPassword) {
     throw new Error('Invalid credentials');
   }
@@ -127,11 +127,11 @@ export const authenticateStudent = async (email, password, latitude, longitude, 
 export const authenticateWarden = async (email, password, latitude, longitude, accuracy) => {
   const emailLower = email.trim().toLowerCase();
   console.log(`🔍 Authenticating warden: ${emailLower}`);
-  
+
   // GEOFENCE CHECK - REQUIRED FOR LOGIN
   console.log(`📍 Verifying geofence for login...`);
   await verifyGeofenceLogin(latitude, longitude, accuracy);
-  
+
   const warden = await prisma.warden.findUnique({
     where: { email: emailLower },
     include: { hostel: true }
@@ -145,7 +145,7 @@ export const authenticateWarden = async (email, password, latitude, longitude, a
   console.log(`✅ Warden found: ${warden.name}`);
   const validPassword = await bcrypt.compare(password, warden.password);
   console.log(`🔐 Password valid: ${validPassword}`);
-  
+
   if (!validPassword) {
     throw new Error('Invalid credentials');
   }
