@@ -9,31 +9,47 @@ export async function apiFetch(path, { method = 'GET', body, headers = {}, token
   const baseUrl = API_BASE_URL
   const url = `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
   const isJSONBody = body && typeof body === 'object' && !(body instanceof FormData)
-  const res = await fetch(url, {
-    method,
-    headers: {
-      ...(isJSONBody ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: isJSONBody ? JSON.stringify(body) : body,
-    credentials: 'include',
-  })
 
-  const text = await res.text()
-  let data
+  // Add timeout to handle Render cold starts (can take 30-60s)
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 second timeout
+
   try {
-    data = text ? JSON.parse(text) : null
-  } catch (_e) {
-    data = text
-  }
+    const res = await fetch(url, {
+      method,
+      headers: {
+        ...(isJSONBody ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      body: isJSONBody ? JSON.stringify(body) : body,
+      credentials: 'include',
+      signal: controller.signal
+    })
 
-  if (!res.ok) {
-    const message = (data && (data.error || data.message)) || res.statusText || 'Request failed'
-    const err = new Error(message)
-    err.status = res.status
-    err.data = data
-    throw err
+    clearTimeout(timeoutId)
+
+    const text = await res.text()
+    let data
+    try {
+      data = text ? JSON.parse(text) : null
+    } catch (_e) {
+      data = text
+    }
+
+    if (!res.ok) {
+      const message = (data && (data.error || data.message)) || res.statusText || 'Request failed'
+      const err = new Error(message)
+      err.status = res.status
+      err.data = data
+      throw err
+    }
+    return data
+  } catch (error) {
+    clearTimeout(timeoutId)
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out. The server might be waking up (Render free tier). Please try again in a moment.')
+    }
+    throw error
   }
-  return data
 }
