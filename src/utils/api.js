@@ -6,7 +6,8 @@ export const API_BASE_URL = (
 ).replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {
-  const url = `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`
+  const baseUrl = getApiBaseUrl_Dynamic()
+  const url = `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
   const isJSONBody = body && typeof body === 'object' && !(body instanceof FormData)
   const res = await fetch(url, {
     method,

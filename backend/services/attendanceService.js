@@ -1,4 +1,3 @@
-import axios from 'axios';
 import prisma from '../config/prisma.js';
 import { getToday, getDateRange, formatDate, toISODateString } from '../utils/dateUtils.js';
 
@@ -231,7 +230,7 @@ export const markAttendance = async (studentId, testImage) => {
     throw new Error(`❌ Face verification failed (${Math.round(similarity)}% match). Your face does not match the enrolled image. Please try again.`);
   }
 
-  console.log(`✅ Face verified successfully for ${student.rollNo}`);
+  console.log(`✅ Face verified successfully for ${student.rollNo} with ${confidence}% confidence`);
 
   // Create new attendance record with consistent date handling
   const attendanceDate = new Date();
@@ -279,10 +278,14 @@ export const markAttendance = async (studentId, testImage) => {
     faceVerified: attendance.faceVerified
   });
 
-  console.log(`✅ Attendance marked: ${student.rollNo} - ${student.name} - ${timeCheck.status}`);
+  const isUpdate = attendance.createdAt && (now.getTime() - new Date(attendance.createdAt).getTime()) < 1000;
+  const action = isUpdate ? 'updated' : 'marked';
+
+  console.log(`✅ Attendance ${action}: ${student.rollNo} - ${student.name} - ${timeCheck.status}`);
+  console.log(`   Attendance Record: ID=${attendance.id}, Date=${attendance.date}, Status=${attendance.status}, FaceVerified=${attendance.faceVerified}`);
 
   return {
-    message: `✅ Attendance marked successfully as ${timeCheck.status}!`,
+    message: `✅ Attendance ${action} successfully as ${timeCheck.status}!`,
     status: timeCheck.status,
     faceVerified: true,
     similarity: Math.round(similarity),
@@ -301,9 +304,16 @@ export const markAttendance = async (studentId, testImage) => {
   };
 };
 
+/**
+ * Get today's attendance for a student
+ * @param {number} studentId - Student ID
+ * @returns {Object} - Today's attendance or NOT_MARKED
+ */
 export const getTodayAttendance = async (studentId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  console.log(`🔍 Checking attendance for student ${studentId} on ${today.toISOString().split('T')[0]}`);
 
   const attendance = await prisma.attendance.findFirst({
     where: {
@@ -313,12 +323,20 @@ export const getTodayAttendance = async (studentId) => {
   });
 
   if (!attendance) {
+    console.log(`   No attendance found - returning NOT_MARKED`);
     return { status: 'NOT_MARKED' };
   }
 
+  console.log(`   Attendance found: ${attendance.status}`);
   return attendance;
 };
 
+/**
+ * Get attendance history for a student
+ * @param {number} studentId - Student ID
+ * @param {number} limit - Number of records to return
+ * @returns {Array} - Attendance records
+ */
 export const getAttendanceHistory = async (studentId, limit = 30) => {
   const attendance = await prisma.attendance.findMany({
     where: { studentId },

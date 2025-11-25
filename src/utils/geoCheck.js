@@ -6,13 +6,21 @@ const getApiBase = () => {
   
   // Auto-detect if running on localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:5000'
+    return 'http://localhost:4000'
   }
   
   return 'https://vista-ia7c.onrender.com'
 }
 
 const API_BASE = getApiBase()
+
+// Development mode - bypass geolocation for testing
+const DEV_MODE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const SAMPLE_LOCATION = {
+  latitude: 26.9136,
+  longitude: 75.7858,
+  accuracy: 50
+}
 
 export async function verifyInsideCampus() {
   try {
@@ -175,6 +183,19 @@ export async function verifyInsideCampus() {
                                apiError.name === 'TypeError';
       
       if (isConnectionError || errorMessage.includes('404') || errorMessage.includes('not found')) {
+        // Development mode: Allow bypass with sample location for testing
+        if (DEV_MODE) {
+          console.warn('⚠️ DEVELOPMENT MODE: Backend not available. Using sample location for testing.')
+          console.warn('📍 Sample Location:', SAMPLE_LOCATION)
+          return {
+            ok: true,
+            details: '✅ Development Mode: Using sample location (backend not available)',
+            coords: SAMPLE_LOCATION,
+            accuracy: SAMPLE_LOCATION.accuracy,
+            isDevelopment: true
+          }
+        }
+        
         return {
           ok: false,
           details: `Cannot connect to backend server at ${API_BASE}. Please ensure the backend is running.`,
