@@ -4,8 +4,7 @@ import { verifyGeoFence } from '../middleware/verifyGeo.js';
 import {
   markAttendance,
   getTodayAttendance,
-  getAttendanceHistory,
-  enrollFace
+  getAttendanceHistory
 } from '../controllers/attendanceController.js';
 
 const router = express.Router();

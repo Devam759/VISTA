@@ -7,6 +7,12 @@ export default function AccessGate({ children }) {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    // Skip checks in development mode
+    if (isDev) {
+      setChecking(false)
+      return
+    }
+    
     checkAccess()
     // Re-check every 5 minutes
     const interval = setInterval(checkAccess, 5 * 60 * 1000)

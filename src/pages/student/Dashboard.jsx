@@ -42,7 +42,9 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     let active = true
-    ;(async () => {
+    let interval
+    
+    const fetchTodayStatus = async () => {
       try {
         const data = await apiFetch('/attendance/today', { token })
         const status = data?.status || 'NOT_MARKED'
@@ -50,8 +52,18 @@ export default function StudentDashboard() {
       } catch (e) {
         if (active) setTodayStatus('NOT_MARKED')
       }
-    })()
-    return () => { active = false }
+    }
+    
+    // Fetch immediately
+    fetchTodayStatus()
+    
+    // Refresh every 5 seconds to show updated attendance
+    interval = setInterval(fetchTodayStatus, 5000)
+    
+    return () => { 
+      active = false
+      if (interval) clearInterval(interval)
+    }
   }, [token])
 
   useEffect(() => {

@@ -18,10 +18,21 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const login = async (email, password) => {
+  const login = async (email, password, coords) => {
     const em = (email || '').trim()
     const pass = (password || '').trim()
     if (!em || !pass) throw new Error('Please enter both email and password')
+
+    if (!coords || !coords.latitude || !coords.longitude) {
+      throw new Error('Location coordinates required')
+    }
+
+    const body = {
+      email: em,
+      password: pass,
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+    }
 
     let data
     let error = null

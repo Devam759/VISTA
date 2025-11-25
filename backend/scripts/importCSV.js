@@ -14,7 +14,7 @@ async function importCSV() {
 
   try {
     // Read CSV file
-    const csvPath = path.join(__dirname, '../../publc/FINAL SHEET OF BH-2.csv');
+    const csvPath = path.join(__dirname, '../../public/FINAL SHEET OF BH-2.csv');
     const csvContent = fs.readFileSync(csvPath, 'utf-8');
     const lines = csvContent.split('\n');
 
@@ -94,7 +94,8 @@ async function importCSV() {
       
       students.push({
         name: studentName,
-        rollNo: rollNo || regNo || `TEMP-${Date.now()}-${Math.random()}`,
+        rollNo: rollNo || `TEMP-${Date.now()}-${Math.random()}`,
+        regNo: regNo || null,
         roomNo: roomNo,
         hostelId: hostel.id,
         program: program,
@@ -102,7 +103,8 @@ async function importCSV() {
         address: address || 'Not provided',
         email: email,
         password: await bcrypt.hash('123', 10), // Default password
-        faceIdUrl: null
+        faceIdUrl: null,
+        faceDescriptor: null
       });
     }
 
@@ -145,15 +147,37 @@ async function importCSV() {
 
     for (const student of students) {
       try {
-        await prisma.student.create({
-          data: student
+        // Prepare student data without undefined values
+        const studentData = {
+          name: student.name,
+          rollNo: student.rollNo,
+          regNo: student.regNo,
+          roomNo: student.roomNo,
+          program: student.program,
+          mobile: student.mobile,
+          address: student.address,
+          faceIdUrl: null,
+          faceDescriptor: null,
+          password: student.password,
+          hostelId: student.hostelId
+        };
+
+        // Remove undefined values
+        Object.keys(studentData).forEach(key => studentData[key] === undefined && delete studentData[key]);
+
+        // Use upsert to handle duplicates - update if exists, create if not
+        await prisma.student.upsert({
+          where: { email: student.email },
+          update: studentData,
+          create: student
         });
         imported++;
         if (imported % 10 === 0) {
           console.log(`   Imported ${imported}/${students.length}...`);
         }
       } catch (error) {
-        // Student might already exist (duplicate email or roll number)
+        // Log error for debugging
+        console.error(`   ⚠️ Error importing ${student.email}:`, error.message);
         skipped++;
       }
     }

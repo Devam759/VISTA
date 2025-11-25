@@ -18,8 +18,8 @@ export default function EnrollFace() {
   const totalSteps = 3
 
   useEffect(() => {
-    // Check if already enrolled
-    if (user?.faceIdUrl) {
+    // Check if already enrolled (check for faceDescriptor or faceIdUrl)
+    if (user?.faceIdUrl || user?.faceDescriptor) {
       setEnrolled(true)
     }
   }, [user])
@@ -51,11 +51,11 @@ export default function EnrollFace() {
       setSubmitting(true)
       const response = await apiFetch('/attendance/enroll-face', {
         method: 'POST',
-        body: { images },
+        body: { faceData: images[0] }, // Send first image as primary face data
         token
       })
       
-      push('Face enrolled successfully!', 'success')
+      push('Face enrolled successfully! You can now mark attendance.', 'success')
       setTimeout(() => {
         navigate('/student/dashboard')
       }, 2000)
@@ -148,7 +148,7 @@ export default function EnrollFace() {
               </div>
             </div>
 
-            <Camera onCapture={handleCapture} active={camOn} />
+            <Camera onCapture={handleCapture} active={camOn} showFaceDetection={true} />
 
             {!camOn && images.length === 0 && (
               <div className="mt-4 p-8 bg-gray-50 rounded-xl text-center">

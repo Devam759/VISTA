@@ -32,9 +32,16 @@ export default function Login() {
 
   const onSubmit = async e => {
     e.preventDefault()
+
+    if (!geoStatus.ok || !locationCoords) {
+      push('Location not verified. Please ensure you are on campus and location services are enabled.', 'error')
+      checkAccessRequirements() // Re-trigger check
+      return
+    }
+
     try {
       setLoading(true)
-      const u = await login(form.email, form.password)
+      const u = await login(form.email, form.password, locationCoords)
       push('Login successful', 'success')
       navigate(u.role === 'warden' ? '/warden/dashboard' : '/student/dashboard', { replace: true })
     } catch (err) {
@@ -151,6 +158,11 @@ export default function Login() {
                   <p className="font-semibold text-purple-900 mb-1">Warden Account</p>
                   <button type="button" onClick={() => fill('warden@jklu.edu.in', '123')} className="text-left text-purple-700 font-mono text-xs hover:underline cursor-pointer">warden@jklu.edu.in</button>
                   <button type="button" onClick={() => fill('warden@jklu.edu.in', '123')} className="block text-left text-purple-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
+                </div>
+                <div className="border-t border-indigo-200 pt-3 bg-yellow-50 rounded p-2">
+                  <p className="text-xs text-yellow-800">
+                    <strong>Note:</strong> All passwords are <code className="bg-yellow-100 px-1 rounded">123</code>
+                  </p>
                 </div>
               </div>
             )}

@@ -37,7 +37,8 @@ model Room {
 model Student {
   id         Int          @id @default(autoincrement())
   name       String       @db.VarChar(100)
-  rollNo     String       @unique @map("roll_no") @db.VarChar(30)
+  rollNo     String?      @map("roll_no") @db.VarChar(30)
+  regNo      String?      @map("reg_no") @db.VarChar(30)
   roomNo     String       @map("room_no") @db.VarChar(10)
   regNo      String?      @map("reg_no") @db.VarChar(40)
   roomId     Int?         @map("room_id")

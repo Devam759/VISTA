@@ -23,6 +23,8 @@ export const getHostelAttendance = async (wardenId, date) => {
   console.log(`📅 Date range: ${formatDate(targetDate)} to ${formatDate(nextDay)}`);
   console.log(`📅 Database query date: ${formattedDate}`);
 
+  console.log(`📊 Fetching attendance for warden hostel ${warden.hostel.name} (ID: ${warden.hostelId}) on ${targetDate.toISOString().split('T')[0]}`);
+
   // Get all students in this hostel with their attendance status
   const query = `
     SELECT 

@@ -88,11 +88,12 @@ export function isPointInPolygon(lat, lng, polygon) {
 }
 
 /**
- * Check if point is inside polygon with GPS accuracy tolerance
+ * STRICT REAL-WORLD GEOFENCING - NO TOLERANCE
+ * Check if point is inside polygon - MUST be clearly inside
  * @param {number} lat - Latitude of the point
  * @param {number} lng - Longitude of the point
  * @param {Array} polygon - Array of {lat, lng} objects forming the polygon
- * @param {number} accuracy - GPS accuracy in meters (optional)
+ * @param {number} accuracy - GPS accuracy in meters (NOT USED - STRICT MODE)
  * @returns {Object} - { inside: boolean, distanceToBoundary: number }
  */
 export function checkPointWithTolerance(lat, lng, polygon, accuracy = null) {
@@ -105,10 +106,10 @@ export function checkPointWithTolerance(lat, lng, polygon, accuracy = null) {
   // Calculate distance to boundary
   const distance = distanceToPolygon(lat, lng, polygon);
   
-  // If GPS accuracy is provided and point is within accuracy radius of boundary, allow it
-  // This handles laptop GPS inaccuracy
-  if (accuracy && accuracy > 50 && distance <= accuracy) {
-    return { inside: true, distanceToBoundary: distance };
+  // STRICT MODE: NO TOLERANCE - Must be clearly inside polygon
+  // GPS accuracy is logged but NOT used to allow out-of-bounds users
+  if (accuracy) {
+    console.log(`⚠️ STRICT GEOFENCING: User is ${Math.round(distance)}m outside boundary (GPS accuracy: ±${Math.round(accuracy)}m) - DENIED`);
   }
   
   return { inside: false, distanceToBoundary: distance };

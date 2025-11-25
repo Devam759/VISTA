@@ -20,8 +20,23 @@ export default function CheckAccess() {
     }
   }
 
+  const bypassChecks = () => {
+    setLocOk(true)
+    setWifiOk(true)
+    setGeoDetails('✅ Development Mode: Bypassed')
+    setWifiDetails('✅ Development Mode: Bypassed')
+    setError('')
+    setLoading(false)
+    setTimeout(() => navigate('/login', { replace: true }), 500)
+  }
+
   useEffect(() => {
-    runChecks()
+    // Auto-bypass geolocation checks in development
+    if (isDev) {
+      bypassChecks()
+    } else {
+      runChecks()
+    }
   }, [])
 
   return (
