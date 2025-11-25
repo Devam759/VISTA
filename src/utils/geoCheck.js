@@ -13,6 +13,7 @@ const getApiBase = () => {
 }
 
 const API_BASE = getApiBase()
+const CAMPUS_CENTER = { lat: 0, lng: 0 }
 
 export async function verifyInsideCampus() {
   try {

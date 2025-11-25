@@ -7,11 +7,13 @@ export default function CheckAccess() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [locOk, setLocOk] = useState(false)
+  const [geoDetails, setGeoDetails] = useState('')
 
   const runChecks = async () => {
     setLoading(true)
     const geo = await verifyInsideCampus()
     setLocOk(!!geo.ok)
+    setGeoDetails(geo.details || '')
     setLoading(false)
     if (geo.ok) {
       setTimeout(() => navigate('/login', { replace: true }), 600)
