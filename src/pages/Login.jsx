@@ -161,13 +161,13 @@ export default function Login() {
               <div className="mt-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl text-sm space-y-3">
                 <div>
                   <p className="font-semibold text-indigo-900 mb-1">Student Account</p>
-                  <button type="button" onClick={() => fill('btech250231@jklu.edu.in', '123')} className="text-left text-indigo-700 font-mono text-xs hover:underline cursor-pointer">btech250231@jklu.edu.in</button>
-                  <button type="button" onClick={() => fill('btech250231@jklu.edu.in', '123')} className="block text-left text-indigo-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
+                  <button type="button" onClick={() => fill('student1@jklu.edu.in', '123')} className="text-left text-indigo-700 font-mono text-xs hover:underline cursor-pointer">student1@jklu.edu.in</button>
+                  <button type="button" onClick={() => fill('student1@jklu.edu.in', '123')} className="block text-left text-indigo-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
                 </div>
                 <div className="border-t border-indigo-200 pt-3">
                   <p className="font-semibold text-purple-900 mb-1">Warden Account</p>
-                  <button type="button" onClick={() => fill('warden@jklu.edu.in', '123')} className="text-left text-purple-700 font-mono text-xs hover:underline cursor-pointer">warden@jklu.edu.in</button>
-                  <button type="button" onClick={() => fill('warden@jklu.edu.in', '123')} className="block text-left text-purple-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
+                  <button type="button" onClick={() => fill('karan@jklu.edu.in', '123')} className="text-left text-purple-700 font-mono text-xs hover:underline cursor-pointer">karan@jklu.edu.in</button>
+                  <button type="button" onClick={() => fill('karan@jklu.edu.in', '123')} className="block text-left text-purple-600 font-mono text-xs hover:underline cursor-pointer">Password: 123</button>
                 </div>
                 <div className="border-t border-indigo-200 pt-3 bg-yellow-50 rounded p-2">
                   <p className="text-xs text-yellow-800">
