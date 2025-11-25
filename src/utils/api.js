@@ -2,7 +2,7 @@
 export const API_BASE_URL = (
   (typeof window !== 'undefined' && window.APP_CONFIG?.API_URL) ||
   import.meta.env.VITE_API_URL ||
-  ((typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 'https://vista-ia7c.onrender.com' : 'https://vista-ia7c.onrender.com')
+  ((typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 'http://localhost:4000' : 'https://vista-ia7c.onrender.com')
 ).replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {

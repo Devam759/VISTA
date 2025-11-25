@@ -11,12 +11,12 @@ export default defineConfig({
       allow: ['..']
     },
     proxy: {
-      '/auth': 'http://127.0.0.1:5000',
-      '/attendance': 'http://127.0.0.1:5000',
-      '/warden': 'http://127.0.0.1:5000',
-      '/face': 'http://127.0.0.1:5000',
-      '/api': 'http://127.0.0.1:5000',
-      '/debug': 'http://127.0.0.1:5000'
+      '/auth': 'http://127.0.0.1:4000',
+      '/attendance': 'http://127.0.0.1:4000',
+      '/warden': 'http://127.0.0.1:4000',
+      '/face': 'http://127.0.0.1:4000',
+      '/api': 'http://127.0.0.1:4000',
+      '/debug': 'http://127.0.0.1:4000'
     }
   }
 })

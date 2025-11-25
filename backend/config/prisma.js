@@ -12,7 +12,8 @@ const prisma = new PrismaClient({
     console.log('✅ Prisma connected to MySQL');
   } catch (err) {
     console.error('❌ Prisma connection failed:', err.message);
-    process.exit(1);
+    console.error('⚠️  Server will continue running, but database operations will fail');
+    // Don't exit - let the server handle DB errors gracefully
   }
 })();
 
