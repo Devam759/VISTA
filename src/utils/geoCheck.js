@@ -6,7 +6,7 @@ const getApiBase = () => {
 
   // Auto-detect if running on localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://127.0.0.1:5000'
+    return 'https://vista-ia7c.onrender.com'
   }
 
   return 'https://vista-ia7c.onrender.com'

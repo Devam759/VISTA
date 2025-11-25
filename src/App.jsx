@@ -34,6 +34,7 @@ export default function App() {
               </div>
             )}
             <AppRoutes />
+            <Analytics />
           </div>
         </ToastProvider>
       </AuthProvider>
