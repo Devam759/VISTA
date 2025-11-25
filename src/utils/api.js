@@ -1,24 +1,9 @@
-// Get API base URL - use localhost:4000 for development, render.com for production
-const getApiBaseUrl = () => {
-  // Check environment variable first
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL
-  }
-  
-  // Auto-detect localhost for development
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    return 'http://localhost:4000'
-  }
-  
-  // Default to production
-  return 'https://vista-ia7c.onrender.com'  // Backend Render URL
-}
-
-// Make it a getter function to always evaluate at runtime
-export const getApiBaseUrl_Dynamic = () => getApiBaseUrl().replace(/\/$/, '')
-
-// Keep the static version for backwards compatibility
-export const API_BASE_URL = getApiBaseUrl().replace(/\/$/, '')
+// First check for window.APP_CONFIG, then Vite env var, then use Render URL as fallback
+export const API_BASE_URL = (
+  (typeof window !== 'undefined' && window.APP_CONFIG?.API_URL) ||
+  import.meta.env.VITE_API_URL || 
+  'https://vista-ia7c.onrender.com'
+).replace(/\/$/, '')
 
 export async function apiFetch(path, { method = 'GET', body, headers = {}, token } = {}) {
   const baseUrl = getApiBaseUrl_Dynamic()

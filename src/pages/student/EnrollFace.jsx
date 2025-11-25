@@ -49,9 +49,7 @@ export default function EnrollFace() {
 
     try {
       setSubmitting(true)
-      // Use the first image as the primary face data
-      // In production, you might want to process all 3 images
-      const response = await apiFetch('/face/enroll', {
+      const response = await apiFetch('/attendance/enroll-face', {
         method: 'POST',
         body: { faceData: images[0] }, // Send first image as primary face data
         token

@@ -198,7 +198,7 @@ app.post('/debug/geolocation', async (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/attendance', studentRoutes);
 app.use('/warden', wardenRoutes);
-app.use('/face', faceRoutes); // Face enrollment and verification
+app.use('/face', faceRoutes); // Face recognition endpoints
 app.use('/api', seedRoutes); // Seed endpoint at /api/seed
 
 // Health check

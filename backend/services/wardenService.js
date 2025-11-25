@@ -1,4 +1,5 @@
 import prisma from '../config/prisma.js';
+import { getDateRange, formatDate } from '../utils/dateUtils.js';
 
 export const getHostelAttendance = async (wardenId, date) => {
   // Get warden's hostel
@@ -11,62 +12,175 @@ export const getHostelAttendance = async (wardenId, date) => {
     throw new Error('Warden not found');
   }
 
-  const targetDate = date ? new Date(date) : new Date();
-  targetDate.setHours(0, 0, 0, 0);
+  // Get date range using utility function
+  const { start: targetDate, end: nextDay } = getDateRange(date);
+  
+  // Format dates for database query (YYYY-MM-DD)
+  const formattedDate = targetDate.toISOString().split('T')[0];
+  
+  // Log the date range in a user-friendly format
+  console.log(`📊 Fetching attendance for hostel ${warden.hostel.name} on ${formatDate(targetDate)}`);
+  console.log(`📅 Date range: ${formatDate(targetDate)} to ${formatDate(nextDay)}`);
+  console.log(`📅 Database query date: ${formattedDate}`);
 
   console.log(`📊 Fetching attendance for warden hostel ${warden.hostel.name} (ID: ${warden.hostelId}) on ${targetDate.toISOString().split('T')[0]}`);
 
   // Get all students in this hostel with their attendance status
-  const students = await prisma.student.findMany({
-    where: { hostelId: warden.hostelId },
-    include: {
-      attendance: {
-        where: { date: targetDate },
-        take: 1
-      },
-      hostel: { select: { name: true } }
-    },
-    orderBy: [{ roomNo: 'asc' }, { rollNo: 'asc' }]
-  });
-
-  console.log(`📊 Found ${students.length} students in hostel`);
+  const query = `
+    SELECT 
+      s.*, 
+      h.name as hostelName,
+      (
+        SELECT 
+          COALESCE(
+            (
+              SELECT 
+                CONCAT(
+                  '[',
+                  GROUP_CONCAT(
+                    JSON_OBJECT(
+                      'id', a.id,
+                      'date', a.date,
+                      'time', a.time,
+                      'status', a.status,
+                      'faceVerified', a.face_verified
+                    )
+                  ),
+                  ']'
+                )
+              FROM 
+                attendance a 
+              WHERE 
+                a.student_id = s.id 
+                AND DATE(a.date) = ?
+              ORDER BY 
+                a.time DESC
+              LIMIT 1
+            ),
+            '[]'
+          )
+      ) as attendance
+    FROM 
+      students s
+      JOIN hostels h ON s.hostel_id = h.id
+    WHERE 
+      s.hostel_id = ?
+    ORDER BY 
+      s.room_no ASC, 
+      s.roll_no ASC
+  `;
   
-  // Log students with attendance
-  const attendedStudents = students.filter(s => s.attendance.length > 0);
-  console.log(`📊 Students with attendance records: ${attendedStudents.length}`);
-  attendedStudents.forEach(s => {
-    console.log(`   - ${s.rollNo} ${s.name}: ${s.attendance[0].status}`);
+  let students;
+  try {
+    students = await prisma.$queryRawUnsafe(query, formattedDate, warden.hostelId);
+    console.log(`✅ Successfully fetched ${students.length} students`);
+  } catch (error) {
+    console.error('❌ Error executing query:', error);
+    throw error;
+  }
+  
+  // Parse the attendance data from JSON string
+  const parsedStudents = students.map(s => {
+    let attendance = [];
+    try {
+      attendance = s.attendance ? JSON.parse(s.attendance) : [];
+    } catch (e) {
+      console.warn('❌ Failed to parse attendance for student', s.id, ':', e.message);
+    }
+    
+    return {
+      ...s,
+      attendance,
+      hostel: { name: s.hostelName }
+    };
   });
+  
+  try {
+    // Log the raw attendance data for debugging
+    const debugData = parsedStudents.map(s => ({
+      id: s.id,
+      rollNo: s.rollNo,
+      attendance: Array.isArray(s.attendance) ? s.attendance.map(a => ({
+        date: a.date,
+        status: a.status,
+        time: a.time
+      })) : []
+    }));
+    
+    console.log('📝 Raw attendance data:', JSON.stringify(debugData, null, 2));
+    
+    console.log(`👥 Found ${parsedStudents.length} students in hostel`);
+    
+    // Log attendance found
+    const attendanceCount = parsedStudents.filter(s => 
+      Array.isArray(s.attendance) && s.attendance.length > 0
+    ).length;
+    
+    console.log(`✅ Attendance records found: ${attendanceCount}`);
 
-  // Format response
-  const formattedStudents = students.map(s => ({
-    id: s.id,
-    rollNo: s.rollNo,
-    name: s.name,
-    roomNo: s.roomNo,
-    hostel: s.hostel.name,
-    status: s.attendance[0]?.status || null,
-    time: s.attendance[0]?.time || null,
-    faceVerified: s.attendance[0]?.faceVerified || false
-  }));
+    // Format response
+    const formattedStudents = parsedStudents.map(s => {
+      const attendance = Array.isArray(s.attendance) && s.attendance[0] ? s.attendance[0] : null;
+      let timeValue = null;
+      
+      if (attendance && attendance.time) {
+        // If time is already a string, parse it
+        if (typeof attendance.time === 'string') {
+          // Handle different time string formats
+          if (attendance.time.includes('T')) {
+            timeValue = new Date(attendance.time);
+          } else {
+            // If it's just a time string, combine with the date
+            const [hours, minutes, seconds] = attendance.time.split(':');
+            const date = new Date(attendance.date || targetDate);
+            date.setHours(hours, minutes, seconds || 0);
+            timeValue = date;
+          }
+        } else {
+          // If it's a Date object or timestamp
+          timeValue = new Date(attendance.time);
+        }
+      }
+      
+      return {
+        id: s.id,
+        rollNo: s.rollNo,
+        name: s.name,
+        roomNo: s.roomNo,
+        hostel: s.hostel?.name || 'Unknown Hostel',
+        status: attendance?.status || null,
+        time: timeValue,
+        faceVerified: attendance?.faceVerified || false,
+        // Pass raw date and time for debugging
+        _rawAttendance: attendance
+      };
+    });
 
-  // Calculate metrics
-  const metrics = {
-    present: formattedStudents.filter(s => s.status === 'Marked').length,
-    late: formattedStudents.filter(s => s.status === 'Late').length,
-    absent: formattedStudents.filter(s => !s.status).length,
-    total: formattedStudents.length
-  };
+    // Calculate metrics
+    const presentCount = formattedStudents.filter(s => s.status === 'Marked').length;
+    const lateCount = formattedStudents.filter(s => s.status === 'Late').length;
+    const absentCount = formattedStudents.length - presentCount - lateCount;
 
-  console.log(`📊 Attendance metrics: Present=${metrics.present}, Late=${metrics.late}, Absent=${metrics.absent}`);
+    const metrics = {
+      present: presentCount,
+      late: lateCount,
+      absent: absentCount > 0 ? absentCount : 0,
+      total: formattedStudents.length
+    };
 
-  return {
-    date: targetDate.toISOString().split('T')[0],
-    hostel: warden.hostel.name,
-    metrics,
-    students: formattedStudents
-  };
+    return {
+      date: targetDate.toISOString().split('T')[0],
+      hostel: warden.hostel?.name || 'Unknown Hostel',
+      metrics,
+      students: formattedStudents
+    };
+  } catch (error) {
+    console.error('❌ Error formatting response:', error);
+    throw new Error('Failed to format attendance data');
+  }
 };
+
+// AC/NAC CSV import functionality and helpers removed
 
 export const getAllAttendance = async (date) => {
   const targetDate = date ? new Date(date) : new Date();
@@ -187,12 +301,14 @@ export const getStudentsList = async (wardenId, search) => {
     select: {
       id: true,
       rollNo: true,
+      regNo: true,
       name: true,
       roomNo: true,
       mobile: true,
       email: true,
       program: true,
-      hostel: { select: { name: true } }
+      hostel: { select: { name: true } },
+      room: { select: { roomNo: true } }
     },
     orderBy: [{ roomNo: 'asc' }, { rollNo: 'asc' }]
   });

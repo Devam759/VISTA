@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password, coords) => {
     const em = (email || '').trim()
     const pass = (password || '').trim()
-    if (!em || !pass) throw new Error('Enter credentials')
+    if (!em || !pass) throw new Error('Please enter both email and password')
 
     if (!coords || !coords.latitude || !coords.longitude) {
       throw new Error('Location coordinates required')
@@ -35,29 +35,42 @@ export function AuthProvider({ children }) {
     }
 
     let data
+    let error = null
+    
+    // Try student login first
     try {
-      data = await apiFetch('/auth/student-login', { method: 'POST', body })
+      data = await apiFetch('/auth/student-login', { 
+        method: 'POST', 
+        body: { email: em, password: pass } 
+      })
     } catch (e1) {
-      // If student login fails, try warden login
-      try {
-        data = await apiFetch('/auth/warden-login', { method: 'POST', body })
-      } catch (e2) {
-        // Throw the most relevant error
-        // If the first error was a 401 (unauthorized), the second error is more specific
-        if (e1.status === 401 && e2.message) {
-          throw e2
+      error = e1
+      // If student login fails with 401, try warden login
+      if (e1.status === 401) {
+        try {
+          data = await apiFetch('/auth/warden-login', { 
+            method: 'POST', 
+            body: { email: em, password: pass } 
+          })
+          error = null
+        } catch (e2) {
+          error = e2
         }
-        throw e1 // Otherwise, throw the original student login error
       }
     }
 
-    const { token: tkn, role, user: u } = data || {}
-    if (!tkn || !u) throw new Error('Invalid response from server')
-    const auth = { token: tkn, role, user: { ...u, role } }
-    localStorage.setItem('vista-auth', JSON.stringify(auth))
-    setUser(auth.user)
-    setToken(tkn)
-    return auth.user
+    // If we have data, login was successful
+    if (data && data.token && data.user) {
+      const { token: tkn, role, user: u } = data
+      const auth = { token: tkn, role, user: { ...u, role } }
+      localStorage.setItem('vista-auth', JSON.stringify(auth))
+      setUser(auth.user)
+      setToken(tkn)
+      return auth.user
+    }
+    
+    // If we get here, all login attempts failed
+    throw error || new Error('Login failed. Please check your credentials.')
   }
 
   const logout = () => {
